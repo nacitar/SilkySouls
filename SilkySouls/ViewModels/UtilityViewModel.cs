@@ -1,4 +1,4 @@
-﻿using SilkySouls.Memory;
+﻿using System.Threading.Tasks;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
@@ -25,14 +25,20 @@ namespace SilkySouls.ViewModels
 
         private readonly UtilityService _utilityService;
         private readonly PlayerViewModel _playerViewModel;
+        private readonly IParamService _paramService;
         private readonly HotkeyManager _hotkeyManager;
 
+        public const int EquipParamGoodsTableIdx = 3;
+        public const int EstusParamRowIdx = 32;
+        public const int LordVesselIconId = 2085;
+        public const int IconIdOffset = 0x2C;
 
         public UtilityViewModel(UtilityService utilityService, HotkeyManager hotkeyManager,
-            PlayerViewModel playerViewModel)
+            PlayerViewModel playerViewModel, IParamService paramService)
         {
             _utilityService = utilityService;
             _playerViewModel = playerViewModel;
+            _paramService = paramService;
             _hotkeyManager = hotkeyManager;
             
             RegisterHotkeys();
@@ -193,6 +199,25 @@ namespace SilkySouls.ViewModels
             }
         }
         
+        private bool _isGuaranteedBkhEnabled;
+        
+        public bool IsGuaranteedBkhEnabled
+        {
+            get => _isGuaranteedBkhEnabled;
+            set
+            {
+                if (SetProperty(ref _isGuaranteedBkhEnabled, value))
+                {
+                    if (AreButtonsEnabled)
+                    {
+                       var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
+                        _paramService.WriteInt32(estusRow, IconIdOffset, LordVesselIconId);
+                        _utilityService.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
+                    }
+                }
+            }
+        }
+        
         public void DisableButtons()
         {
             IsNoClipEnabled = false;
@@ -213,6 +238,17 @@ namespace SilkySouls.ViewModels
                 _utilityService.ToggleFilter(IsFilterRemoveEnabled);
             if (IsDeathCamEnabled)
                 _utilityService.ToggleDeathCam(IsDeathCamEnabled);
+            if (IsGuaranteedBkhEnabled)
+            {
+                _utilityService.SetGuaranteedBkhDrop(true);
+                _ = Task.Run(() =>
+                {
+                    Task.Delay(500).Wait();
+                    var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
+                    _paramService.WriteInt32(estusRow, IconIdOffset, LordVesselIconId);
+                });
+
+            }
             AreButtonsEnabled = true;
         }
 

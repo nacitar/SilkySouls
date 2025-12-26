@@ -147,6 +147,7 @@ namespace SilkySouls.Memory
             Console.WriteLine($"WorldAiMan: 0x{Offsets.WorldAiMan.Base.ToInt64():X}");
             Console.WriteLine($"EmkEventIns: 0x{Offsets.EmkEventIns.Base.ToInt64():X}");
             Console.WriteLine($"DebugEventMan: 0x{Offsets.DebugEventMan.Base.ToInt64():X}");
+            Console.WriteLine($"SoloParamMan: 0x{Offsets.SoloParamMan.Base.ToInt64():X}");
             
             Console.WriteLine($"Weapon: 0x{Offsets.OpenEnhanceShopWeapon:X}");
             Console.WriteLine($"Armor: 0x{Offsets.OpenEnhanceShopArmor:X}");

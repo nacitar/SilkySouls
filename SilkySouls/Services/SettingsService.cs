@@ -26,28 +26,6 @@ namespace SilkySouls.Services
         {
             _memoryIo.WriteByte(Offsets.Patches.QuitoutPatch, value);
         }
-
-        public void SetGuaranteedBkhDrop(bool setValue)
-        {
-            var bkhPtr = _memoryIo.FollowPointers(Offsets.SoloParamMan.Base, new[]
-            {
-                Offsets.SoloParamMan.ParamResCap,
-                Offsets.SoloParamMan.ItemLot,
-                Offsets.SoloParamMan.BkhDropRateBase
-            }, false);
-
-            if (setValue)
-            {
-                _memoryIo.WriteByte(bkhPtr + (int)Offsets.SoloParamMan.BkhDropRateSlots.Nothing, 0);
-                _memoryIo.WriteByte(bkhPtr + (int)Offsets.SoloParamMan.BkhDropRateSlots.Bkh, 0x64);
-                _memoryIo.WriteByte(bkhPtr + (int)Offsets.SoloParamMan.BkhDropRateSlots.Bks, 0);
-            }
-            else
-            {
-                _memoryIo.WriteByte(bkhPtr + (int)Offsets.SoloParamMan.BkhDropRateSlots.Nothing, 0x4B);
-                _memoryIo.WriteByte(bkhPtr + (int)Offsets.SoloParamMan.BkhDropRateSlots.Bkh, 0x14);
-                _memoryIo.WriteByte(bkhPtr + (int)Offsets.SoloParamMan.BkhDropRateSlots.Bks, 0x5);
-            }
-        }
+        
     }
 }

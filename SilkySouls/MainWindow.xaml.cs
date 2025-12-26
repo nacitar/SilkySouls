@@ -55,11 +55,12 @@ namespace SilkySouls
             var eventService = new EventService(_memoryIo, _hookManager);
             var utilityService = new UtilityService(_memoryIo, _hookManager);
             var enemyService = new EnemyService(_memoryIo, _hookManager, _aobScanner);
+            IParamService paramService = new ParamService(_memoryIo);
             _itemService = new ItemService(_memoryIo, _hookManager);
             var settingsService = new SettingsService(_memoryIo);
 
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager);
-            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel);
+            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService);
             _travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel);
             _eventViewModel = new EventViewModel(eventService);
             _enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager);

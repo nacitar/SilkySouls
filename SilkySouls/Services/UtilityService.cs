@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
@@ -22,7 +21,7 @@ namespace SilkySouls.Services
         private readonly byte[] _drawOriginBytes = { 0x44, 0x8B, 0xC6, 0xBA, 0x16, 0x00, 0x00, 0x00 };
 
         private List<long> _noClipHooks;
-        
+
         public UtilityService(MemoryIo memoryIo, HookManager hookManager)
         {
             _memoryIo = memoryIo;
@@ -302,7 +301,7 @@ namespace SilkySouls.Services
             _noClipHooks.Clear();
             _memoryIo.WriteBytes(CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionVariable, new byte[641]);
         }
-        
+
         public void ToggleFilter(bool value)
         {
             if (value)
@@ -354,12 +353,10 @@ namespace SilkySouls.Services
             Array.Copy(bytes, 0, upgradeBytes, 16, bytes.Length);
             _memoryIo.AllocateAndExecute(upgradeBytes);
         }
-        
 
         public void ToggleDeathCam(bool isDeathCamEnabled) =>
             _memoryIo.WriteByte((IntPtr)_memoryIo.ReadInt64(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
                 isDeathCamEnabled ? 1 : 0);
-
 
         public void ToggleDisableEvents(bool isDisableEventsEnabled)
         {
@@ -391,14 +388,14 @@ namespace SilkySouls.Services
         public bool GetEvent(ulong eventId)
         {
             var getEventBytes = AsmLoader.GetAsmBytes("GetEvent");
-            AsmHelper.WriteAbsoluteAddresses64(getEventBytes, new []
+            AsmHelper.WriteAbsoluteAddresses64(getEventBytes, new[]
             {
                 (_memoryIo.ReadInt64(EventFlagMan.Base), 0x0 + 2),
                 ((long)eventId, 0xA + 2),
                 (Funcs.GetEvent, 0x14 + 2),
                 (CodeCaveOffsets.Base.ToInt64() + CodeCaveOffsets.GetEventResult, 0x28 + 2)
             });
-            
+
             _memoryIo.AllocateAndExecute(getEventBytes);
             return _memoryIo.ReadUInt8(CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult) == 1;
         }
@@ -417,7 +414,6 @@ namespace SilkySouls.Services
             _memoryIo.AllocateAndExecute(openRegularShopBytes);
         }
 
-
         public void OpenAttunement()
         {
             var codeBytes = AsmLoader.GetAsmBytes("OpenAttunement");
@@ -426,6 +422,29 @@ namespace SilkySouls.Services
             bytes = BitConverter.GetBytes(Funcs.OpenAttunement);
             Array.Copy(bytes, 0, codeBytes, 0x22 + 2, 8);
             _memoryIo.AllocateAndExecute(codeBytes);
+        }
+
+        public void SetGuaranteedBkhDrop(bool setValue)
+        {
+            var bkhPtr = _memoryIo.FollowPointers(SoloParamMan.Base, new[]
+            {
+                SoloParamMan.ParamResCap,
+                SoloParamMan.ItemLot,
+                SoloParamMan.BkhDropRateBase
+            }, false);
+
+            if (setValue)
+            {
+                _memoryIo.WriteByte(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Nothing, 0);
+                _memoryIo.WriteByte(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bkh, 0x64);
+                _memoryIo.WriteByte(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bks, 0);
+            }
+            else
+            {
+                _memoryIo.WriteByte(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Nothing, 0x4B);
+                _memoryIo.WriteByte(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bkh, 0x14);
+                _memoryIo.WriteByte(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bks, 0x5);
+            }
         }
     }
 }

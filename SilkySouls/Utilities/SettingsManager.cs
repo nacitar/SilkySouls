@@ -13,7 +13,6 @@ namespace SilkySouls.Utilities
         public string HotkeyValues { get; set; } = "";
         public bool EnableHotkeys { get; set; }
         public bool FastQuitout { get; set; }
-        public bool GuaranteedBkh { get; set; }
         public bool AlwaysOnTop { get; set; }
         public double WindowLeft { get; set; }
         public double WindowTop { get; set; }
@@ -44,7 +43,6 @@ namespace SilkySouls.Utilities
                     $"HotkeyValues={HotkeyValues}",
                     $"EnableHotkeys={EnableHotkeys}",
                     $"FastQuitout={FastQuitout}",
-                    $"GuaranteedBkh={GuaranteedBkh}",
                     $"AlwaysOnTop={AlwaysOnTop}",
                     $"WindowLeft={WindowLeft}",
                     $"WindowTop={WindowTop}",
@@ -92,10 +90,6 @@ namespace SilkySouls.Utilities
                                     bool.TryParse(value, out bool fq);
                                     settings.FastQuitout = fq;
                                     break; 
-                                case "GuaranteedBkh":
-                                    bool.TryParse(value, out bool gb);
-                                    settings.GuaranteedBkh = gb;
-                                    break;
                                 case "AlwaysOnTop":
                                     bool.TryParse(value, out bool aot);
                                     settings.AlwaysOnTop = aot;

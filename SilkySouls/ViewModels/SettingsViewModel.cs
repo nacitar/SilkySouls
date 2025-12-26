@@ -12,7 +12,6 @@ namespace SilkySouls.ViewModels
     {
         private bool _isFastQuitoutEnabled;
         private bool _isEnableHotkeysEnabled;
-        private bool _isGuaranteedBkhEnabled;
         private bool _isAlwaysOnTopEnabled;
         private bool _isLoaded;
 
@@ -442,29 +441,11 @@ namespace SilkySouls.ViewModels
                 }
             }
         }
-
-        public bool IsGuaranteedBkhEnabled
-        {
-            get => _isGuaranteedBkhEnabled;
-            set
-            {
-                if (SetProperty(ref _isGuaranteedBkhEnabled, value))
-                {
-                    SettingsManager.Default.GuaranteedBkh = value;
-                    SettingsManager.Default.Save();
-                    if (_isLoaded)
-                    {
-                        _settingsService.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
-                    }
-                }
-            }
-        }
-
+        
         public void ApplyLoadedOptions()
         {
             _isLoaded = true;
             if (IsFastQuitoutEnabled) _settingsService.ToggleFastQuitout(1);
-            if (IsGuaranteedBkhEnabled) _settingsService.SetGuaranteedBkhDrop(true);
         }
 
         public void ApplyStartUpOptions()
@@ -473,8 +454,6 @@ namespace SilkySouls.ViewModels
             if (_isEnableHotkeysEnabled) _hotkeyManager.Start();
             else _hotkeyManager.Stop();
             OnPropertyChanged(nameof(IsEnableHotkeysEnabled));
-            _isGuaranteedBkhEnabled = SettingsManager.Default.GuaranteedBkh;
-            OnPropertyChanged(nameof(IsGuaranteedBkhEnabled));
             _isFastQuitoutEnabled = SettingsManager.Default.FastQuitout;
             OnPropertyChanged(nameof(IsFastQuitoutEnabled));
             IsAlwaysOnTopEnabled = SettingsManager.Default.AlwaysOnTop;
