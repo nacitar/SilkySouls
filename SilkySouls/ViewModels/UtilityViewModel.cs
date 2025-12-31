@@ -249,6 +249,10 @@ namespace SilkySouls.ViewModels
                 });
 
             }
+            else
+            {
+                _utilityService.SetGuaranteedBkhDrop(false);
+            }
             AreButtonsEnabled = true;
         }
 
