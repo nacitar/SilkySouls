@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using H.Hooks;
+using SilkySouls.Interfaces;
 using SilkySouls.Memory;
+using SilkySouls.Services;
 
 namespace SilkySouls.Utilities
 {
     public class HotkeyManager
     {
+        private readonly IMemoryService _memoryService;
+
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")]
         private static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
         
-        private readonly MemoryIo _memoryIo;
         private readonly LowLevelKeyboardHook _keyboardHook;
         private readonly Dictionary<string, Keys> _hotkeyMappings;
 
         private readonly Dictionary<string, Action> _actions;
 
-        public HotkeyManager(MemoryIo memoryIo)
+        public HotkeyManager(IMemoryService memoryService)
         {
-            _memoryIo = memoryIo;
+            _memoryService = memoryService;
             _hotkeyMappings = new Dictionary<string, Keys>();
             _actions = new Dictionary<string, Action>();
 
@@ -70,11 +73,11 @@ namespace SilkySouls.Utilities
 
         private bool IsGameFocused()
         {
-            if (_memoryIo.TargetProcess == null || _memoryIo.TargetProcess.Id == 0) return false;
+            if (_memoryService.TargetProcess == null || _memoryService.TargetProcess.Id == 0) return false;
          
             IntPtr foregroundWindow = GetForegroundWindow();
             GetWindowThreadProcessId(foregroundWindow, out uint foregroundProcessId);
-            return foregroundProcessId == (uint)_memoryIo.TargetProcess.Id;
+            return foregroundProcessId == (uint)_memoryService.TargetProcess.Id;
         }
 
         public void SetHotkey(string actionId, Keys keys)

@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using SilkySouls.memory;
+using SilkySouls.Services;
 
 namespace SilkySouls.Memory
 {

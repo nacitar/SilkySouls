@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using SilkySouls.Interfaces;
 using SilkySouls.memory;
 using SilkySouls.Memory;
 using SilkySouls.Services;
@@ -20,7 +21,7 @@ namespace SilkySouls
     /// </summary>
     public partial class MainWindow
     {
-        private readonly MemoryIo _memoryIo;
+        private readonly IMemoryService _memoryService;
         private readonly DispatcherTimer _gameLoadedTimer;
 
         private readonly PlayerViewModel _playerViewModel;
@@ -36,8 +37,8 @@ namespace SilkySouls
 
         public MainWindow()
         {
-            _memoryIo = new MemoryIo();
-            _memoryIo.StartAutoAttach();
+            _memoryService = new MemoryService();
+            _memoryService.StartAutoAttach();
 
             InitializeComponent();
             if (SettingsManager.Default.WindowLeft != 0 || SettingsManager.Default.WindowTop != 0)
@@ -47,17 +48,17 @@ namespace SilkySouls
             }
             else WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
-            _hookManager = new HookManager(_memoryIo);
-            var hotkeyManager = new HotkeyManager(_memoryIo);
-            _aobScanner = new AoBScanner(_memoryIo);
-            var playerService = new PlayerService(_memoryIo);
-            var travelService = new TravelService(_memoryIo, _hookManager);
-            var eventService = new EventService(_memoryIo, _hookManager);
-            var utilityService = new UtilityService(_memoryIo, _hookManager);
-            var enemyService = new EnemyService(_memoryIo, _hookManager, _aobScanner);
-            IParamService paramService = new ParamService(_memoryIo);
-            _itemService = new ItemService(_memoryIo, _hookManager);
-            var settingsService = new SettingsService(_memoryIo);
+            _hookManager = new HookManager(_memoryService);
+            var hotkeyManager = new HotkeyManager(_memoryService);
+            _aobScanner = new AoBScanner(_memoryService);
+            var playerService = new PlayerService(_memoryService);
+            var travelService = new TravelService(_memoryService, _hookManager);
+            var eventService = new EventService(_memoryService, _hookManager);
+            var utilityService = new UtilityService(_memoryService, _hookManager);
+            var enemyService = new EnemyService(_memoryService, _hookManager, _aobScanner);
+            IParamService paramService = new ParamService(_memoryService);
+            _itemService = new ItemService(_memoryService, _hookManager);
+            var settingsService = new SettingsService(_memoryService);
 
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService);
@@ -107,7 +108,7 @@ namespace SilkySouls
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (_memoryIo.IsAttached)
+            if (_memoryService.IsAttached)
             {
                 IsAttachedText.Text = "Attached to game";
                 IsAttachedText.Foreground = (SolidColorBrush)Application.Current.Resources["AttachedBrush"];
@@ -120,14 +121,14 @@ namespace SilkySouls
 
                 if (!_hasAllocatedMemory)
                 {
-                    _memoryIo.AllocCodeCave();
+                    _memoryService.AllocCodeCave();
                     Console.WriteLine($"Code cave: 0x{CodeCaveOffsets.Base.ToInt64():X}");
                     _hasAllocatedMemory = true;
                 }
                 
                 _utilityViewModel.TryRestoreAttachedFeatures();
                 
-                if (_memoryIo.IsGameLoaded())
+                if (_memoryService.IsGameLoaded())
                 {
                     if (_loaded) return;
                     _loaded = true;
@@ -177,9 +178,9 @@ namespace SilkySouls
 
         private void TrySetGameStartPrefs()
         {
-            ulong gameDataPtr = _memoryIo.ReadUInt64(Offsets.GameDataMan.Base);
+            ulong gameDataPtr = _memoryService.ReadUInt64(Offsets.GameDataMan.Base);
             IntPtr inGameTimePtr = (IntPtr)(gameDataPtr + (int)Offsets.GameDataMan.GameDataOffsets.InGameTime);
-            long gameTimeMs = _memoryIo.ReadInt64(inGameTimePtr);
+            long gameTimeMs = _memoryService.ReadInt64(inGameTimePtr);
             if (gameTimeMs < 5000)
             {
                 _playerViewModel.TrySetNgPref();
@@ -191,7 +192,7 @@ namespace SilkySouls
         {
             base.OnClosing(e);
             _hookManager?.UninstallAllHooks();
-            _memoryIo?.Dispose();
+            _memoryService?.Dispose();
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

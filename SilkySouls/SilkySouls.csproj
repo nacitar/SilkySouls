@@ -16,6 +16,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <ApplicationIcon>Assets\Silky.ico</ApplicationIcon>
+    <LangVersion>12</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -103,6 +104,19 @@
     <Compile Include="Converters\ImmuneFillConverter.cs" />
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
+    <Compile Include="Enums\AsmScripts.cs" />
+    <Compile Include="Interfaces\IChrInsService.cs" />
+    <Compile Include="Interfaces\IEnemyService.cs" />
+    <Compile Include="Interfaces\IEventLogReader.cs" />
+    <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\IItemService.cs" />
+    <Compile Include="Interfaces\IMemoryService.cs" />
+    <Compile Include="Interfaces\IParamService.cs" />
+    <Compile Include="Interfaces\IPlayerService.cs" />
+    <Compile Include="Interfaces\ISettingsService.cs" />
+    <Compile Include="Interfaces\ITargetService.cs" />
+    <Compile Include="Interfaces\ITravelService.cs" />
+    <Compile Include="Interfaces\IUtilityService.cs" />
     <Compile Include="IParamService.cs" />
     <Compile Include="Memory\AoBScanner.cs" />
     <Compile Include="Memory\AsmHelper.cs" />
@@ -119,10 +133,12 @@
     <Compile Include="Models\UpgradeType.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\ItemService.cs" />
+    <Compile Include="Services\MemoryService.cs" />
     <Compile Include="Services\ParamService.cs" />
     <Compile Include="Services\PlayerService.cs" />
     <Compile Include="Services\EnemyService.cs" />
     <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="Services\TargetService.cs" />
     <Compile Include="Services\TravelService.cs" />
     <Compile Include="Services\UtilityService.cs" />
     <Compile Include="Utilities\AsmLoader.cs" />
@@ -137,6 +153,7 @@
     <Compile Include="ViewModels\PlayerViewModel.cs" />
     <Compile Include="ViewModels\EnemyViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\TargetViewModel.cs" />
     <Compile Include="ViewModels\TravelViewModel.cs" />
     <Compile Include="ViewModels\UtilityViewModel.cs" />
     <Compile Include="Views\EventTab.xaml.cs">
@@ -196,7 +213,6 @@
   <ItemGroup>
     <Compile Include="Memory\Kernel32.cs" />
     <Compile Include="Memory\Offsets.cs" />
-    <Compile Include="Memory\MemoryIO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
