@@ -1,35 +1,26 @@
 ﻿using System;
 using System.Threading.Tasks;
+using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Services
 {
-    public class EventService
+    public class EventService(IMemoryService memoryService, HookManager hookManager)
     {
-        private readonly MemoryIo _memoryIo;
-        private readonly HookManager _hookManager;
-        
         private IntPtr _emevdCodeLoc;
         private bool _isEmevdCodeWritten;
-        
-        public EventService(MemoryIo memoryIo, HookManager hookManager)
-        {
-            _memoryIo = memoryIo;
-            _hookManager = hookManager;
-        }
-
 
         public void ToggleDisableEvents(bool isDisableEventsEnabled)
         {
-            _memoryIo.WriteByte((IntPtr)_memoryIo.ReadInt64(DebugEventMan.Base) + DebugEventMan.DisableEvents,
-                isDisableEventsEnabled ? 1 : 0);
+            memoryService.Write(memoryService.Read<nint>(DebugEventMan.Base) + DebugEventMan.DisableEvents,
+                isDisableEventsEnabled ? (byte)1 : (byte)0);
         }
 
         public void SetEvent(ulong flagId, int setVal)
         {
-            var eventMan = _memoryIo.ReadInt64(EventFlagMan.Base);
+            var eventMan = memoryService.Read<nint>(EventFlagMan.Base);
             var setEventBytes = AsmLoader.GetAsmBytes("SetEvent");
             var bytes = BitConverter.GetBytes(eventMan);
             Array.Copy(bytes, 0, setEventBytes, 0x2, 8);
@@ -39,7 +30,7 @@ namespace SilkySouls.Services
             Array.Copy(bytes, 0, setEventBytes, 0x14 + 2, 4);
             bytes = BitConverter.GetBytes(Funcs.SetEvent);
             Array.Copy(bytes, 0, setEventBytes, 0x24 + 2, 8);
-            _memoryIo.AllocateAndExecute(setEventBytes);
+            memoryService.AllocateAndExecute(setEventBytes);
         }
 
         public void SetMultipleEventsOn(params ulong[] flagIds)
@@ -55,14 +46,14 @@ namespace SilkySouls.Services
             var getEventBytes = AsmLoader.GetAsmBytes("GetEvent");
             AsmHelper.WriteAbsoluteAddresses64(getEventBytes, new []
             {
-                (_memoryIo.ReadInt64(EventFlagMan.Base), 0x0 + 2),
+                (memoryService.Read<nint>(EventFlagMan.Base), 0x0 + 2),
                 ((long)eventId, 0xA + 2),
                 (Funcs.GetEvent, 0x14 + 2),
                 (CodeCaveOffsets.Base.ToInt64() + CodeCaveOffsets.GetEventResult, 0x28 + 2)
             });
             
-            _memoryIo.AllocateAndExecute(getEventBytes);
-            return _memoryIo.ReadUInt8(CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult) == 1;
+            memoryService.AllocateAndExecute(getEventBytes);
+            return memoryService.Read<byte>(CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult) == 1;
         }
         
         public void RingGargBell()
@@ -82,7 +73,7 @@ namespace SilkySouls.Services
             ExecuteEmevdCommand(GameIds.EmevdCommands.ReproduceObjectAnimation,
                 GameIds.EmevdCommandParams.SensDoor);
             await Task.Delay(1000);
-            _hookManager.UninstallHook(_emevdCodeLoc.ToInt64());
+            hookManager.UninstallHook(_emevdCodeLoc);
         }
 
         private void ExecuteEmevdCommand(int[] commandParams, int[] funcParams)
@@ -95,11 +86,11 @@ namespace SilkySouls.Services
             
             if (_isEmevdCodeWritten)
             {
-                _memoryIo.WriteInt32(commandParamsLoc, commandParams[0]);
-                _memoryIo.WriteInt32(commandParamsLoc + 0x4, commandParams[1]);
-                _memoryIo.WriteInt32(funcParamsLoc, funcParams[0]);
-                _memoryIo.WriteInt32(funcParamsLoc + 0x4, funcParams[1]);
-                _memoryIo.WriteByte(flag, 0);
+                memoryService.Write(commandParamsLoc, commandParams[0]);
+                memoryService.Write(commandParamsLoc + 0x4, commandParams[1]);
+                memoryService.Write(funcParamsLoc, funcParams[0]);
+                memoryService.Write(funcParamsLoc + 0x4, funcParams[1]);
+                memoryService.Write(flag, (byte)0);
             }
             else
             {
@@ -107,10 +98,10 @@ namespace SilkySouls.Services
                 var paramStruct = codeCaveBase + (int)CodeCaveOffsets.EmevdCommand.ParamStruct;
                 _emevdCodeLoc = codeCaveBase + (int)CodeCaveOffsets.EmevdCommand.Code;
 
-                _memoryIo.WriteInt32(commandParamsLoc, commandParams[0]);
-                _memoryIo.WriteInt32(commandParamsLoc + 0x4, commandParams[1]);
-                _memoryIo.WriteInt32(funcParamsLoc, funcParams[0]);
-                _memoryIo.WriteInt32(funcParamsLoc + 0x4, funcParams[1]);
+                memoryService.Write(commandParamsLoc, commandParams[0]);
+                memoryService.Write(commandParamsLoc + 0x4, commandParams[1]);
+                memoryService.Write(funcParamsLoc, funcParams[0]);
+                memoryService.Write(funcParamsLoc + 0x4, funcParams[1]);
 
                 var codeBytes = AsmLoader.GetAsmBytes("ScriptCommands");
                 AsmHelper.WriteRelativeOffsets(codeBytes, new[]
@@ -145,12 +136,12 @@ namespace SilkySouls.Services
                 var jumpBytes = AsmHelper.GetJmpOriginOffsetBytes(hookLoc, 5, _emevdCodeLoc + 0x12D);
                 Array.Copy(jumpBytes, 0, codeBytes, 0x128 + 1, 4);
 
-                _memoryIo.WriteBytes(_emevdCodeLoc, codeBytes);
+                memoryService.WriteBytes(_emevdCodeLoc, codeBytes);
 
                 _isEmevdCodeWritten = true;
             }
 
-            _hookManager.InstallHook(_emevdCodeLoc.ToInt64(), hookLoc, new byte[]
+            hookManager.InstallHook(_emevdCodeLoc, hookLoc, new byte[]
             {
                 0xBA, 0x01, 0x00, 0x00, 0x00,
             });
@@ -172,7 +163,7 @@ namespace SilkySouls.Services
             await Task.Delay(5);
             ExecuteEmevdCommand(GameIds.EmevdCommands.DeleteMapSfx, GameIds.EmevdCommandParams.NitoFogDeleteMapSfx);
             await Task.Delay(500);
-            _hookManager.UninstallHook(_emevdCodeLoc.ToInt64());
+            hookManager.UninstallHook(_emevdCodeLoc);
         }
     }
 }

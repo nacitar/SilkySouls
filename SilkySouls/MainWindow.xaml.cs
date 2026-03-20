@@ -34,11 +34,13 @@ namespace SilkySouls
         private readonly HookManager _hookManager;
         private readonly AoBScanner _aobScanner;
         private readonly ItemService _itemService;
+        private readonly IStateService _stateService;
 
         public MainWindow()
         {
             _memoryService = new MemoryService();
             _memoryService.StartAutoAttach();
+            _stateService = new StateService(_memoryService);
 
             InitializeComponent();
             if (SettingsManager.Default.WindowLeft != 0 || SettingsManager.Default.WindowTop != 0)
@@ -57,7 +59,7 @@ namespace SilkySouls
             var utilityService = new UtilityService(_memoryService, _hookManager);
             var enemyService = new EnemyService(_memoryService, _hookManager, _aobScanner);
             IParamService paramService = new ParamService(_memoryService);
-            _itemService = new ItemService(_memoryService, _hookManager);
+            _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
 
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager);
@@ -128,7 +130,7 @@ namespace SilkySouls
                 
                 _utilityViewModel.TryRestoreAttachedFeatures();
                 
-                if (_memoryService.IsGameLoaded())
+                if (_stateService.IsLoaded())
                 {
                     if (_loaded) return;
                     _loaded = true;
@@ -178,9 +180,9 @@ namespace SilkySouls
 
         private void TrySetGameStartPrefs()
         {
-            ulong gameDataPtr = _memoryService.ReadUInt64(Offsets.GameDataMan.Base);
+            var gameDataPtr = _memoryService.Read<nint>(Offsets.GameDataMan.Base);
             IntPtr inGameTimePtr = (IntPtr)(gameDataPtr + (int)Offsets.GameDataMan.GameDataOffsets.InGameTime);
-            long gameTimeMs = _memoryService.ReadInt64(inGameTimePtr);
+            long gameTimeMs = _memoryService.Read<long>(inGameTimePtr);
             if (gameTimeMs < 5000)
             {
                 _playerViewModel.TrySetNgPref();
@@ -192,7 +194,6 @@ namespace SilkySouls
         {
             base.OnClosing(e);
             _hookManager?.UninstallAllHooks();
-            _memoryService?.Dispose();
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

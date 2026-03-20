@@ -1,30 +1,31 @@
-﻿using SilkySouls.memory;
+﻿using SilkySouls.Interfaces;
+using SilkySouls.memory;
 using SilkySouls.Memory;
 
 namespace SilkySouls.Services
 {
     public class SettingsService
     {
-        private readonly MemoryIo _memoryIo;
+        private readonly IMemoryService _memoryService;
 
-        public SettingsService(MemoryIo memoryIo)
+        public SettingsService(IMemoryService memoryService)
         {
-            _memoryIo = memoryIo;
+            _memoryService = memoryService;
         }
 
         public void Quitout()
         {
             var quitoutPtr =
-                _memoryIo.FollowPointers(Offsets.MenuMan.Base, new[]
+                _memoryService.FollowPointers(Offsets.MenuMan.Base, new[]
                 {
                     (int)Offsets.MenuMan.MenuManData.Quitout
                 }, false);
-            _memoryIo.WriteByte(quitoutPtr, 2);
+            _memoryService.Write(quitoutPtr, (byte)2);
         }
 
         public void ToggleFastQuitout(int value)
         {
-            _memoryIo.WriteByte(Offsets.Patches.QuitoutPatch, value);
+            _memoryService.Write(Offsets.Patches.QuitoutPatch, (byte)value);
         }
         
     }

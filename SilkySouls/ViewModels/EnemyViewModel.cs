@@ -21,7 +21,7 @@ namespace SilkySouls.ViewModels
 
         private int _targetCurrentHealth;
         private int _targetMaxHealth;
-        private ulong _currentTargetId;
+        private nint _currentTargetId;
         private float _targetSpeed;
         private bool _isFreezeHealthEnabled;
         private bool _isDisableTargetAiEnabled;
@@ -107,7 +107,7 @@ namespace SilkySouls.ViewModels
             TargetCurrentHealth = _enemyService.GetTargetHp();
             TargetMaxHealth = _enemyService.GetTargetMaxHp();
 
-            ulong targetId = _enemyService.GetTargetId();
+            nint targetId = _enemyService.GetTargetChrIns();
 
             if (targetId != _currentTargetId)
             {
@@ -136,7 +136,7 @@ namespace SilkySouls.ViewModels
 
         private bool IsTargetValid()
         {
-            ulong targetId = _enemyService.GetTargetId();
+            nint targetId = _enemyService.GetTargetChrIns();
             if (targetId == 0)
                 return false;
 

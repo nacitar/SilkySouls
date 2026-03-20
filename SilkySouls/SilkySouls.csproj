@@ -105,6 +105,7 @@
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Enums\AsmScripts.cs" />
+    <Compile Include="Enums\State.cs" />
     <Compile Include="Interfaces\IChrInsService.cs" />
     <Compile Include="Interfaces\IEnemyService.cs" />
     <Compile Include="Interfaces\IEventLogReader.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Interfaces\IParamService.cs" />
     <Compile Include="Interfaces\IPlayerService.cs" />
     <Compile Include="Interfaces\ISettingsService.cs" />
+    <Compile Include="Interfaces\IStateService.cs" />
     <Compile Include="Interfaces\ITargetService.cs" />
     <Compile Include="Interfaces\ITravelService.cs" />
     <Compile Include="Interfaces\IUtilityService.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="Memory\CodeCaveOffsets.cs" />
     <Compile Include="Memory\GameIds.cs" />
     <Compile Include="Memory\HookManager.cs" />
+    <Compile Include="Memory\MemoryBlock.cs" />
     <Compile Include="Memory\Pattern.cs" />
     <Compile Include="Models\CharacterState.cs" />
     <Compile Include="Models\EquippedWeapon.cs" />
@@ -138,6 +141,7 @@
     <Compile Include="Services\PlayerService.cs" />
     <Compile Include="Services\EnemyService.cs" />
     <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="Services\StateService.cs" />
     <Compile Include="Services\TargetService.cs" />
     <Compile Include="Services\TravelService.cs" />
     <Compile Include="Services\UtilityService.cs" />

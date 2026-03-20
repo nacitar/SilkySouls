@@ -280,21 +280,21 @@ namespace SilkySouls.memory
         
         public static class Hooks
         {
-            public static long LastLockedTarget;
-            public static long AllNoDamage;
-            public static long ItemSpawn;
-            public static long Draw;
-            public static long TargetingView;
-            public static long InAirTimer;
-            public static long Keyboard;
-            public static long ControllerR2;
-            public static long ControllerL2;
-            public static long UpdateCoords;
-            public static long WarpCoords;
-            public static long LuaIfCase;
-            public static long LuaSwitchCase;
-            public static long BattleActivate;
-            public static long Emevd;
+            public static nint LastLockedTarget;
+            public static nint AllNoDamage;
+            public static nint ItemSpawn;
+            public static nint Draw;
+            public static nint TargetingView;
+            public static nint InAirTimer;
+            public static nint Keyboard;
+            public static nint ControllerR2;
+            public static nint ControllerL2;
+            public static nint UpdateCoords;
+            public static nint WarpCoords;
+            public static nint LuaIfCase;
+            public static nint LuaSwitchCase;
+            public static nint BattleActivate;
+            public static nint Emevd;
         }
 
         public static class Patches

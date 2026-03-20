@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using SilkySouls.Interfaces;
 using SilkySouls.memory;
 using SilkySouls.Services;
 
@@ -14,11 +15,11 @@ namespace SilkySouls.Memory
 {
     public class AoBScanner
     {
-        private readonly MemoryIo _memoryIo;
+        private readonly IMemoryService _memoryService;
 
-        public AoBScanner(MemoryIo memoryIo)
+        public AoBScanner(IMemoryService memoryService)
         {
-            _memoryIo = memoryIo;
+            _memoryService = memoryService;
         }
 
         public void Scan()
@@ -64,34 +65,34 @@ namespace SilkySouls.Memory
 
             // Hooks
             TryPatternWithFallback("LastLockedTarget", Patterns.LastLockedTarget,
-                addr => Offsets.Hooks.LastLockedTarget = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.LastLockedTarget = addr, saved);
             TryPatternWithFallback("AllNoDamage", Patterns.AllNoDamage,
-                addr => Offsets.Hooks.AllNoDamage = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.AllNoDamage = addr, saved);
             TryPatternWithFallback("ItemSpawn", Patterns.ItemSpawnHook,
-                addr => Offsets.Hooks.ItemSpawn = addr.ToInt64(), saved);
-            TryPatternWithFallback("Draw", Patterns.DrawHook, addr => Offsets.Hooks.Draw = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.ItemSpawn = addr, saved);
+            TryPatternWithFallback("Draw", Patterns.DrawHook, addr => Offsets.Hooks.Draw = addr, saved);
             TryPatternWithFallback("TargetingView", Patterns.TargetingView,
-                addr => Offsets.Hooks.TargetingView = addr.ToInt64(), saved);
-            TryPatternWithFallback("InAirTimer", Patterns.InAirTimer, addr => Offsets.Hooks.InAirTimer = addr.ToInt64(),
+                addr => Offsets.Hooks.TargetingView = addr, saved);
+            TryPatternWithFallback("InAirTimer", Patterns.InAirTimer, addr => Offsets.Hooks.InAirTimer = addr,
                 saved);
-            TryPatternWithFallback("Keyboard", Patterns.Keyboard, addr => Offsets.Hooks.Keyboard = addr.ToInt64(),
+            TryPatternWithFallback("Keyboard", Patterns.Keyboard, addr => Offsets.Hooks.Keyboard = addr,
                 saved);
             TryPatternWithFallback("ControllerR2", Patterns.ControllerR2,
-                addr => Offsets.Hooks.ControllerR2 = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.ControllerR2 = addr, saved);
             TryPatternWithFallback("ControllerL2", Patterns.ControllerL2,
-                addr => Offsets.Hooks.ControllerL2 = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.ControllerL2 = addr, saved);
             TryPatternWithFallback("UpdateCoords", Patterns.UpdateCoords,
-                addr => Offsets.Hooks.UpdateCoords = addr.ToInt64(), saved);
-            TryPatternWithFallback("WarpCoords", Patterns.WarpCoords, addr => Offsets.Hooks.WarpCoords = addr.ToInt64(),
+                addr => Offsets.Hooks.UpdateCoords = addr, saved);
+            TryPatternWithFallback("WarpCoords", Patterns.WarpCoords, addr => Offsets.Hooks.WarpCoords = addr,
                 saved);
             TryPatternWithFallback("LuaIfCase", Patterns.LuaIfElseHook,
-                addr => Offsets.Hooks.LuaIfCase = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.LuaIfCase = addr, saved);
             TryPatternWithFallback("LuaSwitchCase", Patterns.LuaOpCodeSwitch,
-                addr => Offsets.Hooks.LuaSwitchCase = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.LuaSwitchCase = addr, saved);
             TryPatternWithFallback("BattleActivate", Patterns.BattleActivateHook,
-                addr => Offsets.Hooks.BattleActivate = addr.ToInt64(), saved); 
+                addr => Offsets.Hooks.BattleActivate = addr, saved); 
             TryPatternWithFallback("Emevd", Patterns.EmevdCommandHook,
-                addr => Offsets.Hooks.Emevd = addr.ToInt64(), saved);
+                addr => Offsets.Hooks.Emevd = addr, saved);
 
 // Patches
             TryPatternWithFallback("FourKingsPatch", Patterns.FourKingsPatch,
@@ -218,7 +219,7 @@ namespace SilkySouls.Memory
                     // }
                     default:
                     {
-                        int offset = _memoryIo.ReadInt32(IntPtr.Add(instructionAddress, pattern.OffsetLocation));
+                        int offset = _memoryService.Read<int>(IntPtr.Add(instructionAddress, pattern.OffsetLocation));
                         addresses[i] = IntPtr.Add(instructionAddress, offset + pattern.InstructionLength);
                         break;
                     }
@@ -233,7 +234,7 @@ namespace SilkySouls.Memory
             const int chunkSize = 4096 * 16;
             byte[] buffer = new byte[chunkSize];
 
-            IntPtr currentAddress = _memoryIo.BaseAddress;
+            IntPtr currentAddress = _memoryService.BaseAddress;
             IntPtr endAddress = IntPtr.Add(currentAddress, 0x3200000);
 
             List<IntPtr> addresses = new List<IntPtr>();
@@ -246,7 +247,7 @@ namespace SilkySouls.Memory
                 if (bytesToRead < pattern.Length)
                     break;
 
-                buffer = _memoryIo.ReadBytes(currentAddress, bytesToRead);
+                buffer = _memoryService.ReadBytes(currentAddress, bytesToRead);
 
                 for (int i = 0; i <= bytesToRead - pattern.Length; i++)
                 {
@@ -280,7 +281,7 @@ namespace SilkySouls.Memory
             const int chunkSize = 4096 * 16;
             byte[] buffer = new byte[chunkSize];
 
-            IntPtr currentAddress = _memoryIo.BaseAddress;
+            IntPtr currentAddress = _memoryService.BaseAddress;
             IntPtr endAddress = IntPtr.Add(currentAddress, 0x3200000);
 
             while (currentAddress.ToInt64() < endAddress.ToInt64())
@@ -291,7 +292,7 @@ namespace SilkySouls.Memory
                 if (bytesToRead < pattern.Length)
                     break;
 
-                buffer = _memoryIo.ReadBytes(currentAddress, bytesToRead);
+                buffer = _memoryService.ReadBytes(currentAddress, bytesToRead);
 
                 for (int i = 0; i <= bytesToRead - pattern.Length; i++)
                 {
@@ -346,7 +347,7 @@ namespace SilkySouls.Memory
                 byte[] buffer;
                 try
                 {
-                    buffer = _memoryIo.ReadBytes(currentAddress, bytesToRead);
+                    buffer = _memoryService.ReadBytes(currentAddress, bytesToRead);
                 }
                 catch (Exception ex)
                 {
@@ -391,8 +392,8 @@ namespace SilkySouls.Memory
 
             if (bestActs.Count != 0) return bestActs.ToArray();
 
-            var worldAiBase = (IntPtr)_memoryIo.ReadUInt64(Offsets.WorldAiMan.Base);
-            var scriptModuleStart = _memoryIo.GetModuleStart(worldAiBase) + 0x8E20000;
+            var worldAiBase = (IntPtr)_memoryService.Read<ulong>(Offsets.WorldAiMan.Base);
+            var scriptModuleStart = _memoryService.GetModuleStart(worldAiBase) + 0x8E20000;
 
             var rangesToScan = new (IntPtr Start, IntPtr End)[]
             {
@@ -447,7 +448,7 @@ namespace SilkySouls.Memory
                     byte[] buffer;
                     try
                     {
-                        buffer = _memoryIo.ReadBytes(currentScanAddr, bytesToRead);
+                        buffer = _memoryService.ReadBytes(currentScanAddr, bytesToRead);
                     }
                     catch
                     {
@@ -464,7 +465,7 @@ namespace SilkySouls.Memory
                         IntPtr foundAddress = IntPtr.Add(currentScanAddr, i);
                         try
                         {
-                            byte[] resultBuffer = _memoryIo.ReadBytes(foundAddress, 10000);
+                            byte[] resultBuffer = _memoryService.ReadBytes(foundAddress, 10000);
                             string content = Encoding.ASCII.GetString(resultBuffer);
 
                             var matches = Regex.Matches(content, @"Act(\d+)Per");
@@ -532,7 +533,7 @@ namespace SilkySouls.Memory
 
         private List<int> ParseActsFromMemory(IntPtr address, string enemyId, int readSize)
         {
-            string result = Encoding.ASCII.GetString(_memoryIo.ReadBytes(address, readSize));
+            string result = Encoding.ASCII.GetString(_memoryService.ReadBytes(address, readSize));
             var pattern = $@"{enemyId}_Act(\d+)";
             return Regex.Matches(result, pattern)
                 .Cast<Match>()

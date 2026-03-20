@@ -158,7 +158,7 @@ namespace SilkySouls.Services
             Kernel32.CloseHandle(thread);
         }
 
-        private bool RunThreadAndWaitForCompletion(IntPtr address, uint timeout = 0xFFFFFFFF)
+        public bool RunThreadAndWaitForCompletion(IntPtr address, uint timeout = 0xFFFFFFFF)
         {
             IntPtr thread = Kernel32.CreateRemoteThread(ProcessHandle, IntPtr.Zero, 0, address, IntPtr.Zero, 0, IntPtr.Zero);
 
@@ -225,6 +225,27 @@ namespace SilkySouls.Services
 
         public void FreeMem(nint addr) => Kernel32.VirtualFreeEx(ProcessHandle, addr, 0, MemRelease);
         
+        public nint GetModuleStart(nint address)
+        {
+            return Kernel32.QueryMemory(ProcessHandle, address).AllocationBase;
+        }
+        
+        public void RunPersistentThread(IntPtr address)
+        {
+            IntPtr thread = Kernel32.CreateRemoteThread(ProcessHandle, IntPtr.Zero, 0, address, IntPtr.Zero, 0, IntPtr.Zero);
+            Kernel32.CloseHandle(thread); 
+        }
+        
+        public IntPtr GetProcAddress(string moduleName, string procName)
+        {
+            IntPtr moduleHandle = Kernel32.GetModuleHandle(moduleName);
+            if (moduleHandle == IntPtr.Zero)
+                return IntPtr.Zero;
+
+            return Kernel32.GetProcAddress(moduleHandle, procName);
+        }
+        
+        
         public void StartAutoAttach()
         {
             _autoAttachTimer = new Timer(AttachCheckInterval);
@@ -233,6 +254,23 @@ namespace SilkySouls.Services
             TryAttachToProcess();
 
             _autoAttachTimer.Start();
+        }
+        
+        public void SetBit32(IntPtr addr, int bitPosition, bool setValue)
+        {
+            IntPtr wordAddr = IntPtr.Add(addr, (bitPosition / 32) * 4);
+            
+            int bitPos = bitPosition % 32;
+            
+            uint currentValue = Read<uint>(wordAddr);
+            
+            uint bitMask = 1u << bitPos;
+            
+            uint newValue = setValue 
+                ? currentValue | bitMask 
+                : currentValue & ~bitMask;
+            
+            Write(wordAddr, (int)newValue);
         }
         
         private void TryAttachToProcess()

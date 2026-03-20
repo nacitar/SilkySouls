@@ -17,7 +17,7 @@ namespace SilkySouls.Memory
             public byte[] OriginalBytes { get; set; }
         }
 
-        public void InstallHook(nint codeLoc, nint origin, byte[] originalBytes)
+        public nint InstallHook(nint codeLoc, nint origin, byte[] originalBytes)
         {
             byte[] hookBytes = GetHookBytes(originalBytes.Length, codeLoc, origin);
             memoryService.WriteBytes(origin, hookBytes);
@@ -27,6 +27,7 @@ namespace SilkySouls.Memory
                 OriginAddr = origin,
                 OriginalBytes = originalBytes
             };
+            return codeLoc;
         }
 
         private byte[] GetHookBytes(int originalBytesLength, nint target, nint origin)

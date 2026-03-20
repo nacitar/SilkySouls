@@ -24,14 +24,18 @@ public interface IMemoryService
     void Write(IntPtr addr, bool value);
     void WriteString(nint addr, string value, int maxLength = 32);
     void WriteBytes(IntPtr addr, byte[] val);
-
+    void SetBit32(IntPtr addr, int bitPosition, bool setValue);
     void SetBitValue(nint addr, int flagMask, bool setValue);
     bool IsBitSet(nint addr, int flagMask);
-
+    IntPtr GetProcAddress(string moduleName, string procName);
     void RunThread(nint address, uint timeout = uint.MaxValue);
+    bool RunThreadAndWaitForCompletion(IntPtr address, uint timeout = 0xFFFFFFFF);
+    void RunPersistentThread(IntPtr address);
 
     void AllocateAndExecute(byte[] shellcode);
     void AllocCodeCave();
+
+    nint GetModuleStart(nint address);
 
     nint AllocateMem(uint size);
     void FreeMem(nint addr);
