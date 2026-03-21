@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.memory;
 using SilkySouls.Memory;
@@ -49,11 +50,17 @@ namespace SilkySouls
                 Top = SettingsManager.Default.WindowTop;
             }
             else WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-            _hookManager = new HookManager(_memoryService);
+            
             var hotkeyManager = new HotkeyManager(_memoryService);
+            _hookManager = new HookManager(_memoryService);
+            
+            IGameTickService gameTickService = new GameTickService(_stateService);
+
+            ITargetService targetService = new TargetService(_memoryService, _hookManager);
+            
             _aobScanner = new AoBScanner(_memoryService);
             var playerService = new PlayerService(_memoryService);
+            
             var travelService = new TravelService(_memoryService, _hookManager);
             var eventService = new EventService(_memoryService, _hookManager);
             var utilityService = new UtilityService(_memoryService, _hookManager);
@@ -61,8 +68,10 @@ namespace SilkySouls
             IParamService paramService = new ParamService(_memoryService);
             _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
+            
 
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager);
+            TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService);
             _travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel);
             _eventViewModel = new EventViewModel(eventService);
@@ -124,7 +133,7 @@ namespace SilkySouls
                 if (!_hasAllocatedMemory)
                 {
                     _memoryService.AllocCodeCave();
-                    Console.WriteLine($"Code cave: 0x{CodeCaveOffsets.Base.ToInt64():X}");
+                    Console.WriteLine($"Code cave: 0x{(long)CodeCaveOffsets.Base:X}");
                     _hasAllocatedMemory = true;
                 }
                 
@@ -134,6 +143,7 @@ namespace SilkySouls
                 {
                     if (_loaded) return;
                     _loaded = true;
+                    _stateService.Publish(State.Loaded);
                     TryEnableFeatures();
                     TrySetGameStartPrefs();
                     _settingsViewModel.ApplyLoadedOptions();

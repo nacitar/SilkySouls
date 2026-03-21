@@ -52,7 +52,7 @@ namespace SilkySouls.ViewModels
             
             string trimmedFlagId = SetFlagId.Trim();
         
-            if (!ulong.TryParse(trimmedFlagId, out ulong flagIdValue) || flagIdValue <= 0)
+            if (!int.TryParse(trimmedFlagId, out int flagIdValue) || flagIdValue <= 0)
                 return;
             _eventService.SetEvent(flagIdValue, FlagStateIndex == 0 ? 1 : 0);
         }
@@ -82,7 +82,7 @@ namespace SilkySouls.ViewModels
             
             string trimmedFlagId = GetFlagId.Trim();
             
-            if (!ulong.TryParse(trimmedFlagId, out ulong flagIdValue) || flagIdValue <= 0)
+            if (!int.TryParse(trimmedFlagId, out int flagIdValue) || flagIdValue <= 0)
                 return;
 
             if (_eventService.GetEvent(flagIdValue))

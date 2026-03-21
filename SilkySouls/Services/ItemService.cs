@@ -1,4 +1,5 @@
-﻿using SilkySouls.Interfaces;
+﻿using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.memory;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
@@ -20,21 +21,21 @@ namespace SilkySouls.Services
                 
                 var sleepAddr = memoryService.GetProcAddress("kernel32.dll", "Sleep");
                 
-                byte[] spawnBytes = AsmLoader.GetAsmBytes("ItemSpawn");
+                byte[] spawnBytes = AsmLoader.GetAsmBytes(AsmScript.ItemSpawn);
                 AsmHelper.WriteRelativeOffsets(spawnBytes, new []
                 {
-                    (code.ToInt64(), shouldProcessFlag.ToInt64(), 7, 0x0 + 2),
-                    (code.ToInt64() + 0xD, shouldProcessFlag.ToInt64(), 7, 0xD + 2),
-                    (code.ToInt64() + 0xA9, shouldExitFlag.ToInt64(), 7, 0xA9 + 2)
+                    (code, shouldProcessFlag, 7, 0x0 + 2),
+                    (code + 0xD, shouldProcessFlag, 7, 0xD + 2),
+                    (code + 0xA9, shouldExitFlag, 7, 0xA9 + 2)
                 });
                 
-                AsmHelper.WriteAbsoluteAddresses64(spawnBytes, new []
+                AsmHelper.WriteAbsoluteAddresses(spawnBytes, new []
                 {
-                    (Offsets.GameDataMan.Base.ToInt64(), 0x2B + 2),
+                    (Offsets.GameDataMan.Base, 0x2B + 2),
                     (Offsets.ItemGet, 0x54 + 2),
-                    (Offsets.ItemGetMenuMan.ToInt64(), 0x64 + 2),
+                    (Offsets.ItemGetMenuMan, 0x64 + 2),
                     (Offsets.ItemDlgFunc, 0x86 + 2),
-                    (sleepAddr.ToInt64(), 0x96 + 2)
+                    (sleepAddr, 0x96 + 2)
                 });
                 
                 memoryService.WriteBytes(code, spawnBytes);

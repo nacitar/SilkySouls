@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
@@ -132,10 +133,10 @@ namespace SilkySouls.Services
             var codeStart = CodeCaveOffsets.Base + (int)CodeCaveOffsets.LevelUp.CodeBlock;
             var soulsPtr = CodeCaveOffsets.Base + (int)CodeCaveOffsets.LevelUp.SoulsPtr;
 
-            byte[] codeBytes = AsmLoader.GetAsmBytes("LevelUp");
-            byte[] bytes = BitConverter.GetBytes(statArrayAddress.ToInt64());
+            byte[] codeBytes = AsmLoader.GetAsmBytes(AsmScript.LevelUp);
+            byte[] bytes = BitConverter.GetBytes(statArrayAddress);
             Array.Copy(bytes, 0, codeBytes, 2, 8);
-            bytes = BitConverter.GetBytes(soulsPtr.ToInt64());
+            bytes = BitConverter.GetBytes(soulsPtr);
             Array.Copy(bytes, 0, codeBytes, 15, 8);
             bytes = BitConverter.GetBytes(LevelUpFunc);
             Array.Copy(bytes, 0, codeBytes, 32, 8);
@@ -275,7 +276,7 @@ namespace SilkySouls.Services
                     (int)GameDataMan.GameDataOffsets.PlayerGameData,
                     (int)GameDataMan.PlayerGameData.EquipMagicData
                 }, true);
-            byte[] restoreBytes = AsmLoader.GetAsmBytes("RestoreSpellCasts");
+            byte[] restoreBytes = AsmLoader.GetAsmBytes(AsmScript.RestoreSpellCasts);
             byte[] bytes = BitConverter.GetBytes(magicDataPtr);
             Array.Copy(bytes, 0, restoreBytes, 2, 8);
             bytes = BitConverter.GetBytes(RestoreCastsFunc);
@@ -462,13 +463,12 @@ namespace SilkySouls.Services
             int equippedWep = memoryService.Read<int>(playerGameData + slotOffset);
 
             var equipGameData = memoryService.Read<nint>(playerGameData + (int)GameDataMan.PlayerGameData.EquipGameData);
-            var bytes = AsmLoader.GetAsmBytes("BreakRightHandWep");
-            AsmHelper.WriteAbsoluteAddresses64(bytes, new []
-            {
+            var bytes = AsmLoader.GetAsmBytes(AsmScript.BreakRightHandWep);
+            AsmHelper.WriteAbsoluteAddresses(bytes, [
                 (equipGameData, 0x0 + 2),
                 (equippedWep, 0x12 + 2),
                 (Funcs.GetInventoryIndexByCatAndId, 0x20 + 2)
-            });
+            ]);
             
             memoryService.AllocateAndExecute(bytes);
         }

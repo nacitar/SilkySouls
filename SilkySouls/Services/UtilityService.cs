@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
@@ -29,7 +30,7 @@ namespace SilkySouls.Services
             long drawFunc1 = _drawOrigin + 11 + 5 + memoryService.Read<int>((IntPtr)(_drawOrigin + 11) + 1);
             long drawFunc2 = _drawOrigin + 43 + 5 + memoryService.Read<int>((IntPtr)(_drawOrigin + 43) + 1);
 
-            byte[] drawBytes = AsmLoader.GetAsmBytes("EnableDraw");
+            byte[] drawBytes = AsmLoader.GetAsmBytes(AsmScript.EnableDraw);
             byte[] bytes = BitConverter.GetBytes(ezDraw);
             Array.Copy(bytes, 0, drawBytes, 2, 8);
             bytes = BitConverter.GetBytes(drawFunc1);
@@ -153,7 +154,7 @@ namespace SilkySouls.Services
 
             var inAirTimerOrigin = Hooks.InAirTimer;
             IntPtr inAirTimerBlock = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.InAirTimer;
-            byte[] inAirTimerCodeBytes = AsmLoader.GetAsmBytes("NoClip_InAirTimer");
+            byte[] inAirTimerCodeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_InAirTimer);
 
             byte[] bytes = BitConverter.GetBytes(playerCoordsBase);
             Array.Copy(bytes, 0, inAirTimerCodeBytes, 11, 8);
@@ -167,7 +168,7 @@ namespace SilkySouls.Services
             IntPtr zDirectionKbCheck = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionKbCheck;
             var keyOrigin = Hooks.Keyboard;
 
-            byte[] zDirectKbBytes = AsmLoader.GetAsmBytes("NoClip_ZDirection_KB");
+            byte[] zDirectKbBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_KB);
             bytes = BitConverter.GetBytes(25);
             Array.Copy(bytes, 0, zDirectKbBytes, 6, 4);
             bytes = BitConverter.GetBytes(39);
@@ -175,12 +176,12 @@ namespace SilkySouls.Services
             int originOffset = (int)(keyOrigin + 7 - (zDirectionKbCheck.ToInt64() + 35));
             bytes = BitConverter.GetBytes(originOffset);
             Array.Copy(bytes, 0, zDirectKbBytes, 31, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr.ToInt64());
+            bytes = BitConverter.GetBytes(zDirectionAddr);
             Array.Copy(bytes, 0, zDirectKbBytes, 38, 8);
             originOffset = (int)(keyOrigin + 7 - (zDirectionKbCheck.ToInt64() + 62));
             bytes = BitConverter.GetBytes(originOffset);
             Array.Copy(bytes, 0, zDirectKbBytes, 58, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr.ToInt64());
+            bytes = BitConverter.GetBytes(zDirectionAddr);
             Array.Copy(bytes, 0, zDirectKbBytes, 65, 8);
             originOffset = (int)(keyOrigin + 7 - (zDirectionKbCheck.ToInt64() + 89));
             bytes = BitConverter.GetBytes(originOffset);
@@ -191,11 +192,11 @@ namespace SilkySouls.Services
             IntPtr zDirectionR2Check = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionR2Check;
             var r2Origin = Hooks.ControllerR2;
 
-            byte[] r2Bytes = AsmLoader.GetAsmBytes("NoClip_ZDirection_R2");
+            byte[] r2Bytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_R2);
 
             bytes = BitConverter.GetBytes(17);
             Array.Copy(bytes, 0, r2Bytes, 9, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr.ToInt64());
+            bytes = BitConverter.GetBytes(zDirectionAddr);
             Array.Copy(bytes, 0, r2Bytes, 16, 8);
             originOffset = (int)(r2Origin + 5 - (zDirectionR2Check.ToInt64() + 35));
             bytes = BitConverter.GetBytes(originOffset);
@@ -206,11 +207,11 @@ namespace SilkySouls.Services
             IntPtr zDirectionL2Check = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionL2Check;
             var l2Origin = Hooks.ControllerL2;
 
-            byte[] l2Bytes = AsmLoader.GetAsmBytes("NoClip_ZDirection_L2");
+            byte[] l2Bytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_L2);
 
             bytes = BitConverter.GetBytes(17);
             Array.Copy(bytes, 0, l2Bytes, 9, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr.ToInt64());
+            bytes = BitConverter.GetBytes(zDirectionAddr);
             Array.Copy(bytes, 0, l2Bytes, 16, 8);
             originOffset = (int)(l2Origin + 5 - (zDirectionL2Check.ToInt64() + 35));
             bytes = BitConverter.GetBytes(originOffset);
@@ -239,7 +240,7 @@ namespace SilkySouls.Services
 
             var camPtr = memoryService.FollowPointers(Cam.Base, new[] { Cam.ChrCam, Cam.ChrExFollowCam }, true);
 
-            byte[] updateCoordsCodeBytes = AsmLoader.GetAsmBytes("NoClip_UpdateCoords");
+            byte[] updateCoordsCodeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_UpdateCoords);
 
             bytes = BitConverter.GetBytes(coordsPtr);
             Array.Copy(bytes, 0, updateCoordsCodeBytes, 3, 8);
@@ -253,7 +254,7 @@ namespace SilkySouls.Services
             Array.Copy(bytes, 0, updateCoordsCodeBytes, 106, 8);
             bytes = BitConverter.GetBytes(camPtr);
             Array.Copy(bytes, 0, updateCoordsCodeBytes, 159, 8);
-            bytes = BitConverter.GetBytes(zDirectionAddr.ToInt64());
+            bytes = BitConverter.GetBytes(zDirectionAddr);
             Array.Copy(bytes, 0, updateCoordsCodeBytes, 181, 8);
             bytes = BitConverter.GetBytes(10);
             Array.Copy(bytes, 0, updateCoordsCodeBytes, 196, 4);
@@ -336,7 +337,7 @@ namespace SilkySouls.Services
 
         public void ShowUpgradeMenu(bool isWeapon)
         {
-            byte[] upgradeBytes = AsmLoader.GetAsmBytes("OpenEnhanceShop");
+            byte[] upgradeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenEnhanceShop);
             var playerGameData = memoryService.FollowPointers(GameDataMan.Base,
                 new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
             byte[] bytes = BitConverter.GetBytes(playerGameData);
@@ -350,51 +351,10 @@ namespace SilkySouls.Services
             memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
                 isDeathCamEnabled ? (byte)1 : (byte)0);
 
-        public void ToggleDisableEvents(bool isDisableEventsEnabled)
-        {
-            memoryService.Write(memoryService.Read<nint>(DebugEventMan.Base) + DebugEventMan.DisableEvents,
-                isDisableEventsEnabled ? (byte)1 : (byte)0);
-        }
-
-        public void SetEvent(ulong flagId)
-        {
-            var eventMan = memoryService.Read<nint>(EventFlagMan.Base);
-            var setEventBytes = AsmLoader.GetAsmBytes("SetEvent");
-            var bytes = BitConverter.GetBytes(eventMan);
-            Array.Copy(bytes, 0, setEventBytes, 0x2, 8);
-            bytes = BitConverter.GetBytes(flagId);
-            Array.Copy(bytes, 0, setEventBytes, 0xA + 2, 8);
-            bytes = BitConverter.GetBytes(Funcs.SetEvent);
-            Array.Copy(bytes, 0, setEventBytes, 0x24 + 2, 8);
-            memoryService.AllocateAndExecute(setEventBytes);
-        }
-
-        public void SetMultipleEvents(params ulong[] flagIds)
-        {
-            foreach (var flagId in flagIds)
-            {
-                SetEvent(flagId);
-            }
-        }
-
-        public bool GetEvent(ulong eventId)
-        {
-            var getEventBytes = AsmLoader.GetAsmBytes("GetEvent");
-            AsmHelper.WriteAbsoluteAddresses64(getEventBytes, new[]
-            {
-                (memoryService.Read<nint>(EventFlagMan.Base), 0x0 + 2),
-                ((long)eventId, 0xA + 2),
-                (Funcs.GetEvent, 0x14 + 2),
-                (CodeCaveOffsets.Base.ToInt64() + CodeCaveOffsets.GetEventResult, 0x28 + 2)
-            });
-
-            memoryService.AllocateAndExecute(getEventBytes);
-            return memoryService.Read<byte>(CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult) == 1;
-        }
-
+        
         public void OpenRegularShop(ulong[] shopParams)
         {
-            var openRegularShopBytes = AsmLoader.GetAsmBytes("OpenRegularShop");
+            var openRegularShopBytes = AsmLoader.GetAsmBytes(AsmScript.OpenRegularShop);
             var bytes = BitConverter.GetBytes(shopParams[0]);
             Array.Copy(bytes, 0, openRegularShopBytes, 0x0 + 2, 8);
             bytes = BitConverter.GetBytes(shopParams[1]);
@@ -408,7 +368,7 @@ namespace SilkySouls.Services
 
         public void OpenAttunement()
         {
-            var codeBytes = AsmLoader.GetAsmBytes("OpenAttunement");
+            var codeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenAttunement);
             var bytes = BitConverter.GetBytes(Funcs.AttunementWindowPrep);
             Array.Copy(bytes, 0, codeBytes, 0xE + 2, 8);
             bytes = BitConverter.GetBytes(Funcs.OpenAttunement);

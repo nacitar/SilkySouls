@@ -1,4 +1,5 @@
 ﻿using System;
+using SilkySouls.Memory;
 
 namespace SilkySouls.memory
 {
@@ -27,6 +28,7 @@ namespace SilkySouls.memory
                 Health = 0x3E8,
                 MaxHealth = 0x3EC,
                 Stamina = 0x3F8,
+                
                 NoDamage = 0x524,
                 ChrFlags = 0x525,
                 NoGoodsConsume = 0x527,
@@ -56,6 +58,31 @@ namespace SilkySouls.memory
                 Z = 0x124,
                 Y = 0x128,
             }
+        }
+
+        public static class ChrIns
+        {
+            public const int Handle = 0x8;
+
+            public const int ChrCtrl = 0x68;
+            
+            public const int CurrentPoise = 0x250;
+            public const int MaxPoise = 0x254;
+            public const int PoiseTimer = 0x25C;
+            public const int Coords = 0x2C0;
+            public const int Health = 0x3E8;
+            public const int MaxHealth = 0x3EC;
+            public const int PoisonCurrent = 0x418;
+            public const int ToxicCurrent = 0x41C;
+            public const int BleedCurrent = 0x420;
+            public const int PoisonMax = 0x428;
+            public const int ToxicMax = 0x42C;
+            public const int BleedMax = 0x430;
+
+            public static readonly BitFlag NoDamage = new(0x524, 1 << 6);
+            public static readonly BitFlag NoUpdate = new(0x525, 1 << 7);
+
+            public static readonly int[] AnimSpeed = [ChrCtrl, 0x18, 0xA8];
         }
 
         public static class DebugEventMan
@@ -117,11 +144,11 @@ namespace SilkySouls.memory
             }
         }
         
-        public static long ItemGet;
+        public static nint ItemGet;
         public static IntPtr ItemGetMenuMan;
-        public static long ItemDlgFunc;
-        public static long LevelUpFunc;
-        public static long RestoreCastsFunc;
+        public static nint ItemDlgFunc;
+        public static nint LevelUpFunc;
+        public static nint RestoreCastsFunc;
 
         public static class FieldArea
         {
@@ -186,10 +213,10 @@ namespace SilkySouls.memory
             BleedMax = 0x430,
             ForceActPtr = 0xAD0,
         }
+        
+        public const int BattleGoalId = 0x4;
 
-        public const int BattleGoalIdPtr1 = 0xAD0;
-        public const int BattleGoalIdPtr2 = 0xC0;
-        public const int BattleGoalIdOffset = 0x4;
+        public static readonly int[] NpcThinkParam = [0xAD0, 0xC0];
         
         public const int SpEffectPtr1 = 0x28;
         public const int SpEffectPtr2 = 0x8;
@@ -267,10 +294,12 @@ namespace SilkySouls.memory
         public static class WorldAiMan
         {
             public static IntPtr Base;
-            public const int DLLuaPtr = 0x17E8;
+
+            public static readonly int[] LuaGlobalTable = [0x17E8, 0x8, 0x28, 0x78];
+            
+            public const int WorldAiLuaManager = 0x17E8;
             public const int DLLua = 0x8;
-            public const int LuaModule = 0x28;
-          
+            public const int LuaState = 0x28;
         }
 
         public static class EmkEventIns
@@ -309,14 +338,14 @@ namespace SilkySouls.memory
 
         public static class Funcs
         {
-            public static long SetEvent;
-            public static long GetEvent;
-            public static long ShopParamSave;
-            public static long OpenRegularShop;
-            public static long ProcessEmevdCommand;
-            public static long OpenAttunement;
-            public static long AttunementWindowPrep;
-            public static long GetInventoryIndexByCatAndId;
+            public static nint SetEvent;
+            public static nint GetEvent;
+            public static nint ShopParamSave;
+            public static nint OpenRegularShop;
+            public static nint ProcessEmevdCommand;
+            public static nint OpenAttunement;
+            public static nint AttunementWindowPrep;
+            public static nint GetInventoryIndexByCatAndId;
 
         }
     }

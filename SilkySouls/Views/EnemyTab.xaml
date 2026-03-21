@@ -39,12 +39,12 @@
                         <Run Text="Health: " />
                         <Run Text="{Binding TargetCurrentHealth, Mode=OneWay}" />
                         <Run Text="/" />
-                        <Run Text="{Binding TargetMaxHealth, Mode=OneWay}" />
+                        <Run Text="{Binding MaxHealth, Mode=OneWay}" />
                     </TextBlock>
 
                     <ProgressBar Width="250" Height="20"
                                  Value="{Binding TargetCurrentHealth}"
-                                 Maximum="{Binding TargetMaxHealth, FallbackValue=100}"
+                                 Maximum="{Binding MaxHealth, FallbackValue=100}"
                                  Margin="0,0,0,5">
                         <ProgressBar.Template>
                             <ControlTemplate TargetType="ProgressBar">

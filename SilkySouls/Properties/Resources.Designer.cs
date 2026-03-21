@@ -288,29 +288,6 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 48 89 fa                mov    rdx,rdi
-        ///50                      push   rax
-        ///51                      push   rcx
-        ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
-        ///48 8b 48 68             mov    rcx,QWORD PTR [rax+0x68]
-        ///48 39 d1                cmp    rcx,rdx
-        ///74 0d                   je     25 &lt;exit&gt;
-        ///48 89 d0                mov    rax,rdx
-        ///48 a3 00 00 00 00 00    movabs ds:0x0,rax
-        ///00 00 00
-        ///000000000025 &lt;exit&gt;:
-        ///59                      pop    rcx
-        ///58                      pop    rax
-        ///48 89 d9                 [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string LastLockedTarget {
-            get {
-                return ResourceManager.GetString("LastLockedTarget", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 48 b8 00 00 00 00 00    movabs rax,0x0
         ///00 00 00
         ///48 89 c2                mov    rdx,rax
@@ -327,6 +304,27 @@ namespace SilkySouls.Properties {
         internal static string LevelUp {
             get {
                 return ResourceManager.GetString("LevelUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 48 89 fa                mov    rdx,rdi
+        ///50                      push   rax
+        ///51                      push   rcx
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # c &lt;_main+0xc&gt;
+        ///48 8b 48 68             mov    rcx,QWORD PTR [rax+0x68]
+        ///48 39 d1                cmp    rcx,rdx
+        ///74 07                   je     1c &lt;exit&gt;
+        ///48 89 15 00 00 00 00    mov    QWORD PTR [rip+0x0],rdx        # 1c &lt;exit&gt;
+        ///
+        ///00000000001c &lt;exit&gt;:
+        ///59                      pop    rcx
+        ///58                      pop    rax
+        ///48 89 d9    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string LockedTarget {
+            get {
+                return ResourceManager.GetString("LockedTarget", resourceCulture);
             }
         }
         

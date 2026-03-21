@@ -43,16 +43,16 @@ namespace SilkySouls.Memory
             Offsets.DebugFlags.Base = FindAddressByPattern(Patterns.DebugFlags);
             Offsets.Cam.Base = FindAddressByPattern(Patterns.CamBase);
             Offsets.GameDataMan.Base = FindAddressByPattern(Patterns.GameDataMan);
-            Offsets.ItemGet = FindAddressByPattern(Patterns.ItemGetFunc).ToInt64();
+            Offsets.ItemGet = FindAddressByPattern(Patterns.ItemGetFunc);
             Offsets.ItemGetMenuMan = FindAddressByPattern(Patterns.ItemGetMenuMan);
-            Offsets.ItemDlgFunc = FindAddressByPattern(Patterns.ItemGetDlgFunc).ToInt64();
+            Offsets.ItemDlgFunc = FindAddressByPattern(Patterns.ItemGetDlgFunc);
             Offsets.FieldArea.Base = FindAddressByPattern(Patterns.FieldArea);
             Offsets.GameMan.Base = FindAddressByPattern(Patterns.GameMan);
             Offsets.DamageMan.Base = FindAddressByPattern(Patterns.DamMan);
             Offsets.MenuMan.Base = FindAddressByPattern(Patterns.MenuMan);
             Offsets.EventFlagMan.Base = FindAddressByPattern(Patterns.EventFlagMan);
-            Offsets.LevelUpFunc = FindAddressByPattern(Patterns.LevelUpFunc).ToInt64();
-            Offsets.RestoreCastsFunc = FindAddressByPattern(Patterns.RestoreCastsFunc).ToInt64();
+            Offsets.LevelUpFunc = FindAddressByPattern(Patterns.LevelUpFunc);
+            Offsets.RestoreCastsFunc = FindAddressByPattern(Patterns.RestoreCastsFunc);
             Offsets.HgDraw.Base = FindAddressByPattern(Patterns.HgDraw);
             Offsets.WarpEvent = FindAddressByPattern(Patterns.WarpEvent);
             Offsets.WarpFunc = FindAddressByPattern(Patterns.WarpFunc).ToInt64();
@@ -115,14 +115,14 @@ namespace SilkySouls.Memory
             }
             
             
-            Offsets.Funcs.SetEvent = FindAddressByPattern(Patterns.SetEvent).ToInt64();
-            Offsets.Funcs.GetEvent = FindAddressByPattern(Patterns.GetEvent).ToInt64();
-            Offsets.Funcs.ShopParamSave = FindAddressByPattern(Patterns.ShopParamSave).ToInt64();
-            Offsets.Funcs.OpenRegularShop = FindAddressByPattern(Patterns.OpenRegularShop).ToInt64();
-            Offsets.Funcs.ProcessEmevdCommand = FindAddressByPattern(Patterns.ProcessEmevdCommand).ToInt64();
-            Offsets.Funcs.OpenAttunement = FindAddressByPattern(Patterns.OpenAttunement).ToInt64();
-            Offsets.Funcs.AttunementWindowPrep = FindAddressByPattern(Patterns.AttunementWindowPrep).ToInt64();
-            Offsets.Funcs.GetInventoryIndexByCatAndId = FindAddressByPattern(Patterns.GetInventoryIndexByCatAndId).ToInt64();
+            Offsets.Funcs.SetEvent = FindAddressByPattern(Patterns.SetEvent);
+            Offsets.Funcs.GetEvent = FindAddressByPattern(Patterns.GetEvent);
+            Offsets.Funcs.ShopParamSave = FindAddressByPattern(Patterns.ShopParamSave);
+            Offsets.Funcs.OpenRegularShop = FindAddressByPattern(Patterns.OpenRegularShop);
+            Offsets.Funcs.ProcessEmevdCommand = FindAddressByPattern(Patterns.ProcessEmevdCommand);
+            Offsets.Funcs.OpenAttunement = FindAddressByPattern(Patterns.OpenAttunement);
+            Offsets.Funcs.AttunementWindowPrep = FindAddressByPattern(Patterns.AttunementWindowPrep);
+            Offsets.Funcs.GetInventoryIndexByCatAndId = FindAddressByPattern(Patterns.GetInventoryIndexByCatAndId);
             
             
             #if DEBUG
@@ -165,7 +165,7 @@ namespace SilkySouls.Memory
             Console.WriteLine($"Hooks.ControllerL2: 0x{Offsets.Hooks.ControllerL2:X}");
             Console.WriteLine($"Hooks.UpdateCoords: 0x{Offsets.Hooks.UpdateCoords:X}");
             Console.WriteLine($"Hooks.WarpCoords: 0x{Offsets.Hooks.WarpCoords:X}");
-            Console.WriteLine($"Hooks.LuaIfElse: 0x{Offsets.Hooks.LuaIfCase:X}");
+            Console.WriteLine($"Hooks.LuaIfElse: 0x{(long)Offsets.Hooks.LuaIfCase:X}");
             Console.WriteLine($"Hooks.Emevd: 0x{Offsets.Hooks.Emevd:X}");
             Console.WriteLine($"Hooks.Draw: 0x{Offsets.Hooks.Draw:X}");
             Console.WriteLine($"Patches.InfiniteDurabilityPatch: 0x{Offsets.Patches.InfiniteDurabilityPatch.ToInt64():X}");

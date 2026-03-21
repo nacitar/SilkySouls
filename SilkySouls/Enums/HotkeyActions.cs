@@ -2,7 +2,7 @@
 
 namespace SilkySouls.Enums;
 
-public enum AsmScripts
+public enum HotkeyActions
 {
     
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
+using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Models;
@@ -9,30 +9,22 @@ using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Services
 {
-    public class TravelService
+    public class TravelService(IMemoryService memoryService, HookManager hookManager)
     {
-        private readonly IMemoryService _memoryService;
-        private readonly HookManager _hookManager;
-        public TravelService(IMemoryService memoryService, HookManager hookManager)
-        {
-            _memoryService = memoryService;
-            _hookManager = hookManager;
-        }
-
         public void Warp(WarpLocation selectedWarpLocation)
         {
             var lastBonfireAdr =
-                _memoryService.FollowPointers(GameMan.Base, new[] { GameMan.LastBonfire }, false);
+                memoryService.FollowPointers(GameMan.Base, new[] { GameMan.LastBonfire }, false);
 
-            _memoryService.Write(lastBonfireAdr, selectedWarpLocation.Id);
+            memoryService.Write(lastBonfireAdr, selectedWarpLocation.Id);
 
-            byte[] warpBytes = AsmLoader.GetAsmBytes("Warp");
+            byte[] warpBytes = AsmLoader.GetAsmBytes(AsmScript.Warp);
             byte[] bytes = BitConverter.GetBytes(WarpEvent.ToInt64());
             Array.Copy(bytes, 0, warpBytes, 2, 8);
             bytes = BitConverter.GetBytes(WarpFunc);
             Array.Copy(bytes, 0, warpBytes, 24, 8);
 
-            _memoryService.AllocateAndExecute(warpBytes);
+            memoryService.AllocateAndExecute(warpBytes);
 
             if (selectedWarpLocation.HasCoordinates)
             {
@@ -41,19 +33,20 @@ namespace SilkySouls.Services
                 var coordCodeBlockAddr = CodeCaveOffsets.Base + (int)CodeCaveOffsets.WarpCoords.CoordCode;
 
                 byte[] coords = new byte[4 * sizeof(float)];
-                Buffer.BlockCopy(selectedWarpLocation.Coords, 0, coords, 0, Math.Min(selectedWarpLocation.Coords.Length, 3) * sizeof(float));
+                Buffer.BlockCopy(selectedWarpLocation.Coords, 0, coords, 0,
+                    Math.Min(selectedWarpLocation.Coords.Length, 3) * sizeof(float));
                 BitConverter.GetBytes(1.0f).CopyTo(coords, 3 * sizeof(float));
 
-                _memoryService.WriteBytes(coordsAddr, coords);
+                memoryService.WriteBytes(coordsAddr, coords);
 
-                byte[] coordWarpBytes = AsmLoader.GetAsmBytes("WarpCoords");
-                bytes = BitConverter.GetBytes(coordsAddr.ToInt64());
+                byte[] coordWarpBytes = AsmLoader.GetAsmBytes(AsmScript.WarpCoords);
+                bytes = BitConverter.GetBytes(coordsAddr);
                 Array.Copy(bytes, 0, coordWarpBytes, 3, 8);
-                int originOffset = (int)(coordsOrigin + 8 - (coordCodeBlockAddr.ToInt64() + 33));
+                int originOffset = (int)(coordsOrigin + 8 - (coordCodeBlockAddr + 33));
                 bytes = BitConverter.GetBytes(originOffset);
                 Array.Copy(bytes, 0, coordWarpBytes, 29, 4);
 
-                _memoryService.WriteBytes(coordCodeBlockAddr, coordWarpBytes);
+                memoryService.WriteBytes(coordCodeBlockAddr, coordWarpBytes);
 
                 var angleAddr = CodeCaveOffsets.Base + (int)CodeCaveOffsets.WarpCoords.Angle;
                 var angleOrigin = coordsOrigin + 0x40;
@@ -62,27 +55,27 @@ namespace SilkySouls.Services
                 byte[] angle = new byte[16];
                 bytes = BitConverter.GetBytes(selectedWarpLocation.Angle);
                 Array.Copy(bytes, 0, angle, 4, 4);
-                _memoryService.WriteBytes(angleAddr, angle);
+                memoryService.WriteBytes(angleAddr, angle);
 
-                byte[] angleWarpBytes = AsmLoader.GetAsmBytes("WarpAngle");
-                bytes = BitConverter.GetBytes(angleAddr.ToInt64());
+                byte[] angleWarpBytes = AsmLoader.GetAsmBytes(AsmScript.WarpAngle);
+                bytes = BitConverter.GetBytes(angleAddr);
                 Array.Copy(bytes, 0, angleWarpBytes, 3, 8);
-                originOffset = (int)(angleOrigin + 8 - (angleCodeBlockAddr.ToInt64() + 33));
+                originOffset = (int)(angleOrigin + 8 - (angleCodeBlockAddr + 33));
                 bytes = BitConverter.GetBytes(originOffset);
                 Array.Copy(bytes, 0, angleWarpBytes, 29, 4);
-                _memoryService.WriteBytes(angleCodeBlockAddr, angleWarpBytes);
+                memoryService.WriteBytes(angleCodeBlockAddr, angleWarpBytes);
 
                 IntPtr loadingFlagAddr =
-                    _memoryService.FollowPointers(MenuMan.Base, new[] { (int)MenuMan.MenuManData.LoadedFlag }, false);
+                    memoryService.FollowPointers(MenuMan.Base, new[] { (int)MenuMan.MenuManData.LoadedFlag }, false);
 
                 if (!WaitForLoadingFlag(loadingFlagAddr, 0))
                 {
                     return;
                 }
 
-                _hookManager.InstallHook(coordCodeBlockAddr, coordsOrigin,
+                hookManager.InstallHook(coordCodeBlockAddr, coordsOrigin,
                     new byte[] { 0x66, 0x0F, 0x7F, 0x80, 0x80, 0x0A, 0x00, 0x00 });
-                _hookManager.InstallHook(angleCodeBlockAddr, angleOrigin,
+                hookManager.InstallHook(angleCodeBlockAddr, angleOrigin,
                     new byte[] { 0x66, 0x0F, 0x7F, 0x80, 0x90, 0x0A, 0x00, 0x00 });
 
 
@@ -90,8 +83,8 @@ namespace SilkySouls.Services
                 {
                 }
 
-                _hookManager.UninstallHook(coordCodeBlockAddr);
-                _hookManager.UninstallHook(angleCodeBlockAddr);
+                hookManager.UninstallHook(coordCodeBlockAddr);
+                hookManager.UninstallHook(angleCodeBlockAddr);
             }
         }
 
@@ -101,7 +94,7 @@ namespace SilkySouls.Services
 
             while (Environment.TickCount - startTime < 10000)
             {
-                int loadingValue = _memoryService.Read<int>(loadingFlagAddr);
+                int loadingValue = memoryService.Read<int>(loadingFlagAddr);
                 if (loadingValue == expectedValue)
                 {
                     return true;
@@ -112,22 +105,22 @@ namespace SilkySouls.Services
 
             return false;
         }
-        
+
         public void UnlockBonfireWarps()
         {
-            var bonfireFlagBase = _memoryService.FollowPointers(EventFlagMan.Base,
+            var bonfireFlagBase = memoryService.FollowPointers(EventFlagMan.Base,
                 new[] { EventFlagMan.FlagPtr }, true);
 
             var bonfireWarpFlagAddr = bonfireFlagBase + EventFlagMan.WarpFlag;
-            _memoryService.SetBit32(bonfireWarpFlagAddr, EventFlagMan.WarpFlagBit1, true);
-            _memoryService.SetBit32(bonfireWarpFlagAddr, EventFlagMan.WarpFlagBit2, true);
+            memoryService.SetBit32(bonfireWarpFlagAddr, EventFlagMan.WarpFlagBit1, true);
+            memoryService.SetBit32(bonfireWarpFlagAddr, EventFlagMan.WarpFlagBit2, true);
 
             var bonfireFlagAddr = bonfireFlagBase + EventFlagMan.BonfireFlags;
             foreach (EventFlagMan.BonfireBitFlag flag in Enum.GetValues(
                          typeof(EventFlagMan.BonfireBitFlag)))
             {
                 int bitPosition = (int)flag;
-                _memoryService.SetBit32(bonfireFlagAddr, bitPosition, true);
+                memoryService.SetBit32(bonfireFlagAddr, bitPosition, true);
             }
         }
     }

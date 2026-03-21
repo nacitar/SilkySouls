@@ -5,7 +5,7 @@ namespace SilkySouls.Memory
     public static class CodeCaveOffsets
     {
        
-            public static IntPtr Base;
+            public static nint Base;
             public const int EnableDraw = 0x0;
             public const int TargetView = 0x200;
             public const int LockedTarget = 0x220;
