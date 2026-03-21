@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -53,10 +52,14 @@ namespace SilkySouls
             
             IGameTickService gameTickService = new GameTickService(_stateService);
 
-            ITargetService targetService = new TargetService(_memoryService, _hookManager);
+            IPlayerService playerService = new PlayerService(_memoryService);
             
+            
+            ITargetService targetService = new TargetService(_memoryService, _hookManager);
+
             _aobScanner = new AoBScanner(_memoryService);
-            var playerService = new PlayerService(_memoryService);
+
+            var playerServiceOld = new PlayerServiceOld(_memoryService);
             
             var travelService = new TravelService(_memoryService, _hookManager);
             var eventService = new EventService(_memoryService, _hookManager);
@@ -67,7 +70,7 @@ namespace SilkySouls
             var settingsService = new SettingsService(_memoryService);
             
 
-            _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService);
+            _playerViewModel = new PlayerViewModel(playerServiceOld, playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
             var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);

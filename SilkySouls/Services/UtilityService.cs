@@ -223,7 +223,7 @@ namespace SilkySouls.Services
 
             var coordsPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base), new[]
             {
-                (int)WorldChrMan.BaseOffsets.PlayerIns,
+                (int)WorldChrMan.PlayerIns,
                 (int)WorldChrMan.PlayerInsOffsets.CoordsPtr1,
                 WorldChrMan.CoordsPtr2,
                 WorldChrMan.CoordsPtr3,
@@ -234,7 +234,7 @@ namespace SilkySouls.Services
             var padManPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
-                    (int)WorldChrMan.BaseOffsets.PlayerIns,
+                    (int)WorldChrMan.PlayerIns,
                     (int)WorldChrMan.PlayerInsOffsets.PadMan
                 }, true);
 

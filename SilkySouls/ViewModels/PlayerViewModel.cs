@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using System.Windows.Threading;
 using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
@@ -15,14 +14,14 @@ namespace SilkySouls.ViewModels
 {
     public class PlayerViewModel : BaseViewModel
     {
-        private readonly PlayerService _playerService;
+        private readonly PlayerServiceOld _playerServiceOld;
+        private readonly IPlayerService _playerService;
         private readonly HotkeyManager _hotkeyManager;
-        private readonly DispatcherTimer _timer;
+        private readonly IGameTickService _gameTickService;
 
         private CharacterState _saveState1 = new();
         private CharacterState _saveState2 = new();
-
-        private (float x, float y, float z) _coords;
+        
         private float _playerDesiredSpeed = -1f;
         private const float DefaultSpeed = 1f;
         private const float Epsilon = 0.0001f;
@@ -32,21 +31,24 @@ namespace SilkySouls.ViewModels
         private bool _wasNoDeathEnabled;
         private int _currentSoulLevel;
 
-        public PlayerViewModel(PlayerService playerService, HotkeyManager hotkeyManager, IStateService stateService)
+        public PlayerViewModel(PlayerServiceOld playerServiceOld, IPlayerService playerService,
+            HotkeyManager hotkeyManager, IStateService stateService, IGameTickService gameTickService)
         {
+            _playerServiceOld = playerServiceOld;
             _playerService = playerService;
             _hotkeyManager = hotkeyManager;
+            _gameTickService = gameTickService;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
 
-            SetRtsrCommand = new DelegateCommand(() => SetHp(1));
-            SetMaxHpCommand = new DelegateCommand(() => SetHp(CurrentMaxHp));
+            SetRtsrCommand = new DelegateCommand(SetRtsr);
+            SetMaxHpCommand = new DelegateCommand(SetMaxHp);
             SavePosCommand = new DelegateCommand(OnSavePos);
             RestorePosCommand = new DelegateCommand(OnRestorePos);
             RestoreSpellCastsCommand = new DelegateCommand(() => _playerService.RestoreSpellCasts());
             GiveSoulsCommand = new DelegateCommand(() => _playerService.GiveSouls());
-            BreakWeaponCommand = new DelegateCommand(() => _playerService.BreakWeapon(SelectedWeaponSlot.SlotOffset));
+            BreakWeaponCommand = new DelegateCommand(() => _playerServiceOld.BreakWeapon(SelectedWeaponSlot.SlotOffset));
 
             RegisterHotkeys();
 
@@ -60,32 +62,9 @@ namespace SilkySouls.ViewModels
                 new("Left hand 2", 0x330)
             ];
             SelectedWeaponSlot = EquippedWeapons.FirstOrDefault();
-
-            _timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(100)
-            };
-            _timer.Tick += (s, e) =>
-            {
-                if (_pauseUpdates) return;
-
-                CurrentHp = _playerService.GetHp();
-                CurrentMaxHp = _playerService.GetMaxHp();
-                Souls = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Souls);
-                PlayerSpeed = _playerService.GetPlayerSpeed();
-                _coords = _playerService.GetReadOnlyCoords();
-                PosX = _coords.x;
-                PosY = _coords.y;
-                PosZ = _coords.z;
-                int newSoulLevel = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.SoulLevel);
-                if (_currentSoulLevel != newSoulLevel)
-                {
-                    SoulLevel = newSoulLevel;
-                    _currentSoulLevel = newSoulLevel;
-                    LoadStats();
-                }
-            };
         }
+
+        
 
         #region Commands
 
@@ -154,27 +133,7 @@ namespace SilkySouls.ViewModels
         public float PosX
         {
             get => _posX;
-            set
-            {
-                if (SetProperty(ref _posX, value))
-                {
-                    _playerService.SetAxis(WorldChrMan.Coords.X, value);
-                }
-            }
-        }
-
-        private float _posZ;
-
-        public float PosZ
-        {
-            get => _posZ;
-            set
-            {
-                if (SetProperty(ref _posZ, value))
-                {
-                    _playerService.SetAxis(WorldChrMan.Coords.Z, value);
-                }
-            }
+            set => SetProperty(ref _posX, value);
         }
 
         private float _posY;
@@ -182,13 +141,15 @@ namespace SilkySouls.ViewModels
         public float PosY
         {
             get => _posY;
-            set
-            {
-                if (SetProperty(ref _posY, value))
-                {
-                    _playerService.SetAxis(WorldChrMan.Coords.Y, value);
-                }
-            }
+            set => SetProperty(ref _posY, value);
+        }
+
+        private float _posZ;
+
+        public float PosZ
+        {
+            get => _posZ;
+            set => SetProperty(ref _posZ, value);
         }
 
         private bool _isNoDeathEnabled;
@@ -200,7 +161,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoDeathEnabled, value))
                 {
-                    _playerService.ToggleNoDeath(_isNoDeathEnabled ? 1 : 0);
+                    _playerServiceOld.ToggleNoDeath(_isNoDeathEnabled ? 1 : 0);
                 }
             }
         }
@@ -214,7 +175,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoDamageEnabled, value))
                 {
-                    _playerService.ToggleNoDamage(_isNoDamageEnabled);
+                    _playerServiceOld.ToggleNoDamage(_isNoDamageEnabled);
                 }
             }
         }
@@ -228,7 +189,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfiniteStaminaEnabled, value))
                 {
-                    _playerService.ToggleInfiniteStamina(_isInfiniteStaminaEnabled);
+                    _playerServiceOld.ToggleInfiniteStamina(_isInfiniteStaminaEnabled);
                 }
             }
         }
@@ -242,7 +203,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoGoodsConsumeEnabled, value))
                 {
-                    _playerService.ToggleNoGoodsConsume(_isNoGoodsConsumeEnabled);
+                    _playerServiceOld.ToggleNoGoodsConsume(_isNoGoodsConsumeEnabled);
                 }
             }
         }
@@ -256,7 +217,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfiniteCastsEnabled, value))
                 {
-                    _playerService.ToggleInfiniteCasts(_isInfiniteCastsEnabled ? 1 : 0);
+                    _playerServiceOld.ToggleInfiniteCasts(_isInfiniteCastsEnabled ? 1 : 0);
                 }
             }
         }
@@ -270,7 +231,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfiniteDurabilityEnabled, value))
                 {
-                    _playerService.ToggleInfiniteDurability(_isInfiniteDurabilityEnabled);
+                    _playerServiceOld.ToggleInfiniteDurability(_isInfiniteDurabilityEnabled);
                 }
             }
         }
@@ -284,7 +245,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isOneShotEnabled, value))
                 {
-                    _playerService.ToggleOneShot(_isOneShotEnabled ? 1 : 0);
+                    _playerServiceOld.ToggleOneShot(_isOneShotEnabled ? 1 : 0);
                 }
             }
         }
@@ -298,7 +259,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInvisibleEnabled, value))
                 {
-                    _playerService.ToggleInvisible(_isInvisibleEnabled ? 1 : 0);
+                    _playerServiceOld.ToggleInvisible(_isInvisibleEnabled ? 1 : 0);
                 }
             }
         }
@@ -312,7 +273,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isSilentEnabled, value))
                 {
-                    _playerService.ToggleSilent(_isSilentEnabled ? 1 : 0);
+                    _playerServiceOld.ToggleSilent(_isSilentEnabled ? 1 : 0);
                 }
             }
         }
@@ -326,7 +287,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoAmmoConsumeEnabled, value))
                 {
-                    _playerService.ToggleNoAmmoConsume(_isNoAmmoConsumeEnabled ? 1 : 0);
+                    _playerServiceOld.ToggleNoAmmoConsume(_isNoAmmoConsumeEnabled ? 1 : 0);
                 }
             }
         }
@@ -340,7 +301,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfinitePoiseEnabled, value))
                 {
-                    _playerService.ToggleInfinitePoise(_isInfinitePoiseEnabled);
+                    _playerServiceOld.ToggleInfinitePoise(_isInfinitePoiseEnabled);
                 }
             }
         }
@@ -361,7 +322,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isNoRollEnabled, value)) return;
-                _playerService.ToggleNoRoll(_isNoRollEnabled);
+                _playerServiceOld.ToggleNoRoll(_isNoRollEnabled);
             }
         }
 
@@ -462,7 +423,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _newGame, value))
                 {
-                    _playerService.SetNewGame(value);
+                    _playerServiceOld.SetNewGame(value);
                 }
             }
         }
@@ -476,7 +437,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _playerSpeed, value))
                 {
-                    _playerService.SetPlayerSpeed(value);
+                    _playerServiceOld.SetPlayerSpeed(value);
                 }
             }
         }
@@ -501,21 +462,9 @@ namespace SilkySouls.ViewModels
 
         #region Public Methods
 
-        public void PauseUpdates()
-        {
-            _pauseUpdates = true;
-        }
-
-        public void ResumeUpdates()
-        {
-            _pauseUpdates = false;
-        }
-
-        public void SetHp(int hp)
-        {
-            _playerService.SetHp(hp);
-            CurrentHp = hp;
-        }
+        public void PauseUpdates() => _pauseUpdates = true;
+        public void ResumeUpdates() => _pauseUpdates = false;
+        public void SetHp(int hp) => _playerService.SetHp(hp);
 
         public void SetStat(string statName, int val)
         {
@@ -527,8 +476,8 @@ namespace SilkySouls.ViewModels
         public void TrySetNgPref()
         {
             if (IsAutoSetNewGameSixEnabled)
-                _playerService.SetNewGame(7);
-            NewGame = _playerService.GetNewGame();
+                _playerServiceOld.SetNewGame(7);
+            NewGame = _playerServiceOld.GetNewGame();
         }
 
         #endregion
@@ -538,38 +487,38 @@ namespace SilkySouls.ViewModels
         private void OnNotLoaded()
         {
             AreOptionsEnabled = false;
-            _timer.Stop();
+            _gameTickService.Unsubscribe(PlayerTick);
         }
 
         private void OnLoaded()
         {
             if (IsNoDeathEnabled)
-                _playerService.ToggleNoDeath(1);
+                _playerServiceOld.ToggleNoDeath(1);
             if (IsNoDamageEnabled)
-                _playerService.ToggleNoDamage(true);
+                _playerServiceOld.ToggleNoDamage(true);
             if (IsInfiniteStaminaEnabled)
-                _playerService.ToggleInfiniteStamina(true);
+                _playerServiceOld.ToggleInfiniteStamina(true);
             if (IsNoGoodsConsumeEnabled)
-                _playerService.ToggleNoGoodsConsume(true);
+                _playerServiceOld.ToggleNoGoodsConsume(true);
             if (IsInfiniteCastsEnabled)
-                _playerService.ToggleInfiniteCasts(1);
+                _playerServiceOld.ToggleInfiniteCasts(1);
             if (IsOneShotEnabled)
-                _playerService.ToggleOneShot(1);
+                _playerServiceOld.ToggleOneShot(1);
             if (IsInvisibleEnabled)
-                _playerService.ToggleInvisible(1);
+                _playerServiceOld.ToggleInvisible(1);
             if (IsSilentEnabled)
-                _playerService.ToggleSilent(1);
+                _playerServiceOld.ToggleSilent(1);
             if (IsNoAmmoConsumeEnabled)
-                _playerService.ToggleNoAmmoConsume(1);
+                _playerServiceOld.ToggleNoAmmoConsume(1);
             if (IsInfinitePoiseEnabled)
-                _playerService.ToggleInfinitePoise(true);
+                _playerServiceOld.ToggleInfinitePoise(true);
             if (IsInfiniteDurabilityEnabled)
-                _playerService.ToggleInfiniteDurability(true);
+                _playerServiceOld.ToggleInfiniteDurability(true);
             if (IsNoRollEnabled)
-                _playerService.ToggleNoRoll(true);
+                _playerServiceOld.ToggleNoRoll(true);
             AreOptionsEnabled = true;
             LoadStats();
-            _timer.Start();
+            _gameTickService.Subscribe(PlayerTick);
         }
 
         private void RegisterHotkeys()
@@ -578,13 +527,38 @@ namespace SilkySouls.ViewModels
             _hotkeyManager.RegisterAction(HotkeyActions.SavePos2, () => SavePos(1));
             _hotkeyManager.RegisterAction(HotkeyActions.RestorePos1, () => RestorePos(0));
             _hotkeyManager.RegisterAction(HotkeyActions.RestorePos2, () => RestorePos(1));
-            _hotkeyManager.RegisterAction(HotkeyActions.RTSR, () => SetHp(1));
+            _hotkeyManager.RegisterAction(HotkeyActions.RTSR, SetRtsr);
             _hotkeyManager.RegisterAction(HotkeyActions.NoDeath, () => { IsNoDeathEnabled = !IsNoDeathEnabled; });
             _hotkeyManager.RegisterAction(HotkeyActions.OneShot, () => { IsOneShotEnabled = !IsOneShotEnabled; });
-            _hotkeyManager.RegisterAction(HotkeyActions.RestoreSpellCasts, () => _playerService.RestoreSpellCasts());
+            _hotkeyManager.RegisterAction(HotkeyActions.RestoreSpellCasts, () =>
+            {
+                if (!AreOptionsEnabled) return;
+                _playerService.RestoreSpellCasts();
+            });
             _hotkeyManager.RegisterAction(HotkeyActions.ToggleSpeed, ToggleSpeed);
             _hotkeyManager.RegisterAction(HotkeyActions.IncreaseSpeed, () => SetSpeed(Math.Min(10, PlayerSpeed + 0.25f)));
             _hotkeyManager.RegisterAction(HotkeyActions.DecreaseSpeed, () => SetSpeed(Math.Max(0, PlayerSpeed - 0.25f)));
+        }
+
+        private void PlayerTick()
+        {
+            if (_pauseUpdates) return;
+
+            CurrentHp = _playerService.GetHp();
+            CurrentMaxHp = _playerService.GetMaxHp();
+            Souls = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Souls);
+            PlayerSpeed = _playerServiceOld.GetPlayerSpeed();
+            var pos = _playerService.GetPosition();
+            PosX = pos.X;
+            PosY = pos.Z;
+            PosZ = pos.Y;
+            int newSoulLevel = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.SoulLevel);
+            if (_currentSoulLevel != newSoulLevel)
+            {
+                SoulLevel = newSoulLevel;
+                _currentSoulLevel = newSoulLevel;
+                LoadStats();
+            }
         }
 
         private void LoadStats()
@@ -599,8 +573,8 @@ namespace SilkySouls.ViewModels
             Faith = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Faith);
             Humanity = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Humanity);
             Souls = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Souls);
-            NewGame = _playerService.GetNewGame();
-            PlayerSpeed = _playerService.GetPlayerSpeed();
+            NewGame = _playerServiceOld.GetNewGame();
+            PlayerSpeed = _playerServiceOld.GetPlayerSpeed();
             SoulLevel = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.SoulLevel);
         }
 
@@ -617,7 +591,7 @@ namespace SilkySouls.ViewModels
                 state.Sp = _playerService.GetSp();
             }
 
-            _playerService.SavePos(index);
+            _playerServiceOld.SavePos(index);
         }
 
         private void RestorePos(int index)
@@ -626,7 +600,7 @@ namespace SilkySouls.ViewModels
             _wasNoDeathEnabled = IsNoDeathEnabled;
             IsNoDamageEnabled = true;
             _isNoDeathEnabled = true;
-            _playerService.RestorePos(index);
+            _playerServiceOld.RestorePos(index);
             IsNoDamageEnabled = _wasNoDamageEnabled;
             IsNoDeathEnabled = _wasNoDeathEnabled;
             if (!IsStateIncluded) return;
@@ -673,6 +647,9 @@ namespace SilkySouls.ViewModels
         {
             return Math.Abs(a - b) < Epsilon;
         }
+
+        private void SetRtsr() => _playerService.SetRtsr();
+        private void SetMaxHp() => _playerService.SetMaxHp();
 
         #endregion
     }

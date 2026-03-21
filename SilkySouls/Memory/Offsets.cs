@@ -8,11 +8,13 @@ namespace SilkySouls.memory
         public static class WorldChrMan
         {
             public static IntPtr Base;
+
+            public const int PlayerIns = 0x68;
             
             public enum BaseOffsets
             {
                 UpdateCoordsBasePtr = 0x40,
-                PlayerIns = 0x68,
+                
                 DeathCam = 0x70
             }
             
@@ -24,10 +26,6 @@ namespace SilkySouls.memory
                 PlayerCtrl = 0x68,
                 PadMan = 0x70,
                 InfinitePoise = 0x2A6,
-                ReadOnlyCoords = 0x2C0,
-                Health = 0x3E8,
-                MaxHealth = 0x3EC,
-                Stamina = 0x3F8,
                 
                 NoDamage = 0x524,
                 ChrFlags = 0x525,
@@ -62,7 +60,7 @@ namespace SilkySouls.memory
         public static class ChrIns
         {
             public const int Handle = 0x8;
-
+            
             public const int ChrCtrl = 0x68;
             
             public const int CurrentPoise = 0x250;
@@ -71,6 +69,7 @@ namespace SilkySouls.memory
             public const int Coords = 0x2C0;
             public const int Health = 0x3E8;
             public const int MaxHealth = 0x3EC;
+            public const int Stamina = 0x3F8;
             public const int PoisonCurrent = 0x418;
             public const int ToxicCurrent = 0x41C;
             public const int BleedCurrent = 0x420;
@@ -88,7 +87,11 @@ namespace SilkySouls.memory
             {
                 AuxImmunitySpEffect = 0x50,
             }
+            
+            
         }
+
+        
 
         public static class DebugEventMan
         {
@@ -283,10 +286,6 @@ namespace SilkySouls.memory
             public static IntPtr Base;
 
             public static readonly int[] LuaGlobalTable = [0x17E8, 0x8, 0x28, 0x78];
-            
-            public const int WorldAiLuaManager = 0x17E8;
-            public const int DLLua = 0x8;
-            public const int LuaState = 0x28;
         }
 
         public static class EmkEventIns

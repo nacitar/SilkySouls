@@ -143,6 +143,7 @@
     <Compile Include="Services\MemoryService.cs" />
     <Compile Include="Services\ParamService.cs" />
     <Compile Include="Services\PlayerService.cs" />
+    <Compile Include="Services\PlayerServiceOld.cs" />
     <Compile Include="Services\EnemyService.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\StateService.cs" />
