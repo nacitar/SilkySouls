@@ -52,7 +52,7 @@ namespace SilkySouls.ViewModels
         
         private void RegisterHotkeys()
         {
-            _hotkeyManager.RegisterAction("Warp", Warp);
+            _hotkeyManager.RegisterAction(HotkeyActions.Warp, Warp);
         }
 
         private void LoadLocations()

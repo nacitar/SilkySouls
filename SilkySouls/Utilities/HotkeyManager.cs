@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using H.Hooks;
+using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Services;
@@ -49,9 +50,9 @@ namespace SilkySouls.Utilities
             _keyboardHook.Stop();
         }
 
-        public void RegisterAction(string actionId, Action action)
+        public void RegisterAction(HotkeyActions actionId, Action action)
         {
-            _actions[actionId] = action;
+            _actions[actionId.ToString()] = action;
         }
 
         private void KeyboardHook_Down(object sender, KeyboardEventArgs e)

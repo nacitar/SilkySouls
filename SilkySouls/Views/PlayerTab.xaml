@@ -41,12 +41,12 @@
                     <TextBlock Text="{Binding CurrentMaxHp, StringFormat=Max: {0}}" 
                                VerticalAlignment="Center" 
                                Margin="10,0,0,0"/>
-                    <Button Click="SetRtsrClick"
+                    <Button Command="{Binding SetRtsrCommand}"
                             Content="1 HP"
                             IsEnabled="{Binding AreOptionsEnabled}"
                             Margin="10,0,0,0"
                             Width="60"/>
-                    <Button Click="SetMaxHpClick"
+                    <Button Command="{Binding SetMaxHpCommand}"
                             Content="Max Hp"
                             IsEnabled="{Binding AreOptionsEnabled}"
                             Margin="10,0,0,0"
@@ -67,12 +67,12 @@
 
                     <UniformGrid Grid.Row="0" Grid.Column="0" Rows="1" Columns="2">
                         <Button Content="Save Pos 1"
-                                Click="SavePos_Click" CommandParameter="0"
+                                Command="{Binding SavePosCommand}" CommandParameter="0"
                                 Margin="0,0,5,5"
                                 IsEnabled="{Binding AreOptionsEnabled}" />
 
                         <Button Content="Restore Pos 1"
-                                Click="RestorePos_Click" CommandParameter="0"
+                                Command="{Binding RestorePosCommand}" CommandParameter="0"
                                 Margin="5,0,0,5">
                             <Button.IsEnabled>
                                 <MultiBinding Converter="{StaticResource BooleanAndConverter}">
@@ -110,12 +110,12 @@
 
                     <UniformGrid Grid.Row="1" Grid.Column="0" Rows="1" Columns="2">
                         <Button Content="Save Pos 2"
-                                Click="SavePos_Click" CommandParameter="1"
+                                Command="{Binding SavePosCommand}" CommandParameter="1"
                                 Margin="0,5,5,0"
                                 IsEnabled="{Binding AreOptionsEnabled}" />
 
                         <Button Content="Restore Pos 2"
-                                Click="RestorePos_Click" CommandParameter="1"
+                                Command="{Binding RestorePosCommand}" CommandParameter="1"
                                 Margin="5,5,0,0">
                             <Button.IsEnabled>
                                 <MultiBinding Converter="{StaticResource BooleanAndConverter}">
@@ -190,10 +190,10 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                    <Button Content="Restore spell casts" 
+                    <Button Content="Restore spell casts"
                             Height="25" Width="150"
                             FontSize="14"
-                            Click="Restore_Spell_Click"
+                            Command="{Binding RestoreSpellCastsCommand}"
                             IsEnabled="{Binding AreOptionsEnabled}"
                             Margin="0,0,0,15"/>
     
@@ -203,10 +203,10 @@
                               SelectedItem="{Binding SelectedWeaponSlot}"
                               DisplayMemberPath="DisplayName"
                               Margin="0,0,0,5"/>
-                    <Button Content="Break Weapon" 
+                    <Button Content="Break Weapon"
                             Height="25" Width="150"
                             FontSize="14"
-                            Click="BreakWep_Click"
+                            Command="{Binding BreakWeaponCommand}"
                             IsEnabled="{Binding AreOptionsEnabled}"/>
                 </StackPanel>
             </Grid>
@@ -436,7 +436,7 @@
                                    Margin="10,0,0,0" />
 
                         <Button Content="Give 10k Souls"
-                                Click="GiveSouls_Click"
+                                Command="{Binding GiveSoulsCommand}"
                                 IsEnabled="{Binding AreOptionsEnabled}"
                                 Grid.Column="0"
                                 Grid.Row="1"

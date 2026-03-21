@@ -183,7 +183,7 @@ public class TargetService(IMemoryService memoryService, HookManager hookManager
         }
     }
 
-    public int GetEnemyBattleId()
+    public int GetBattleId()
     {
         var enemyBattleIdPtr = memoryService.FollowPointers(
             memoryService.Read<nint>(CodeCaveOffsets.Base + CodeCaveOffsets.LockedTargetPtr),

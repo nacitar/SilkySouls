@@ -29,9 +29,9 @@ namespace SilkySouls.ViewModels
 
         private void RegisterHotkeys()
         {
-            _hotkeyManager.RegisterAction("DisableAi", () => { IsDisableAiEnabled = !IsDisableAiEnabled; });
-            _hotkeyManager.RegisterAction("AllNoDeath", () => { IsAllNoDeathEnabled = !IsAllNoDeathEnabled; });
-            _hotkeyManager.RegisterAction("AllNoDamage", () => { IsAllNoDamageEnabled = !IsAllNoDamageEnabled; });
+            _hotkeyManager.RegisterAction(HotkeyActions.DisableAi, () => { IsDisableAiEnabled = !IsDisableAiEnabled; });
+            _hotkeyManager.RegisterAction(HotkeyActions.AllNoDeath, () => { IsAllNoDeathEnabled = !IsAllNoDeathEnabled; });
+            _hotkeyManager.RegisterAction(HotkeyActions.AllNoDamage, () => { IsAllNoDamageEnabled = !IsAllNoDamageEnabled; });
         }
 
         public bool AreOptionsEnabled

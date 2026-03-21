@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -8,30 +8,15 @@ using Xceed.Wpf.Toolkit;
 
 namespace SilkySouls.Views
 {
-    /// <summary>
-    /// Interaction logic for PlayerTab.xaml
-    /// </summary>
     public partial class PlayerTab
     {
         private readonly PlayerViewModel _playerViewModel;
-
 
         public PlayerTab(PlayerViewModel playerViewModel)
         {
             InitializeComponent();
             _playerViewModel = playerViewModel;
             DataContext = _playerViewModel;
-        }
-
-        private void SetRtsrClick(object sender, RoutedEventArgs e)
-        {
-            _playerViewModel.SetHp(1);
-        }
-
-
-        private void SetMaxHpClick(object sender, RoutedEventArgs e)
-        {
-            _playerViewModel.SetMaxHp();
         }
 
         private void HealthUpDown_Loaded(object sender, RoutedEventArgs e)
@@ -56,7 +41,6 @@ namespace SilkySouls.Views
             if (decField?.GetValue(spinner) is ButtonBase decBtn)
                 decBtn.Click += SpinnerSetHp;
         }
-
 
         private void PauseUpdates_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -95,23 +79,6 @@ namespace SilkySouls.Views
             Focus();
 
             e.Handled = true;
-        }
-
-        private void SavePos_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = (Button)sender;
-            string parameter = button.CommandParameter.ToString();
-            int index = int.Parse(parameter);
-            _playerViewModel.SavePos(index);
-        }
-
-
-        private void RestorePos_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = (Button)sender;
-            string parameter = button.CommandParameter.ToString();
-            int index = int.Parse(parameter);
-            _playerViewModel.RestorePos(index);
         }
 
         private void StatUpDowns_Loaded(object sender, RoutedEventArgs e)
@@ -175,22 +142,6 @@ namespace SilkySouls.Views
             {
                 _playerViewModel.SetStat(statName, upDown.Value.Value);
             }
-        }
-
-
-        private void Restore_Spell_Click(object sender, RoutedEventArgs e)
-        {
-            _playerViewModel.RestoreSpellCasts();
-        }
-
-        private void GiveSouls_Click(object sender, RoutedEventArgs e)
-        {
-            _playerViewModel.GiveSouls();
-        }
-
-        private void BreakWep_Click(object sender, RoutedEventArgs e)
-        {
-            _playerViewModel.BreakWep();
         }
     }
 }

@@ -411,18 +411,18 @@ public class TargetViewModel : BaseViewModel
 
     private void RegisterHotkeys()
     {
-        _hotkeyManager.RegisterAction("EnableTargetOptions",
+        _hotkeyManager.RegisterAction(HotkeyActions.EnableTargetOptions,
             () => { IsTargetOptionsEnabled = !IsTargetOptionsEnabled; });
-        _hotkeyManager.RegisterAction("ShowAllResistances", () =>
+        _hotkeyManager.RegisterAction(HotkeyActions.ShowAllResistances, () =>
         {
             _showAllResistances = !_showAllResistances;
             UpdateResistancesDisplay();
         });
-        _hotkeyManager.RegisterAction("FreezeHp", () => { IsFreezeHealthEnabled = !IsFreezeHealthEnabled; });
-        _hotkeyManager.RegisterAction("DisableTargetAi",
+        _hotkeyManager.RegisterAction(HotkeyActions.FreezeHp, () => { IsFreezeHealthEnabled = !IsFreezeHealthEnabled; });
+        _hotkeyManager.RegisterAction(HotkeyActions.DisableTargetAi,
             () => { IsDisableTargetAiEnabled = !IsDisableTargetAiEnabled; });
-        _hotkeyManager.RegisterAction("IncreaseTargetSpeed", () => SetSpeed(Math.Min(5, TargetSpeed + 0.25f)));
-        _hotkeyManager.RegisterAction("DecreaseTargetSpeed", () => SetSpeed(Math.Max(0, TargetSpeed - 0.25f)));
+        _hotkeyManager.RegisterAction(HotkeyActions.IncreaseTargetSpeed, () => SetSpeed(Math.Min(5, TargetSpeed + 0.25f)));
+        _hotkeyManager.RegisterAction(HotkeyActions.DecreaseTargetSpeed, () => SetSpeed(Math.Max(0, TargetSpeed - 0.25f)));
     }
 
     private void TargetTick()
@@ -617,7 +617,7 @@ public class TargetViewModel : BaseViewModel
     private bool IsCurrentTargetRepeating()
     {
         var currentRepeatEnemyId = _targetService.GetCurrentRepeatEnemyId();
-        var lockedTargetId = _targetService.GetEnemyBattleId();
+        var lockedTargetId = _targetService.GetBattleId();
         return currentRepeatEnemyId == lockedTargetId;
     }
 

@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using H.Hooks;
+using SilkySouls.Enums;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
 
@@ -10,245 +11,212 @@ namespace SilkySouls.ViewModels
 {
     public class SettingsViewModel : BaseViewModel
     {
-        private bool _isFastQuitoutEnabled;
-        private bool _isEnableHotkeysEnabled;
-        private bool _isAlwaysOnTopEnabled;
-        private bool _isLoaded;
-
         private readonly HotkeyManager _hotkeyManager;
+        private readonly SettingsService _settingsService;
+        private readonly Dictionary<string, HotkeyBindingViewModel> _hotkeyLookup;
+
         private string _currentSettingHotkeyId;
         private LowLevelKeyboardHook _tempHook;
         private Keys _currentKeys;
+        private bool _isLoaded;
 
-        private string _savePos1HotkeyText;
-
-        public string SavePos1HotkeyText
-        {
-            get => _savePos1HotkeyText;
-            set => SetProperty(ref _savePos1HotkeyText, value);
-        }
-
-        private string _savePos2HotkeyText;
-
-        public string SavePos2HotkeyText
-        {
-            get => _savePos2HotkeyText;
-            set => SetProperty(ref _savePos2HotkeyText, value);
-        }
-
-        private string _restorePos1HotkeyText;
-
-        public string RestorePos1HotkeyText
-        {
-            get => _restorePos1HotkeyText;
-            set => SetProperty(ref _restorePos1HotkeyText, value);
-        }
-
-        private string _restorePos2HotkeyText;
-
-        public string RestorePos2HotkeyText
-        {
-            get => _restorePos2HotkeyText;
-            set => SetProperty(ref _restorePos2HotkeyText, value);
-        }
-
-        private string _rtsrHotkeyText;
-
-        public string RtsrHotkeyText
-        {
-            get => _rtsrHotkeyText;
-            set => SetProperty(ref _rtsrHotkeyText, value);
-        }
-
-        private string _noClipHotkeyText;
-
-        public string NoClipHotkeyText
-        {
-            get => _noClipHotkeyText;
-            set => SetProperty(ref _noClipHotkeyText, value);
-        }
-
-        private string _noDeathHotkeyText;
-
-        public string NoDeathHotkeyText
-        {
-            get => _noDeathHotkeyText;
-            set => SetProperty(ref _noDeathHotkeyText, value);
-        }
-
-        private string _oneShotHotkeyText;
-
-        public string OneShotHotkeyText
-        {
-            get => _oneShotHotkeyText;
-            set => SetProperty(ref _oneShotHotkeyText, value);
-        }
-
-        private string _restoreSpellCastsHotkeyText;
-
-        public string RestoreSpellCastsHotkeyText
-        {
-            get => _restoreSpellCastsHotkeyText;
-            set => SetProperty(ref _restoreSpellCastsHotkeyText, value);
-        }
-
-        private string _toggleSpeedHotkeyText;
-
-        public string ToggleSpeedHotkeyText
-        {
-            get => _toggleSpeedHotkeyText;
-            set => SetProperty(ref _toggleSpeedHotkeyText, value);
-        }
-
-        private string _increaseSpeedHotkeyText;
-
-        public string IncreaseSpeedHotkeyText
-        {
-            get => _increaseSpeedHotkeyText;
-            set => SetProperty(ref _increaseSpeedHotkeyText, value);
-        }
-
-        private string _decreaseSpeedHotkeyText;
-
-        public string DecreaseSpeedHotkeyText
-        {
-            get => _decreaseSpeedHotkeyText;
-            set => SetProperty(ref _decreaseSpeedHotkeyText, value);
-        }
-
-        private string _disableTargetAiHotkeyText;
-
-        public string DisableTargetAiHotkeyText
-        {
-            get => _disableTargetAiHotkeyText;
-            set => SetProperty(ref _disableTargetAiHotkeyText, value);
-        }
-
-        private string _freezeHpHotkeyText;
-
-        public string FreezeHpHotkeyText
-        {
-            get => _freezeHpHotkeyText;
-            set => SetProperty(ref _freezeHpHotkeyText, value);
-        }
-
-        private string _increaseTargetSpeedHotkeyText;
-
-        public string IncreaseTargetSpeedHotkeyText
-        {
-            get => _increaseTargetSpeedHotkeyText;
-            set => SetProperty(ref _increaseTargetSpeedHotkeyText, value);
-        }
-
-        private string _decreaseTargetSpeedHotkeyText;
-
-        public string DecreaseTargetSpeedHotkeyText
-        {
-            get => _decreaseTargetSpeedHotkeyText;
-            set => SetProperty(ref _decreaseTargetSpeedHotkeyText, value);
-        }
-
-        private string _enableTargetOptionsHotkeyText;
-
-        public string EnableTargetOptionsHotkeyText
-        {
-            get => _enableTargetOptionsHotkeyText;
-            set => SetProperty(ref _enableTargetOptionsHotkeyText, value);
-        }
-
-        private string _showAllResistancesHotkeyText;
-
-        public string ShowAllResistancesHotkeyText
-        {
-            get => _showAllResistancesHotkeyText;
-            set => SetProperty(ref _showAllResistancesHotkeyText, value);
-        }
-
-        private string _quitoutHotkeyText;
-
-        public string QuitoutHotkeyText
-        {
-            get => _quitoutHotkeyText;
-            set => SetProperty(ref _quitoutHotkeyText, value);
-        }
-
-        private string _disableAiHotkeyText;
-
-        public string DisableAiHotkeyText
-        {
-            get => _disableAiHotkeyText;
-            set => SetProperty(ref _disableAiHotkeyText, value);
-        }
-
-        private string _allNoDeathHotkeyText;
-
-        public string AllNoDeathHotkeyText
-        {
-            get => _allNoDeathHotkeyText;
-            set => SetProperty(ref _allNoDeathHotkeyText, value);
-        }
-
-        private string _allNoDamageHotkeyText;
-
-        public string AllNoDamageHotkeyText
-        {
-            get => _allNoDamageHotkeyText;
-            set => SetProperty(ref _allNoDamageHotkeyText, value);
-        }
-
-
-        private readonly Dictionary<string, Action<string>> _propertySetters;
-        private readonly SettingsService _settingsService;
+        public Dictionary<string, List<HotkeyBindingViewModel>> Hotkeys { get; }
 
         public SettingsViewModel(SettingsService settingsService, HotkeyManager hotkeyManager)
         {
             _settingsService = settingsService;
             _hotkeyManager = hotkeyManager;
 
-            RegisterHotkeys();
-
-            _propertySetters = new Dictionary<string, Action<string>>
+            Hotkeys = new Dictionary<string, List<HotkeyBindingViewModel>>
             {
-                { "SavePos1", text => SavePos1HotkeyText = text },
-                { "SavePos2", text => SavePos2HotkeyText = text },
-                { "RestorePos1", text => RestorePos1HotkeyText = text },
-                { "RestorePos2", text => RestorePos2HotkeyText = text },
-                { "RTSR", text => RtsrHotkeyText = text },
-                { "NoDeath", text => NoDeathHotkeyText = text },
-                { "OneShot", text => OneShotHotkeyText = text },
-                { "RestoreSpellCasts", text => RestoreSpellCastsHotkeyText = text },
-                { "ToggleSpeed", text => ToggleSpeedHotkeyText = text },
-                { "IncreaseSpeed", text => IncreaseSpeedHotkeyText = text },
-                { "DecreaseSpeed", text => DecreaseSpeedHotkeyText = text },
-                { "NoClip", text => NoClipHotkeyText = text },
-                { "DisableTargetAi", text => DisableTargetAiHotkeyText = text },
-                { "FreezeHp", text => FreezeHpHotkeyText = text },
-                { "Quitout", text => QuitoutHotkeyText = text },
-                { "DisableAi", text => DisableAiHotkeyText = text },
-                { "AllNoDeath", text => AllNoDeathHotkeyText = text },
-                { "AllNoDamage", text => AllNoDamageHotkeyText = text },
-                { "IncreaseTargetSpeed", text => IncreaseTargetSpeedHotkeyText = text },
-                { "DecreaseTargetSpeed", text => DecreaseTargetSpeedHotkeyText = text },
-                { "EnableTargetOptions", text => EnableTargetOptionsHotkeyText = text },
-                { "ShowAllResistances", text => ShowAllResistancesHotkeyText = text },
+                ["Player"] =
+                [
+                    new("Save Position 1", HotkeyActions.SavePos1),
+                    new("Save Position 2", HotkeyActions.SavePos2),
+                    new("Restore Position 1", HotkeyActions.RestorePos1),
+                    new("Restore Position 2", HotkeyActions.RestorePos2),
+                    new("RTSR Setup", HotkeyActions.RTSR),
+                    new("No Death", HotkeyActions.NoDeath),
+                    new("One Shot", HotkeyActions.OneShot),
+                    new("Restore Spells", HotkeyActions.RestoreSpellCasts),
+                    new("Toggle Speed", HotkeyActions.ToggleSpeed),
+                    new("Increase Speed", HotkeyActions.IncreaseSpeed),
+                    new("Decrease Speed", HotkeyActions.DecreaseSpeed),
+                ],
+                ["Enemies"] =
+                [
+                    new("Disable All AI", HotkeyActions.DisableAi),
+                    new("All No Death", HotkeyActions.AllNoDeath),
+                    new("All No Damage", HotkeyActions.AllNoDamage),
+                ],
+                ["Target"] =
+                [
+                    new("Enable Target Options", HotkeyActions.EnableTargetOptions),
+                    new("Show All Resistances", HotkeyActions.ShowAllResistances),
+                    new("Freeze HP", HotkeyActions.FreezeHp),
+                    new("Disable Target AI", HotkeyActions.DisableTargetAi),
+                    new("Increase Target Speed", HotkeyActions.IncreaseTargetSpeed),
+                    new("Decrease Target Speed", HotkeyActions.DecreaseTargetSpeed),
+                ],
+                ["Utility"] =
+                [
+                    new("Quitout", HotkeyActions.Quitout),
+                    new("No Clip", HotkeyActions.NoClip),
+                    new("Warp", HotkeyActions.Warp),
+                ],
             };
 
+            _hotkeyLookup = Hotkeys.Values
+                .SelectMany(x => x)
+                .ToDictionary(h => h.ActionId);
+
             LoadHotkeyDisplays();
+            RegisterHotkeys();
         }
+
+        #region Properties
+
+        private bool _isFastQuitoutEnabled;
+
+        public bool IsFastQuitoutEnabled
+        {
+            get => _isFastQuitoutEnabled;
+            set
+            {
+                if (SetProperty(ref _isFastQuitoutEnabled, value))
+                {
+                    SettingsManager.Default.FastQuitout = value;
+                    SettingsManager.Default.Save();
+                    if (_isLoaded)
+                    {
+                        _settingsService.ToggleFastQuitout(_isFastQuitoutEnabled ? 1 : 0);
+                    }
+                }
+            }
+        }
+
+        private bool _isAlwaysOnTopEnabled;
+
+        public bool IsAlwaysOnTopEnabled
+        {
+            get => _isAlwaysOnTopEnabled;
+            set
+            {
+                if (!SetProperty(ref _isAlwaysOnTopEnabled, value)) return;
+                SettingsManager.Default.AlwaysOnTop = value;
+                SettingsManager.Default.Save();
+                var mainWindow = Application.Current.MainWindow;
+                if (mainWindow != null) mainWindow.Topmost = _isAlwaysOnTopEnabled;
+            }
+        }
+
+        private bool _isEnableHotkeysEnabled;
+
+        public bool IsEnableHotkeysEnabled
+        {
+            get => _isEnableHotkeysEnabled;
+            set
+            {
+                if (SetProperty(ref _isEnableHotkeysEnabled, value))
+                {
+                    SettingsManager.Default.EnableHotkeys = value;
+                    SettingsManager.Default.Save();
+                    if (_isEnableHotkeysEnabled) _hotkeyManager.Start();
+                    else _hotkeyManager.Stop();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void StartSettingHotkey(string actionId)
+        {
+            if (_currentSettingHotkeyId != null &&
+                _hotkeyLookup.TryGetValue(_currentSettingHotkeyId, out var prev))
+            {
+                prev.HotkeyText = GetHotkeyDisplayText(_currentSettingHotkeyId);
+            }
+
+            _currentSettingHotkeyId = actionId;
+
+            if (_hotkeyLookup.TryGetValue(actionId, out var current))
+            {
+                current.HotkeyText = "Press keys...";
+            }
+
+            _tempHook = new LowLevelKeyboardHook();
+            _tempHook.IsExtendedMode = true;
+            _tempHook.Down += TempHook_Down;
+            _tempHook.Start();
+        }
+
+        public void ConfirmHotkey()
+        {
+            var currentSettingHotkeyId = _currentSettingHotkeyId;
+            var currentKeys = _currentKeys;
+            if (currentSettingHotkeyId == null || currentKeys == null || currentKeys.IsEmpty)
+            {
+                CancelSettingHotkey();
+                return;
+            }
+
+            HandleExistingHotkey(currentKeys);
+            SetNewHotkey(currentSettingHotkeyId, currentKeys);
+
+            StopSettingHotkey();
+        }
+
+        public void CancelSettingHotkey()
+        {
+            var actionId = _currentSettingHotkeyId;
+
+            if (actionId != null && _hotkeyLookup.TryGetValue(actionId, out var binding))
+            {
+                binding.HotkeyText = "None";
+                _hotkeyManager.SetHotkey(actionId, new Keys());
+            }
+
+            StopSettingHotkey();
+        }
+
+        public void ApplyLoadedOptions()
+        {
+            _isLoaded = true;
+            if (IsFastQuitoutEnabled) _settingsService.ToggleFastQuitout(1);
+        }
+
+        public void ApplyStartUpOptions()
+        {
+            _isEnableHotkeysEnabled = SettingsManager.Default.EnableHotkeys;
+            if (_isEnableHotkeysEnabled) _hotkeyManager.Start();
+            else _hotkeyManager.Stop();
+            OnPropertyChanged(nameof(IsEnableHotkeysEnabled));
+            _isFastQuitoutEnabled = SettingsManager.Default.FastQuitout;
+            OnPropertyChanged(nameof(IsFastQuitoutEnabled));
+            IsAlwaysOnTopEnabled = SettingsManager.Default.AlwaysOnTop;
+        }
+
+        public void ResetAttached()
+        {
+            _isLoaded = false;
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private void RegisterHotkeys()
         {
-            _hotkeyManager.RegisterAction("Quitout", () => _settingsService.Quitout());
+            _hotkeyManager.RegisterAction(HotkeyActions.Quitout, () => _settingsService.Quitout());
         }
 
         private void LoadHotkeyDisplays()
         {
-            foreach (var entry in _propertySetters)
+            foreach (var hotkey in _hotkeyLookup.Values)
             {
-                string actionId = entry.Key;
-                Action<string> setter = entry.Value;
-
-                setter(GetHotkeyDisplayText(actionId));
+                hotkey.HotkeyText = GetHotkeyDisplayText(hotkey.ActionId);
             }
         }
 
@@ -256,28 +224,6 @@ namespace SilkySouls.ViewModels
         {
             Keys keys = _hotkeyManager.GetHotkey(actionId);
             return keys != null && keys.Values.ToArray().Length > 0 ? string.Join(" + ", keys) : "None";
-        }
-
-
-        public void StartSettingHotkey(string actionId)
-        {
-            if (_currentSettingHotkeyId != null &&
-                _propertySetters.TryGetValue(_currentSettingHotkeyId, out var prevSetter))
-            {
-                prevSetter(GetHotkeyDisplayText(_currentSettingHotkeyId));
-            }
-
-            _currentSettingHotkeyId = actionId;
-
-            if (_propertySetters.TryGetValue(actionId, out var setter))
-            {
-                setter("Press keys...");
-            }
-
-            _tempHook = new LowLevelKeyboardHook();
-            _tempHook.IsExtendedMode = true;
-            _tempHook.Down += TempHook_Down;
-            _tempHook.Start();
         }
 
         private void TempHook_Down(object sender, KeyboardEventArgs e)
@@ -315,17 +261,16 @@ namespace SilkySouls.ViewModels
 
                 _currentKeys = e.Keys;
 
-                if (_propertySetters.TryGetValue(_currentSettingHotkeyId, out var setter))
+                if (_hotkeyLookup.TryGetValue(_currentSettingHotkeyId, out var binding))
                 {
-                    string keyText = e.Keys.ToString();
-                    setter(keyText);
+                    binding.HotkeyText = e.Keys.ToString();
                 }
             }
             catch (Exception ex)
             {
-                if (_propertySetters.TryGetValue(_currentSettingHotkeyId, out var setter))
+                if (_hotkeyLookup.TryGetValue(_currentSettingHotkeyId, out var binding))
                 {
-                    setter("Error: Invalid key combination");
+                    binding.HotkeyText = "Error: Invalid key combination";
                 }
             }
 
@@ -344,124 +289,29 @@ namespace SilkySouls.ViewModels
             _currentSettingHotkeyId = null;
             _currentKeys = null;
         }
-        
-        public void ConfirmHotkey()
-        {
-            
-            var currentSettingHotkeyId = _currentSettingHotkeyId;
-            var currentKeys = _currentKeys;
-            if (currentSettingHotkeyId == null || currentKeys == null || currentKeys.IsEmpty)
-            {
-                CancelSettingHotkey();
-                return;
-            }
-
-            HandleExistingHotkey(currentKeys);
-            SetNewHotkey(currentSettingHotkeyId, currentKeys);
-
-            StopSettingHotkey();
-        }
 
         private void HandleExistingHotkey(Keys currentKeys)
         {
             string existingHotkeyId = _hotkeyManager.GetActionIdByKeys(currentKeys);
             if (string.IsNullOrEmpty(existingHotkeyId)) return;
-            
+
             _hotkeyManager.ClearHotkey(existingHotkeyId);
-            if (_propertySetters.TryGetValue(existingHotkeyId, out var oldSetter))
+            if (_hotkeyLookup.TryGetValue(existingHotkeyId, out var binding))
             {
-                oldSetter("None");
+                binding.HotkeyText = "None";
             }
         }
-        
+
         private void SetNewHotkey(string currentSettingHotkeyId, Keys currentKeys)
         {
             _hotkeyManager.SetHotkey(currentSettingHotkeyId, currentKeys);
-            
-            if (_propertySetters.TryGetValue(currentSettingHotkeyId, out var setter))
-            {
-                setter(new Keys(currentKeys.Values.ToArray()).ToString());
-            }
-        }
-        
-        public void CancelSettingHotkey()
-        {
-            if (_currentSettingHotkeyId != null &&
-                _propertySetters.TryGetValue(_currentSettingHotkeyId, out var setter))
-            {
-                setter("None");
-                _hotkeyManager.SetHotkey(_currentSettingHotkeyId, new Keys());
-            }
 
-            StopSettingHotkey();
-        }
-
-
-        public bool IsFastQuitoutEnabled
-        {
-            get => _isFastQuitoutEnabled;
-            set
+            if (_hotkeyLookup.TryGetValue(currentSettingHotkeyId, out var binding))
             {
-                if (SetProperty(ref _isFastQuitoutEnabled, value))
-                {
-                    SettingsManager.Default.FastQuitout = value;
-                    SettingsManager.Default.Save();
-                    if (_isLoaded)
-                    {
-                        _settingsService.ToggleFastQuitout(_isFastQuitoutEnabled ? 1 : 0);
-                    }
-                }
-            }
-        }
-        
-        public bool IsAlwaysOnTopEnabled
-        {
-            get => _isAlwaysOnTopEnabled;
-            set
-            {
-                if (!SetProperty(ref _isAlwaysOnTopEnabled, value)) return;
-                SettingsManager.Default.AlwaysOnTop = value;
-                SettingsManager.Default.Save();
-                var mainWindow = Application.Current.MainWindow;
-                if (mainWindow != null) mainWindow.Topmost = _isAlwaysOnTopEnabled;
+                binding.HotkeyText = new Keys(currentKeys.Values.ToArray()).ToString();
             }
         }
 
-        public bool IsEnableHotkeysEnabled
-        {
-            get => _isEnableHotkeysEnabled;
-            set
-            {
-                if (SetProperty(ref _isEnableHotkeysEnabled, value))
-                {
-                    SettingsManager.Default.EnableHotkeys = value;
-                    SettingsManager.Default.Save();
-                    if (_isEnableHotkeysEnabled) _hotkeyManager.Start();
-                    else _hotkeyManager.Stop();
-                }
-            }
-        }
-        
-        public void ApplyLoadedOptions()
-        {
-            _isLoaded = true;
-            if (IsFastQuitoutEnabled) _settingsService.ToggleFastQuitout(1);
-        }
-
-        public void ApplyStartUpOptions()
-        {
-            _isEnableHotkeysEnabled = SettingsManager.Default.EnableHotkeys;
-            if (_isEnableHotkeysEnabled) _hotkeyManager.Start();
-            else _hotkeyManager.Stop();
-            OnPropertyChanged(nameof(IsEnableHotkeysEnabled));
-            _isFastQuitoutEnabled = SettingsManager.Default.FastQuitout;
-            OnPropertyChanged(nameof(IsFastQuitoutEnabled));
-            IsAlwaysOnTopEnabled = SettingsManager.Default.AlwaysOnTop;
-        }
-
-        public void ResetAttached()
-        {
-            _isLoaded = false;
-        }
+        #endregion
     }
 }

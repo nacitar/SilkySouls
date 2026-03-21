@@ -51,7 +51,7 @@ namespace SilkySouls.ViewModels
 
         private void RegisterHotkeys()
         {
-            _hotkeyManager.RegisterAction("NoClip", () => { IsNoClipEnabled = !IsNoClipEnabled; });
+            _hotkeyManager.RegisterAction(HotkeyActions.NoClip, () => { IsNoClipEnabled = !IsNoClipEnabled; });
             
         }
         
