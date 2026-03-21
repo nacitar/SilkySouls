@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.Models;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
@@ -32,11 +34,14 @@ namespace SilkySouls.ViewModels
         
 
         public TravelViewModel(TravelService travelService, HotkeyManager hotkeyManager,
-            UtilityViewModel utilityViewModel)
+            UtilityViewModel utilityViewModel, IStateService stateService)
         {
             _travelService = travelService;
             _hotkeyManager = hotkeyManager;
             _utilityViewModel = utilityViewModel;
+
+            stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.NotLoaded, OnNotLoaded);
             
             _mainAreas = new ObservableCollection<string>();
             _areaLocations = new ObservableCollection<WarpLocation>();
@@ -175,12 +180,12 @@ namespace SilkySouls.ViewModels
         }
 
 
-        public void DisableFeatures()
+        private void OnNotLoaded()
         {
             AreButtonsEnabled = false;
         }
 
-        public void TryEnableFeatures()
+        private void OnLoaded()
         {
             AreButtonsEnabled = true;
         }

@@ -29,14 +29,13 @@ namespace SilkySouls.Services
                     (code + 0xA9, shouldExitFlag, 7, 0xA9 + 2)
                 });
                 
-                AsmHelper.WriteAbsoluteAddresses(spawnBytes, new []
-                {
+                AsmHelper.WriteAbsoluteAddresses(spawnBytes, [
                     (Offsets.GameDataMan.Base, 0x2B + 2),
                     (Offsets.ItemGet, 0x54 + 2),
                     (Offsets.ItemGetMenuMan, 0x64 + 2),
                     (Offsets.ItemDlgFunc, 0x86 + 2),
                     (sleepAddr, 0x96 + 2)
-                });
+                ]);
                 
                 memoryService.WriteBytes(code, spawnBytes);
                 _codeIsWritten = true;

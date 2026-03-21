@@ -64,7 +64,7 @@
                 <TextBlock.Effect>
                     <DropShadowEffect ShadowDepth="1" BlurRadius="3" Color="Black" Opacity="0.7"/>
                 </TextBlock.Effect>
-                <Run Text="{Binding TargetCurrentHealth, Mode=OneWay}" 
+                <Run Text="{Binding CurrentHealth, Mode=OneWay}" 
                      Foreground="#FF9900" FontSize="18" FontWeight="Bold"/>
                 <Run Text="/" Foreground="#FF9900" FontSize="18"/>
                 <Run Text="{Binding MaxHealth, Mode=OneWay}" 

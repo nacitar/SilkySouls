@@ -104,6 +104,7 @@
     <Compile Include="Converters\ImmuneFillConverter.cs" />
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\StringToVisibilityConverter.cs" />
+    <Compile Include="Core\DelegateCommand.cs" />
     <Compile Include="Enums\AsmScript.cs" />
     <Compile Include="Enums\HotkeyActions.cs" />
     <Compile Include="Enums\State.cs" />
@@ -182,6 +183,9 @@
     <Compile Include="Views\SettingsTab.xaml.cs">
       <DependentUpon>SettingsTab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\TargetTab.xaml.cs">
+      <DependentUpon>TargetTab.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TravelTab.xaml.cs">
       <DependentUpon>TravelTab.xaml</DependentUpon>
     </Compile>
@@ -212,6 +216,7 @@
     </Page>
     <Page Include="Views\ResistancesWindow.xaml" />
     <Page Include="Views\SettingsTab.xaml" />
+    <Page Include="Views\TargetTab.xaml" />
     <Page Include="Views\TravelTab.xaml" />
     <Page Include="Views\UtilityTab.xaml">
       <SubType>Designer</SubType>

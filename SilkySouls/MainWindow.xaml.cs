@@ -70,13 +70,13 @@ namespace SilkySouls
             var settingsService = new SettingsService(_memoryService);
             
 
-            _playerViewModel = new PlayerViewModel(playerService, hotkeyManager);
+            _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService);
             TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
-            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService);
-            _travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel);
-            _eventViewModel = new EventViewModel(eventService);
-            _enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager);
-            _itemViewModel = new ItemViewModel(_itemService);
+            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
+            _travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
+            _eventViewModel = new EventViewModel(eventService, _stateService);
+            _enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService);
+            _itemViewModel = new ItemViewModel(_itemService, _stateService);
             _settingsViewModel = new SettingsViewModel(settingsService, hotkeyManager);
 
             var playerTab = new PlayerTab(_playerViewModel);
@@ -84,6 +84,7 @@ namespace SilkySouls
             var eventTab = new EventTab(_eventViewModel);
             var utilityTab = new UtilityTab(_utilityViewModel);
             var enemyTab = new EnemyTab(_enemyViewModel);
+            var targetTab = new TargetTab(targetViewModel);
             var itemTab = new ItemTab(_itemViewModel);
             var settingsTab = new SettingsTab(_settingsViewModel);
 
@@ -92,6 +93,7 @@ namespace SilkySouls
             MainTabControl.Items.Add(new TabItem { Header = "Event", Content = eventTab });
             MainTabControl.Items.Add(new TabItem { Header = "Utility", Content = utilityTab });
             MainTabControl.Items.Add(new TabItem { Header = "Enemies", Content = enemyTab });
+            MainTabControl.Items.Add(new TabItem { Header = "Target", Content = targetTab });
             MainTabControl.Items.Add(new TabItem { Header = "Items", Content = itemTab });
             MainTabControl.Items.Add(new TabItem { Header = "Settings", Content = settingsTab });
 
@@ -144,20 +146,19 @@ namespace SilkySouls
                     if (_loaded) return;
                     _loaded = true;
                     _stateService.Publish(State.Loaded);
-                    TryEnableFeatures();
                     TrySetGameStartPrefs();
                     _settingsViewModel.ApplyLoadedOptions();
                 }
                 else if (_loaded)
                 {
-                    DisableFeatures();
+                    _stateService.Publish(State.NotLoaded);
                     _loaded = false;
                 }
             }
             else
             {
                 _hookManager.ClearHooks();
-                DisableFeatures();
+                _stateService.Publish(State.NotLoaded);
                 _utilityViewModel.ResetAttached();
                 _settingsViewModel.ResetAttached();
                 _hasAllocatedMemory = false;
@@ -168,25 +169,6 @@ namespace SilkySouls
             }
         }
 
-        private void TryEnableFeatures()
-        {
-            _playerViewModel.TryEnableActiveOptions();
-            _eventViewModel.TryEnableActiveOptions();
-            _utilityViewModel.TryEnableActiveOptions();
-            _enemyViewModel.TryEnableActiveOptions();
-            _itemViewModel.TryEnableActiveOptions();
-            _travelViewModel.TryEnableFeatures();
-        }
-
-        private void DisableFeatures()
-        {
-            _travelViewModel.DisableFeatures();
-            _eventViewModel.DisableFeatures();
-            _playerViewModel.DisableButtons();
-            _utilityViewModel.DisableButtons();
-            _enemyViewModel.DisableButtons();
-            _itemViewModel.DisableButtons();
-        }
 
         private void TrySetGameStartPrefs()
         {

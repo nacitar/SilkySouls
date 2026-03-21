@@ -14,7 +14,7 @@ namespace SilkySouls.Services
         public void Warp(WarpLocation selectedWarpLocation)
         {
             var lastBonfireAdr =
-                memoryService.FollowPointers(GameMan.Base, new[] { GameMan.LastBonfire }, false);
+                memoryService.FollowPointers(memoryService.Read<nint>(GameMan.Base), new[] { GameMan.LastBonfire }, false);
 
             memoryService.Write(lastBonfireAdr, selectedWarpLocation.Id);
 
@@ -66,7 +66,7 @@ namespace SilkySouls.Services
                 memoryService.WriteBytes(angleCodeBlockAddr, angleWarpBytes);
 
                 IntPtr loadingFlagAddr =
-                    memoryService.FollowPointers(MenuMan.Base, new[] { (int)MenuMan.MenuManData.LoadedFlag }, false);
+                    memoryService.FollowPointers(memoryService.Read<nint>(MenuMan.Base), new[] { (int)MenuMan.MenuManData.LoadedFlag }, false);
 
                 if (!WaitForLoadingFlag(loadingFlagAddr, 0))
                 {
@@ -108,7 +108,7 @@ namespace SilkySouls.Services
 
         public void UnlockBonfireWarps()
         {
-            var bonfireFlagBase = memoryService.FollowPointers(EventFlagMan.Base,
+            var bonfireFlagBase = memoryService.FollowPointers(memoryService.Read<nint>(EventFlagMan.Base),
                 new[] { EventFlagMan.FlagPtr }, true);
 
             var bonfireWarpFlagAddr = bonfireFlagBase + EventFlagMan.WarpFlag;

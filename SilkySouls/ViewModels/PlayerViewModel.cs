@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
+using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.Models;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
@@ -70,11 +72,15 @@ namespace SilkySouls.ViewModels
         private bool _wasNoDamageEnabled;
         private bool _wasNoDeathEnabled;
 
-        public PlayerViewModel(PlayerService playerService, HotkeyManager hotkeyManager)
+        public PlayerViewModel(PlayerService playerService, HotkeyManager hotkeyManager, IStateService stateService)
         {
             _playerService = playerService;
 
             _hotkeyManager = hotkeyManager;
+
+            stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.NotLoaded, OnNotLoaded);
+
             RegisterHotkeys();
 
             LoadStats();
@@ -418,13 +424,13 @@ namespace SilkySouls.ViewModels
         }
 
 
-        public void DisableButtons()
+        private void OnNotLoaded()
         {
             AreOptionsEnabled = false;
             _timer.Stop();
         }
 
-        public void TryEnableActiveOptions()
+        private void OnLoaded()
         {
             if (IsNoDeathEnabled)
                 _playerService.ToggleNoDeath(1);

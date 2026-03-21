@@ -32,4 +32,5 @@ public interface ITargetService
     void DisableRepeatAct();
     int GetCurrentRepeatEnemyId();
     int GetEnemyBattleId();
+    int GetImmunitySpEffect();
 }

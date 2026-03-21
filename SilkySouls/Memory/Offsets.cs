@@ -83,6 +83,12 @@ namespace SilkySouls.memory
             public static readonly BitFlag NoUpdate = new(0x525, 1 << 7);
 
             public static readonly int[] AnimSpeed = [ChrCtrl, 0x18, 0xA8];
+            public static readonly int[] NpcParam = [0x580, 0x8];
+
+            public enum NpcParamOffsets
+            {
+                AuxImmunitySpEffect = 0x50,
+            }
         }
 
         public static class DebugEventMan

@@ -1,17 +1,13 @@
-﻿using System.Windows.Threading;
+﻿using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
-using SilkySouls.Views;
 
 namespace SilkySouls.ViewModels
 {
     public class EnemyViewModel : BaseViewModel
     {
         private bool _areOptionsEnabled;
-
-        private readonly DispatcherTimer _targetOptionsTimer;
-
-        private ResistancesWindow _resistancesWindowWindow;
 
         private bool _isAllNoDamageEnabled;
         private bool _isAllNoDeathEnabled;
@@ -20,10 +16,13 @@ namespace SilkySouls.ViewModels
         private readonly EnemyService _enemyService;
         private readonly HotkeyManager _hotkeyManager;
 
-        public EnemyViewModel(EnemyService enemyService, HotkeyManager hotkeyManager)
+        public EnemyViewModel(EnemyService enemyService, HotkeyManager hotkeyManager, IStateService stateService)
         {
             _enemyService = enemyService;
             _hotkeyManager = hotkeyManager;
+
+            stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.NotLoaded, OnNotLoaded);
 
             RegisterHotkeys();
         }
@@ -91,17 +90,12 @@ namespace SilkySouls.ViewModels
             }
         }
 
-        public void DisableButtons()
+        private void OnNotLoaded()
         {
-            _targetOptionsTimer.Stop();
-            // IsFreezeHealthEnabled = false;
-            // IsRepeatActEnabled = false;
-            // _enemyService.DisableRepeatAct();
-            // _currentlyRepeatingAct = "None";
             AreOptionsEnabled = false;
         }
 
-        public void TryEnableActiveOptions()
+        private void OnLoaded()
         {
             if (IsDisableAiEnabled)
                 _enemyService.ToggleAi(1);

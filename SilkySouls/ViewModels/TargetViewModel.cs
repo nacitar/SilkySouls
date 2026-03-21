@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
+using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Utilities;
@@ -28,10 +30,13 @@ public class TargetViewModel : BaseViewModel
         IStateService stateService)
     {
         _targetService = targetService;
+        _hotkeyManager = hotkeyManager;
         _gameTickService = gameTickService;
 
         stateService.Subscribe(State.Loaded, OnLoaded);
         stateService.Subscribe(State.NotLoaded, OnNotLoaded);
+
+        SetHealthCommand = new DelegateCommand(SetHealth);
 
         _repeatActOptions = new ObservableCollection<string> { "None" };
         SelectedRepeatActOption = "None";
@@ -40,6 +45,8 @@ public class TargetViewModel : BaseViewModel
     }
 
     #region Commands
+
+    public ICommand SetHealthCommand { get; set; }
 
     #endregion
 
@@ -394,14 +401,16 @@ public class TargetViewModel : BaseViewModel
             _gameTickService.Subscribe(TargetTick);
         }
 
-        // _enemyService.DisableRepeatAct();
-        // _currentlyRepeatingAct = "None";
-        AreOptionsEnabled = false;
+        AreOptionsEnabled = true;
     }
 
     private void OnNotLoaded()
     {
-        throw new NotImplementedException();
+        IsFreezeHealthEnabled = false;
+        IsRepeatActEnabled = false;
+        _targetService.DisableRepeatAct();
+        _currentlyRepeatingAct = "None";
+        AreOptionsEnabled = false;
     }
 
     private void RegisterHotkeys()
@@ -525,7 +534,7 @@ public class TargetViewModel : BaseViewModel
         IsToxicImmune = false;
         IsPoisonImmune = false;
         IsBleedImmune = false;
-        int immunity = _enemyService.GetImmunitySpEffect();
+        int immunity = _targetService.GetImmunitySpEffect();
         switch (immunity)
         {
             case 90000:
@@ -579,9 +588,10 @@ public class TargetViewModel : BaseViewModel
         }
     }
     
-    public void SetTargetHealth(int value)
+    private void SetHealth(object parameter)
     {
-        int health = MaxHealth * value / 100;
+        int healthPercentage = Convert.ToInt32(parameter);
+        int health = MaxHealth * healthPercentage / 100;
         _targetService.SetHp(health);
     }
 

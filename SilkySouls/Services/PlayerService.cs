@@ -27,7 +27,7 @@ namespace SilkySouls.Services
 
         public void SetPlayerStat(GameDataMan.PlayerGameData statType, int newValue)
         {
-            var statPtr = memoryService.FollowPointers(GameDataMan.Base, new[]
+            var statPtr = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base), new[]
                 { (int)GameDataMan.GameDataOffsets.PlayerGameData, (int)statType }, false);
 
             int currentValue = memoryService.Read<int>(statPtr);
@@ -68,7 +68,7 @@ namespace SilkySouls.Services
             }
 
             int difference = newValue - oldValue;
-            var totalSoulsPtr = memoryService.FollowPointers(GameDataMan.Base, new[]
+            var totalSoulsPtr = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base), new[]
                 {
                     (int)GameDataMan.GameDataOffsets.PlayerGameData,
                     (int)GameDataMan.PlayerGameData.TotalSouls
@@ -83,7 +83,7 @@ namespace SilkySouls.Services
         private void UpdatePlayerStats(int difference)
         {
             var allStatsPtr =
-                memoryService.FollowPointers(GameDataMan.Base,
+                memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
                     new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
 
             int originalSouls = memoryService.Read<int>(allStatsPtr + (int)GameDataMan.PlayerGameData.Souls);
@@ -186,7 +186,7 @@ namespace SilkySouls.Services
 
         public IntPtr GetPlayerInsPointer(int finalOffset)
         {
-            var ptr = memoryService.FollowPointers(WorldChrMan.Base,
+            var ptr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns,
@@ -214,7 +214,7 @@ namespace SilkySouls.Services
 
         public IntPtr GetPlayerCoordinatePtr(WorldChrMan.Coords coordinateType)
         {
-            return memoryService.FollowPointers(WorldChrMan.Base, new[]
+            return memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base), new[]
             {
                 (int)WorldChrMan.BaseOffsets.PlayerIns,
                 (int)WorldChrMan.PlayerInsOffsets.CoordsPtr1,
@@ -270,7 +270,7 @@ namespace SilkySouls.Services
 
         public void RestoreSpellCasts()
         {
-            var magicDataPtr = memoryService.FollowPointers(GameDataMan.Base,
+            var magicDataPtr = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
                 new[]
                 {
                     (int)GameDataMan.GameDataOffsets.PlayerGameData,
@@ -293,7 +293,7 @@ namespace SilkySouls.Services
 
         public void ToggleNoDamage(bool setValue)
         {
-            var noDamagePtr = memoryService.FollowPointers(WorldChrMan.Base,
+            var noDamagePtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns, (int)WorldChrMan.PlayerInsOffsets.NoDamage
@@ -304,7 +304,7 @@ namespace SilkySouls.Services
 
         public void ToggleInfiniteStamina(bool setValue)
         {
-            var infiniteStamPtr = memoryService.FollowPointers(WorldChrMan.Base,
+            var infiniteStamPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns,
@@ -317,7 +317,7 @@ namespace SilkySouls.Services
 
         public void ToggleNoGoodsConsume(bool setValue)
         {
-            var noGoodsConsumePtr = memoryService.FollowPointers(WorldChrMan.Base,
+            var noGoodsConsumePtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns,
@@ -359,7 +359,7 @@ namespace SilkySouls.Services
 
         public void ToggleInfinitePoise(bool setValue)
         {
-            var infinitePoisePtr = memoryService.FollowPointers(WorldChrMan.Base,
+            var infinitePoisePtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns,
@@ -416,7 +416,7 @@ namespace SilkySouls.Services
 
         public void GiveSouls()
         {
-            var soulsPtr = memoryService.FollowPointers(GameDataMan.Base, new[]
+            var soulsPtr = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base), new[]
                 {
                     (int)GameDataMan.GameDataOffsets.PlayerGameData,
                     (int)GameDataMan.PlayerGameData.Souls
@@ -432,7 +432,7 @@ namespace SilkySouls.Services
 
         private IntPtr GetPlayerSpeedPtr()
         {
-            return memoryService.FollowPointers(WorldChrMan.Base,
+            return memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns,

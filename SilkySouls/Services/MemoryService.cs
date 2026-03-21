@@ -173,9 +173,9 @@ namespace SilkySouls.Services
             return waitResult == 0;
         }
 
-        public nint FollowPointers(nint baseAddress, int[] offsets, bool readFinalPtr, bool derefBase = true)
+        public nint FollowPointers(nint address, int[] offsets, bool readFinalPtr)
         {
-            nint ptr = derefBase ? Read<nint>(baseAddress) : baseAddress;
+            nint ptr = address;
 
             for (int i = 0; i < offsets.Length - 1; i++)
             {
@@ -184,10 +184,7 @@ namespace SilkySouls.Services
 
             nint finalAddress = ptr + offsets[offsets.Length - 1];
 
-            if (readFinalPtr)
-                return Read<nint>(finalAddress);
-
-            return finalAddress;
+            return readFinalPtr ? Read<nint>(finalAddress) : finalAddress;
         }
 
         public void AllocateAndExecute(byte[] shellcode)

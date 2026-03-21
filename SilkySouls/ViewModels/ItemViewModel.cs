@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.Models;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
@@ -44,9 +46,12 @@ namespace SilkySouls.ViewModels
         private bool _isSearchActive;
         private readonly ObservableCollection<Item> _searchResultsCollection = new ObservableCollection<Item>();
 
-        public ItemViewModel(ItemService itemService)
+        public ItemViewModel(ItemService itemService, IStateService stateService)
         {
             _itemService = itemService;
+
+            stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.NotLoaded, OnNotLoaded);
 
             _categories = new ObservableCollection<ItemCategory>();
             _items = new ObservableCollection<Item>();
@@ -412,12 +417,12 @@ namespace SilkySouls.ViewModels
 
         public ObservableCollection<Item> WeaponList => new ObservableCollection<Item>(_itemsByCategory["Weapons"]);
 
-        public void DisableButtons()
+        private void OnNotLoaded()
         {
             AreOptionsEnabled = false;
         }
 
-        public void TryEnableActiveOptions()
+        private void OnLoaded()
         {
             AreOptionsEnabled = true;
         }

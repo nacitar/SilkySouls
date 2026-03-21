@@ -16,7 +16,7 @@ namespace SilkySouls.Services
         public void Quitout()
         {
             var quitoutPtr =
-                _memoryService.FollowPointers(Offsets.MenuMan.Base, new[]
+                _memoryService.FollowPointers(_memoryService.Read<nint>(Offsets.MenuMan.Base), new[]
                 {
                     (int)Offsets.MenuMan.MenuManData.Quitout
                 }, false);

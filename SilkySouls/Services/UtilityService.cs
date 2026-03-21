@@ -26,7 +26,7 @@ namespace SilkySouls.Services
             if (!IsDrawOriginInitialized()) return false;
             _draw = CodeCaveOffsets.Base + CodeCaveOffsets.EnableDraw;
 
-            var ezDraw = memoryService.FollowPointers(HgDraw.Base, new[] { HgDraw.EzDraw }, true);
+            var ezDraw = memoryService.FollowPointers(memoryService.Read<nint>(HgDraw.Base), new[] { HgDraw.EzDraw }, true);
             long drawFunc1 = _drawOrigin + 11 + 5 + memoryService.Read<int>((IntPtr)(_drawOrigin + 11) + 1);
             long drawFunc2 = _drawOrigin + 43 + 5 + memoryService.Read<int>((IntPtr)(_drawOrigin + 43) + 1);
 
@@ -64,14 +64,14 @@ namespace SilkySouls.Services
         internal void EnableHitboxView()
         {
             var hitboxAddr =
-                memoryService.FollowPointers(DamageMan.Base, new[] { DamageMan.HitboxFlag }, false);
+                memoryService.FollowPointers(memoryService.Read<nint>(DamageMan.Base), new[] { DamageMan.HitboxFlag }, false);
             memoryService.Write(hitboxAddr, 1);
         }
 
         internal void DisableHitboxView()
         {
             var hitboxAddr =
-                memoryService.FollowPointers(DamageMan.Base, new[] { DamageMan.HitboxFlag }, false);
+                memoryService.FollowPointers(memoryService.Read<nint>(DamageMan.Base), new[] { DamageMan.HitboxFlag }, false);
             memoryService.Write(hitboxAddr, 0);
         }
 
@@ -145,7 +145,7 @@ namespace SilkySouls.Services
         {
             var zDirectionAddr = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionVariable;
 
-            var playerCoordsBase = memoryService.FollowPointers(WorldChrMan.Base,
+            var playerCoordsBase = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.UpdateCoordsBasePtr, WorldChrMan.UpdateCoords
@@ -221,7 +221,7 @@ namespace SilkySouls.Services
 
             IntPtr updateCoordsBlock = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.UpdateCoords;
 
-            var coordsPtr = memoryService.FollowPointers(WorldChrMan.Base, new[]
+            var coordsPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base), new[]
             {
                 (int)WorldChrMan.BaseOffsets.PlayerIns,
                 (int)WorldChrMan.PlayerInsOffsets.CoordsPtr1,
@@ -231,14 +231,14 @@ namespace SilkySouls.Services
             }, true);
 
             var updateCoordsOrigin = Hooks.UpdateCoords;
-            var padManPtr = memoryService.FollowPointers(WorldChrMan.Base,
+            var padManPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
                 new[]
                 {
                     (int)WorldChrMan.BaseOffsets.PlayerIns,
                     (int)WorldChrMan.PlayerInsOffsets.PadMan
                 }, true);
 
-            var camPtr = memoryService.FollowPointers(Cam.Base, new[] { Cam.ChrCam, Cam.ChrExFollowCam }, true);
+            var camPtr = memoryService.FollowPointers(memoryService.Read<nint>(Cam.Base), new[] { Cam.ChrCam, Cam.ChrExFollowCam }, true);
 
             byte[] updateCoordsCodeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_UpdateCoords);
 
@@ -299,10 +299,10 @@ namespace SilkySouls.Services
         {
             if (value)
             {
-                var filterPtr = memoryService.FollowPointers(FieldArea.Base, new[]
+                var filterPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
                     { FieldArea.RenderPtr, FieldArea.FilterRemoval }, false);
                 memoryService.Write(filterPtr, (byte)1);
-                var brightnessPtr = memoryService.FollowPointers(FieldArea.Base, new[]
+                var brightnessPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
                     { FieldArea.RenderPtr, FieldArea.Brightness }, false);
                 var bytes = new byte[12];
                 var floatBytes = BitConverter.GetBytes(5.0f);
@@ -314,10 +314,10 @@ namespace SilkySouls.Services
             }
             else
             {
-                var filterPtr = memoryService.FollowPointers(FieldArea.Base, new[]
+                var filterPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
                     { FieldArea.RenderPtr, FieldArea.FilterRemoval }, false);
                 memoryService.Write(filterPtr, (byte)0);
-                var brightnessPtr = memoryService.FollowPointers(FieldArea.Base, new[]
+                var brightnessPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
                     { FieldArea.RenderPtr, FieldArea.Brightness }, false);
                 var bytes = new byte[12];
                 var floatBytes = BitConverter.GetBytes(1.0f);
@@ -331,14 +331,14 @@ namespace SilkySouls.Services
 
         public void ShowMenu(MenuMan.MenuManData menuType)
         {
-            var menuPtr = memoryService.FollowPointers(MenuMan.Base, new[] { (int)menuType }, false);
+            var menuPtr = memoryService.FollowPointers(memoryService.Read<nint>(MenuMan.Base), new[] { (int)menuType }, false);
             memoryService.Write(menuPtr, menuType == MenuMan.MenuManData.Warp ? (byte)2 : (byte)1);
         }
 
         public void ShowUpgradeMenu(bool isWeapon)
         {
             byte[] upgradeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenEnhanceShop);
-            var playerGameData = memoryService.FollowPointers(GameDataMan.Base,
+            var playerGameData = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
                 new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
             byte[] bytes = BitConverter.GetBytes(playerGameData);
             Array.Copy(bytes, 0, upgradeBytes, 2, bytes.Length);
@@ -378,7 +378,7 @@ namespace SilkySouls.Services
 
         public void SetGuaranteedBkhDrop(bool setValue)
         {
-            var bkhPtr = memoryService.FollowPointers(SoloParamMan.Base, new[]
+            var bkhPtr = memoryService.FollowPointers(memoryService.Read<nint>(SoloParamMan.Base), new[]
             {
                 SoloParamMan.ParamResCap,
                 SoloParamMan.ItemLot,

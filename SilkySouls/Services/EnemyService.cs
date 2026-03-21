@@ -15,19 +15,7 @@ namespace SilkySouls.Services
         private IntPtr _lastTargetBlock;
 
         private bool _isHookInstalled;
-
-        public int GetImmunitySpEffect()
-        {
-            var spEffectPtr = memoryService.FollowPointers(CodeCaveOffsets.Base +
-                                                       CodeCaveOffsets.LockedTargetPtr,
-                new[]
-                {
-                    (int)Offsets.LockedTarget.NpcSpEffectEquipCtrl, Offsets.SpEffectPtr1, Offsets.SpEffectPtr2,
-                    Offsets.SpEffectOffset
-                }, false);
-
-            return memoryService.Read<int>(spEffectPtr);
-        }
+        
         
         public void ToggleAllNoDamage(int value)
         {

@@ -1,4 +1,6 @@
 ﻿using System.Windows.Media;
+using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Services;
 
@@ -17,9 +19,12 @@ namespace SilkySouls.ViewModels
 
         private bool _areButtonsEnabled;
 
-        public EventViewModel(EventService eventService)
+        public EventViewModel(EventService eventService, IStateService stateService)
         {
             _eventService = eventService;
+
+            stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.NotLoaded, OnNotLoaded);
         }
         
                 
@@ -103,12 +108,12 @@ namespace SilkySouls.ViewModels
             set => SetProperty(ref _areButtonsEnabled, value);
         }
 
-        public void TryEnableActiveOptions()
+        private void OnLoaded()
         {
             AreButtonsEnabled = true;
         }
 
-        public void DisableFeatures()
+        private void OnNotLoaded()
         {
             AreButtonsEnabled = false;
             IsDisableEventsEnabled = false;

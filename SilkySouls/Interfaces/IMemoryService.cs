@@ -14,7 +14,7 @@ public interface IMemoryService
     
     string ReadString(nint addr, int maxLength = 32);
     byte[] ReadBytes(nint addr, int size);
-    public nint FollowPointers(nint baseAddress, int[] offsets, bool readFinalPtr, bool derefBase = true);
+    public nint FollowPointers(nint address, int[] offsets, bool readFinalPtr);
 
     T[] ReadArray<T>(IntPtr addr, int count) where T : unmanaged;
     T Read<T>(IntPtr addr) where T : unmanaged;

@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using SilkySouls.Enums;
+using SilkySouls.Interfaces;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
@@ -34,13 +36,16 @@ namespace SilkySouls.ViewModels
         public const int IconIdOffset = 0x2C;
 
         public UtilityViewModel(UtilityService utilityService, HotkeyManager hotkeyManager,
-            PlayerViewModel playerViewModel, IParamService paramService)
+            PlayerViewModel playerViewModel, IParamService paramService, IStateService stateService)
         {
             _utilityService = utilityService;
             _playerViewModel = playerViewModel;
             _paramService = paramService;
             _hotkeyManager = hotkeyManager;
-            
+
+            stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.NotLoaded, OnNotLoaded);
+
             RegisterHotkeys();
         }
 
@@ -218,13 +223,13 @@ namespace SilkySouls.ViewModels
             }
         }
         
-        public void DisableButtons()
+        private void OnNotLoaded()
         {
             IsNoClipEnabled = false;
             AreButtonsEnabled = false;
         }
 
-        public void TryEnableActiveOptions()
+        private void OnLoaded()
         {
             if (IsHitboxEnabled)
                 _utilityService.EnableHitboxView();
