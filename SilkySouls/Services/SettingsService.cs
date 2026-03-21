@@ -4,28 +4,20 @@ using SilkySouls.Memory;
 
 namespace SilkySouls.Services
 {
-    public class SettingsService
+    public class SettingsService(IMemoryService memoryService)
     {
-        private readonly IMemoryService _memoryService;
-
-        public SettingsService(IMemoryService memoryService)
-        {
-            _memoryService = memoryService;
-        }
-
         public void Quitout()
         {
             var quitoutPtr =
-                _memoryService.FollowPointers(_memoryService.Read<nint>(Offsets.MenuMan.Base), new[]
-                {
+                memoryService.FollowPointers(memoryService.Read<nint>(Offsets.MenuMan.Base), [
                     (int)Offsets.MenuMan.MenuManData.Quitout
-                }, false);
-            _memoryService.Write(quitoutPtr, (byte)2);
+                ], false);
+            memoryService.Write(quitoutPtr, (byte)2);
         }
 
         public void ToggleFastQuitout(int value)
         {
-            _memoryService.Write(Offsets.Patches.QuitoutPatch, (byte)value);
+            memoryService.Write(Offsets.Patches.QuitoutPatch, (byte)value);
         }
         
     }

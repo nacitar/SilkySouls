@@ -16,6 +16,10 @@ public enum AsmScript
     AllNoDamage,
     
     LockedTarget,
+    RepeatActIdCheck,
+    RepeatActFlagSet,
+    RepeatAct,
+    
     
     EnableDraw,
     NoClip_InAirTimer,

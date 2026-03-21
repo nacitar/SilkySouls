@@ -12,7 +12,10 @@ public class StateService(IMemoryService memoryService) : IStateService
 
     public bool IsLoaded()
     {
-        var loadingCheckPtr = memoryService.FollowPointers(memoryService.Read<nint>(Offsets.MenuMan.Base), new[] { (int)Offsets.MenuMan.MenuManData.LoadedFlag }, false);
+        var loadingCheckPtr = memoryService.FollowPointers(
+            memoryService.Read<nint>(Offsets.MenuMan.Base),
+            [(int)Offsets.MenuMan.MenuManData.LoadedFlag
+        ], false);
         return memoryService.Read<int>(loadingCheckPtr) == 1;
     }
 

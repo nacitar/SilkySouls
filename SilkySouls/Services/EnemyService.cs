@@ -7,15 +7,8 @@ using SilkySouls.Utilities;
 
 namespace SilkySouls.Services
 {
-    public class EnemyService(IMemoryService memoryService, HookManager hookManager, AoBScanner aobScanner)
+    public class EnemyService(IMemoryService memoryService, HookManager hookManager)
     {
-        private readonly AoBScanner _aoBScanner = aobScanner;
-
-        private IntPtr savedTargetPtr;
-        private IntPtr _lastTargetBlock;
-
-        private bool _isHookInstalled;
-        
         
         public void ToggleAllNoDamage(int value)
         {

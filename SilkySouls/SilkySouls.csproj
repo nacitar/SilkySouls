@@ -108,7 +108,6 @@
     <Compile Include="Enums\AsmScript.cs" />
     <Compile Include="Enums\HotkeyActions.cs" />
     <Compile Include="Enums\State.cs" />
-    <Compile Include="Interfaces\IChrInsService.cs" />
     <Compile Include="Interfaces\IEnemyService.cs" />
     <Compile Include="Interfaces\IEventLogReader.cs" />
     <Compile Include="Interfaces\IEventService.cs" />

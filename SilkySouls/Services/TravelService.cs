@@ -14,7 +14,7 @@ namespace SilkySouls.Services
         public void Warp(WarpLocation selectedWarpLocation)
         {
             var lastBonfireAdr =
-                memoryService.FollowPointers(memoryService.Read<nint>(GameMan.Base), new[] { GameMan.LastBonfire }, false);
+                memoryService.FollowPointers(memoryService.Read<nint>(GameMan.Base), [GameMan.LastBonfire], false);
 
             memoryService.Write(lastBonfireAdr, selectedWarpLocation.Id);
 

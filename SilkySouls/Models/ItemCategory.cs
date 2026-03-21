@@ -1,15 +1,9 @@
 ﻿namespace SilkySouls.Models
 {
-    public class ItemCategory
+    public class ItemCategory(int id, string name)
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-
-        public ItemCategory(int id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
+        public int Id { get; set; } = id;
+        public string Name { get; set; } = name;
 
         public override string ToString()
         {

@@ -84,7 +84,7 @@ namespace SilkySouls.Services
         {
             var allStatsPtr =
                 memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
-                    new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
+                    [(int)GameDataMan.GameDataOffsets.PlayerGameData], true);
 
             int originalSouls = memoryService.Read<int>(allStatsPtr + (int)GameDataMan.PlayerGameData.Souls);
 
@@ -187,11 +187,10 @@ namespace SilkySouls.Services
         public IntPtr GetPlayerInsPointer(int finalOffset)
         {
             var ptr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
-                new[]
-                {
-                    (int)WorldChrMan.BaseOffsets.PlayerIns,
+            [
+                (int)WorldChrMan.BaseOffsets.PlayerIns,
                     finalOffset
-                }, false);
+            ], false);
 
             return ptr;
         }

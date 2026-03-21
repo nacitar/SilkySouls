@@ -18,14 +18,10 @@ public class TargetViewModel : BaseViewModel
     private readonly ITargetService _targetService;
 
     private nint _currentChrIns;
-    private float _targetDesiredSpeed = -1f;
     private ResistancesWindow _resistancesWindowWindow;
 
     private string _currentlyRepeatingAct = "None";
-
-    private const float DefaultSpeed = 1f;
-    private const float Epsilon = 0.0001f;
-
+    
     public TargetViewModel(ITargetService targetService, HotkeyManager hotkeyManager, IGameTickService gameTickService,
         IStateService stateService)
     {

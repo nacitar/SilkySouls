@@ -26,10 +26,7 @@ namespace SilkySouls
         private readonly DispatcherTimer _gameLoadedTimer;
 
         private readonly PlayerViewModel _playerViewModel;
-        private readonly TravelViewModel _travelViewModel;
-        private readonly EventViewModel _eventViewModel;
         private readonly UtilityViewModel _utilityViewModel;
-        private readonly EnemyViewModel _enemyViewModel;
         private readonly ItemViewModel _itemViewModel;
         private readonly SettingsViewModel _settingsViewModel;
         private readonly HookManager _hookManager;
@@ -64,7 +61,7 @@ namespace SilkySouls
             var travelService = new TravelService(_memoryService, _hookManager);
             var eventService = new EventService(_memoryService, _hookManager);
             var utilityService = new UtilityService(_memoryService, _hookManager);
-            var enemyService = new EnemyService(_memoryService, _hookManager, _aobScanner);
+            var enemyService = new EnemyService(_memoryService, _hookManager);
             IParamService paramService = new ParamService(_memoryService);
             _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
@@ -73,17 +70,17 @@ namespace SilkySouls
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService);
             TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
-            _travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
-            _eventViewModel = new EventViewModel(eventService, _stateService);
-            _enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService);
+            var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
+            var eventViewModel = new EventViewModel(eventService, _stateService);
+            var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService);
             _itemViewModel = new ItemViewModel(_itemService, _stateService);
             _settingsViewModel = new SettingsViewModel(settingsService, hotkeyManager);
 
             var playerTab = new PlayerTab(_playerViewModel);
-            var travelTab = new TravelTab(_travelViewModel);
-            var eventTab = new EventTab(_eventViewModel);
+            var travelTab = new TravelTab(travelViewModel);
+            var eventTab = new EventTab(eventViewModel);
             var utilityTab = new UtilityTab(_utilityViewModel);
-            var enemyTab = new EnemyTab(_enemyViewModel);
+            var enemyTab = new EnemyTab(enemyViewModel);
             var targetTab = new TargetTab(targetViewModel);
             var itemTab = new ItemTab(_itemViewModel);
             var settingsTab = new SettingsTab(_settingsViewModel);
@@ -102,7 +99,7 @@ namespace SilkySouls
             
             _gameLoadedTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(1)
+                Interval = TimeSpan.FromMilliseconds(25)
             };
             _gameLoadedTimer.Tick += Timer_Tick;
             _gameLoadedTimer.Start();
@@ -173,7 +170,7 @@ namespace SilkySouls
         private void TrySetGameStartPrefs()
         {
             var gameDataPtr = _memoryService.Read<nint>(Offsets.GameDataMan.Base);
-            IntPtr inGameTimePtr = (IntPtr)(gameDataPtr + (int)Offsets.GameDataMan.GameDataOffsets.InGameTime);
+            IntPtr inGameTimePtr = gameDataPtr + (int)Offsets.GameDataMan.GameDataOffsets.InGameTime;
             long gameTimeMs = _memoryService.Read<long>(inGameTimePtr);
             if (gameTimeMs < 5000)
             {
