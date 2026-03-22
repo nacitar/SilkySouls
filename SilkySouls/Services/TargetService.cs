@@ -199,8 +199,8 @@ public class TargetService(IMemoryService memoryService, HookManager hookManager
     {
         var ifManipulationCode = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.LuaIfManipulationCode;
         var luaSwitchCheckCode = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.LuaSwitchCheckCode;
-        var luaIfCaseHook = Hooks.LuaIfCase;
-        var luaSwitchCaseHook = Hooks.LuaSwitchCase;
+        var luaIfCaseHook = Hooks.LuaLowerOrEqual;
+        var luaSwitchCaseHook = Hooks.LuaVmSwitch;
         var battleActivateHook = Hooks.BattleActivate;
 
         if (actLabelIndex == 0)
@@ -244,7 +244,7 @@ public class TargetService(IMemoryService memoryService, HookManager hookManager
         var enemyRaxIdentifier = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.EnemyRaxIdentifier;
         var enemyIdentifierCode = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.EnemyIdentifierCode;
         var luaSwitchHistory = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.LuaSwitchHistory;
-        var originalCallOffset = Hooks.LuaIfCase + 0x906;
+        var originalCallOffset = Hooks.LuaLowerOrEqual + 0x906;
         var luaIfCounter = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.LuaIfCounter;
         var ifConditionFlag = CodeCaveOffsets.Base + (int)CodeCaveOffsets.RepeatAct.IfConditionFlag;
 

@@ -6,18 +6,24 @@ using System.Numerics;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
+using SilkySouls.Models;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Services;
 
-public class PlayerService(IMemoryService memoryService) : IPlayerService
+public class PlayerService(IMemoryService memoryService, ITravelService travelService) : IPlayerService
 {
     private readonly Dictionary<int, int> _lowLevelSoulRequirements = new()
     {
         { 2, 673 }, { 3, 690 }, { 4, 707 }, { 5, 724 }, { 6, 741 }, { 7, 758 }, { 8, 775 }, { 9, 793 }, { 10, 811 },
         { 11, 829 },
     };
+
+    private readonly Dictionary<uint, int> _bonfiresByBlockId = DataLoader.LoadDict<uint, int>("BonfiresByBlockId");
+
+    private Position _position1 = new();
+    private Position _position2 = new();
 
     public int GetHp() => memoryService.Read<int>(GetPlayerIns() + ChrIns.Health);
 
@@ -34,6 +40,16 @@ public class PlayerService(IMemoryService memoryService) : IPlayerService
     public void SetSp(int sp) => memoryService.Write(GetPlayerIns() + ChrIns.Stamina, sp);
 
     public Vector3 GetPosition() => memoryService.Read<Vector3>(GetPlayerIns() + ChrIns.ReadOnlyCoords);
+    
+    public void SavePosition(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RestorePositon(int index)
+    {
+        throw new NotImplementedException();
+    }
 
     public int GetNewGame() =>
         memoryService.Read<int>(memoryService.Read<nint>(GameDataMan.Base) + (int)GameDataMan.GameDataOffsets.Ng);
@@ -106,10 +122,22 @@ public class PlayerService(IMemoryService memoryService) : IPlayerService
 
         AsmHelper.WriteAbsoluteAddresses(bytes, [
             (equipMagicData, 2),
-            (RestoreCastsFunc, 0xE + 2)
+            (Functions.RestoreCastsFunc, 0xE + 2)
         ]);
 
         memoryService.AllocateAndExecute(bytes);
+    }
+
+    public void GiveSouls()
+    {
+        var soulsPtr = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base), new[]
+            {
+                (int)GameDataMan.GameDataOffsets.PlayerGameData,
+                (int)GameDataMan.PlayerGameData.Souls
+            },
+            false);
+        int currentVal = memoryService.Read<int>(soulsPtr);
+        HandleSoulEdit(soulsPtr, currentVal + 10000, currentVal);
     }
 
     public int GetPlayerStat(GameDataMan.PlayerGameData stat)
@@ -154,19 +182,24 @@ public class PlayerService(IMemoryService memoryService) : IPlayerService
         }
     }
 
-    public void GiveSouls()
+    public void BreakWeapon(int slotOffset)
     {
-        var soulsPtr = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base), new[]
-            {
-                (int)GameDataMan.GameDataOffsets.PlayerGameData,
-                (int)GameDataMan.PlayerGameData.Souls
-            },
-            false);
-        int currentVal = memoryService.Read<int>(soulsPtr);
-        HandleSoulEdit(soulsPtr, currentVal + 10000, currentVal);
-    }
+        var playerGameData = memoryService.Read<nint>(memoryService.Read<nint>(GameDataMan.Base) +
+                                                      (int)GameDataMan.GameDataOffsets.PlayerGameData);
+        int equippedWep = memoryService.Read<int>(playerGameData + slotOffset);
 
-    public nint GetPlayerIns() =>
+        var equipGameData = memoryService.Read<nint>(playerGameData + (int)GameDataMan.PlayerGameData.EquipGameData);
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.BreakRightHandWep);
+        AsmHelper.WriteAbsoluteAddresses(bytes, [
+            (equipGameData, 0x0 + 2),
+            (equippedWep, 0x12 + 2),
+            (Functions.GetInventoryIndexByCatAndId, 0x20 + 2)
+        ]);
+
+        memoryService.AllocateAndExecute(bytes);
+    }
+    
+    private nint GetPlayerIns() =>
         memoryService.Read<nint>(memoryService.Read<nint>(WorldChrMan.Base) + WorldChrMan.PlayerIns);
 
     private void UpdatePlayerStats(int difference)
@@ -227,7 +260,7 @@ public class PlayerService(IMemoryService memoryService) : IPlayerService
         Array.Copy(bytes, 0, codeBytes, 2, 8);
         bytes = BitConverter.GetBytes(soulsPtr);
         Array.Copy(bytes, 0, codeBytes, 15, 8);
-        bytes = BitConverter.GetBytes(LevelUpFunc);
+        bytes = BitConverter.GetBytes(Functions.LevelUpFunc);
         Array.Copy(bytes, 0, codeBytes, 32, 8);
         memoryService.WriteBytes(codeStart, codeBytes);
 

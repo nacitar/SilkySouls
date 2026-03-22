@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using SilkySouls.Models;
 
@@ -97,6 +99,34 @@ namespace SilkySouls.Utilities
                 }
             }
             return warpDict;
+        }
+        public static Dictionary<TKey, TValue> LoadDict<TKey, TValue>(string resourceName, char separator = ',')
+        {
+            var dict = new Dictionary<TKey, TValue>();
+
+            string data = Properties.Resources.ResourceManager.GetString(resourceName);
+            if (string.IsNullOrWhiteSpace(data)) return dict;
+
+            var keyConverter = TypeDescriptor.GetConverter(typeof(TKey));
+            var valueConverter = TypeDescriptor.GetConverter(typeof(TValue));
+
+            using (var reader = new StringReader(data))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    string[] parts = line.Split(separator);
+                    if (parts.Length < 2) continue;
+
+                    var key = (TKey)keyConverter.ConvertFromInvariantString(parts[0].Trim());
+                    var value = (TValue)valueConverter.ConvertFromInvariantString(parts[1].Trim());
+                    dict[key] = value;
+                }
+            }
+
+            return dict;
         }
     }
 }

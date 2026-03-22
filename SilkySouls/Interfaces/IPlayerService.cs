@@ -15,6 +15,8 @@ public interface IPlayerService
     int GetSp();
     void SetSp(int sp);
     Vector3 GetPosition();
+    void SavePosition(int index);
+    void RestorePositon(int index);
     int GetNewGame();
     void SetNewGame(int newGame);
     float GetSpeed();
@@ -26,10 +28,9 @@ public interface IPlayerService
     void ToggleInfinitePoise(bool isEnabled);
     void ToggleInfiniteDurability(bool isEnabled);
     void ToggleNoRoll(bool isEnabled);
-
-
     void RestoreSpellCasts();
     void GiveSouls();
     int GetPlayerStat(GameDataMan.PlayerGameData stat);
     void SetPlayerStat(GameDataMan.PlayerGameData statType, int newValue);
+    void BreakWeapon(int slotOffset);
 }

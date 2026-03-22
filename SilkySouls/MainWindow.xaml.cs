@@ -52,8 +52,8 @@ namespace SilkySouls
             
             IGameTickService gameTickService = new GameTickService(_stateService);
 
-            IPlayerService playerService = new PlayerService(_memoryService);
-            
+            ITravelService travelService = new TravelService(_memoryService, _hookManager);
+            IPlayerService playerService = new PlayerService(_memoryService, travelService);
             
             ITargetService targetService = new TargetService(_memoryService, _hookManager);
 
@@ -61,7 +61,7 @@ namespace SilkySouls
 
             var playerServiceOld = new PlayerServiceOld(_memoryService);
             
-            var travelService = new TravelService(_memoryService, _hookManager);
+            var travelServiceOld = new TravelServiceOld(_memoryService, _hookManager);
             var eventService = new EventService(_memoryService, _hookManager);
             var utilityService = new UtilityService(_memoryService, _hookManager);
             var enemyService = new EnemyService(_memoryService, _hookManager);
@@ -73,7 +73,7 @@ namespace SilkySouls
             _playerViewModel = new PlayerViewModel(playerServiceOld, playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
-            var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
+            var travelViewModel = new TravelViewModel(travelServiceOld, hotkeyManager, _utilityViewModel, _stateService);
             var eventViewModel = new EventViewModel(eventService, _stateService);
             var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService);
             _itemViewModel = new ItemViewModel(_itemService, _stateService);
@@ -118,6 +118,7 @@ namespace SilkySouls
         private bool _loaded;
         private bool _hasScanned;
         private bool _hasAllocatedMemory;
+        private bool _hasCheckedPatch;
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -126,16 +127,23 @@ namespace SilkySouls
                 IsAttachedText.Text = "Attached to game";
                 IsAttachedText.Foreground = (SolidColorBrush)Application.Current.Resources["AttachedBrush"];
                 
-                if (!_hasScanned)
+                if (!_hasCheckedPatch)
                 {
-                    _aobScanner.Scan();
-                    _hasScanned = true;
+                    if (!PatchManager.Initialize(_memoryService))
+                    {
+                        _aobScanner.Scan();
+                        _hasScanned = true;
+                    }
+                    _hasCheckedPatch = true;
                 }
+                
 
                 if (!_hasAllocatedMemory)
                 {
                     _memoryService.AllocCodeCave();
+#if DEBUG
                     Console.WriteLine($"Code cave: 0x{(long)CodeCaveOffsets.Base:X}");
+#endif
                     _hasAllocatedMemory = true;
                 }
                 
@@ -162,6 +170,7 @@ namespace SilkySouls
                 _utilityViewModel.ResetAttached();
                 _settingsViewModel.ResetAttached();
                 _hasAllocatedMemory = false;
+                _hasCheckedPatch = false;
                 _loaded = false;
                 _itemService.Reset();
                 IsAttachedText.Text = "Not attached";

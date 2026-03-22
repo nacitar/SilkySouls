@@ -1,8 +1,8 @@
 ﻿using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.memory;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
+using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Services
 {
@@ -30,10 +30,10 @@ namespace SilkySouls.Services
                 });
                 
                 AsmHelper.WriteAbsoluteAddresses(spawnBytes, [
-                    (Offsets.GameDataMan.Base, 0x2B + 2),
-                    (Offsets.ItemGet, 0x54 + 2),
-                    (Offsets.ItemGetMenuMan, 0x64 + 2),
-                    (Offsets.ItemDlgFunc, 0x86 + 2),
+                    (GameDataMan.Base, 0x2B + 2),
+                    (Functions.ItemGet, 0x54 + 2),
+                    (ItemGetMenuManImpl.Base, 0x64 + 2),
+                    (Functions.ItemDlgFunc, 0x86 + 2),
                     (sleepAddr, 0x96 + 2)
                 ]);
                 

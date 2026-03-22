@@ -21,7 +21,7 @@ namespace SilkySouls.ViewModels
 
         private CharacterState _saveState1 = new();
         private CharacterState _saveState2 = new();
-        
+
         private float _playerDesiredSpeed = -1f;
         private const float DefaultSpeed = 1f;
         private const float Epsilon = 0.0001f;
@@ -46,9 +46,10 @@ namespace SilkySouls.ViewModels
             SetMaxHpCommand = new DelegateCommand(SetMaxHp);
             SavePosCommand = new DelegateCommand(OnSavePos);
             RestorePosCommand = new DelegateCommand(OnRestorePos);
-            RestoreSpellCastsCommand = new DelegateCommand(() => _playerService.RestoreSpellCasts());
+            RestoreSpellCastsCommand = new DelegateCommand(() => SafeExecute(() => _playerService.RestoreSpellCasts()));
             GiveSoulsCommand = new DelegateCommand(() => _playerService.GiveSouls());
-            BreakWeaponCommand = new DelegateCommand(() => _playerServiceOld.BreakWeapon(SelectedWeaponSlot.SlotOffset));
+            BreakWeaponCommand =
+                new DelegateCommand(() => SafeExecute(() => _playerService.BreakWeapon(SelectedWeaponSlot.SlotOffset)));
 
             RegisterHotkeys();
 
@@ -63,8 +64,6 @@ namespace SilkySouls.ViewModels
             ];
             SelectedWeaponSlot = EquippedWeapons.FirstOrDefault();
         }
-
-        
 
         #region Commands
 
@@ -518,14 +517,12 @@ namespace SilkySouls.ViewModels
             _hotkeyManager.RegisterAction(HotkeyActions.RTSR, SetRtsr);
             _hotkeyManager.RegisterAction(HotkeyActions.NoDeath, () => { IsNoDeathEnabled = !IsNoDeathEnabled; });
             _hotkeyManager.RegisterAction(HotkeyActions.OneShot, () => { IsOneShotEnabled = !IsOneShotEnabled; });
-            _hotkeyManager.RegisterAction(HotkeyActions.RestoreSpellCasts, () =>
-            {
-                if (!AreOptionsEnabled) return;
-                _playerService.RestoreSpellCasts();
-            });
+            _hotkeyManager.RegisterAction(HotkeyActions.RestoreSpellCasts, () => SafeExecute(() => _playerService.RestoreSpellCasts()));
             _hotkeyManager.RegisterAction(HotkeyActions.ToggleSpeed, ToggleSpeed);
-            _hotkeyManager.RegisterAction(HotkeyActions.IncreaseSpeed, () => SetSpeed(Math.Min(10, PlayerSpeed + 0.25f)));
-            _hotkeyManager.RegisterAction(HotkeyActions.DecreaseSpeed, () => SetSpeed(Math.Max(0, PlayerSpeed - 0.25f)));
+            _hotkeyManager.RegisterAction(HotkeyActions.IncreaseSpeed,
+                () => SetSpeed(Math.Min(10, PlayerSpeed + 0.25f)));
+            _hotkeyManager.RegisterAction(HotkeyActions.DecreaseSpeed,
+                () => SetSpeed(Math.Max(0, PlayerSpeed - 0.25f)));
         }
 
         private void PlayerTick()
@@ -638,6 +635,12 @@ namespace SilkySouls.ViewModels
 
         private void SetRtsr() => _playerService.SetRtsr();
         private void SetMaxHp() => _playerService.SetMaxHp();
+
+        private void SafeExecute(Action action)
+        {
+            if (!AreOptionsEnabled) return;
+            action();
+        }
 
         #endregion
     }

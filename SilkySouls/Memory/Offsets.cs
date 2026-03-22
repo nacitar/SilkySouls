@@ -1,16 +1,49 @@
 ﻿using System;
+using SilkySouls.Enums;
 using SilkySouls.Memory;
+using SilkySouls.Utilities;
+using static SilkySouls.Enums.GameVersion;
 
 namespace SilkySouls.memory
 {
     public static class Offsets
     {
+        private static GameVersion? _version;
+
+        public static GameVersion Version => _version
+                                             ?? Version1_0_3_1;
+
+        public static bool Initialize(long fileSize, nint moduleBase)
+        {
+            _version = fileSize switch
+            {
+                74186240 => Version1_0_1_0,
+                75245056 => Version1_0_1_1,
+                56756736 => Version1_0_1_2,
+                57067008 => Version1_0_3_0,
+                50286344 => Version1_0_3_1,
+                _ => null
+            };
+
+            if (!_version.HasValue)
+            {
+                MsgBox.Show(
+                    $@"Unknown patch version (file size: {fileSize}), please report it on GitHub",
+                    "Unknown patch version");
+                return false;
+            }
+
+
+            InitializeBaseAddresses(moduleBase);
+            return true;
+        }
+
         public static class WorldChrMan
         {
-            public static IntPtr Base;
+            public static nint Base;
 
             public const int PlayerIns = 0x68;
-            
+
             public static readonly int[] CurrentBlockId = [PlayerIns, 0x370, 0x10, 0x288];
 
             public enum BaseOffsets
@@ -68,11 +101,10 @@ namespace SilkySouls.memory
 
             public static readonly int[] AnimSpeed = [ChrCtrl, 0x18, 0xA8];
             public static readonly int[] NpcParam = [0x580, 0x8];
-            
+
             public static readonly int[] PhysicsModule = [ChrCtrl, 0x28];
             public const int Angle = 0x0;
             public const int Coords = 0x10;
-            
 
             public enum NpcParamOffsets
             {
@@ -82,13 +114,13 @@ namespace SilkySouls.memory
 
         public static class DebugEventMan
         {
-            public static IntPtr Base;
+            public static nint Base;
             public const int DisableEvents = 0xDC;
         }
 
         public static class DebugFlags
         {
-            public static IntPtr Base;
+            public static nint Base;
 
             public const int NoDeath = 0x0;
             public const int OneShot = 0x1;
@@ -100,18 +132,10 @@ namespace SilkySouls.memory
             public const int AllNoDamage = 0x9;
             public const int DisableAi = 0xD;
         }
-
-        public static class Cam
-        {
-            public static IntPtr Base;
-
-            public const int ChrCam = 0x60;
-            public const int ChrExFollowCam = 0x60;
-        }
-
+        
         public static class GameDataMan
         {
-            public static IntPtr Base;
+            public static nint Base;
 
             public enum GameDataOffsets
             {
@@ -139,39 +163,45 @@ namespace SilkySouls.memory
             }
         }
 
-        public static nint ItemGet;
-        public static IntPtr ItemGetMenuMan;
-        public static nint ItemDlgFunc;
-        public static nint LevelUpFunc;
-        public static nint RestoreCastsFunc;
-
+        public static class ItemGetMenuManImpl
+        {
+            public static nint Base;
+        }
+        
         public static class FieldArea
         {
-            public static IntPtr Base;
+            public static nint Base;
             public const int RenderPtr = 0x28;
             public const int FilterRemoval = 0x34D;
             public const int Brightness = 0x350;
+            
+            public const int ChrCam = 0x38;
+            public const int ChrExFollowCam = 0x60;
         }
 
         public static class GameMan
         {
-            public static IntPtr Base;
+            public static nint Base;
             public const int BonfireCoords = 0xA80;
             public const int LastBonfire = 0xB34;
         }
 
-        public static IntPtr WarpEvent;
-        public static long WarpFunc;
-
-        public static class DamageMan
+        public static class EventMan
         {
-            public static IntPtr Base;
+            public static nint Base;
+
+            public const int FrpgEventProxy = 0x8;
+        }
+
+        public static class DamageManager
+        {
+            public static nint Base;
             public const int HitboxFlag = 0x30;
         }
 
         public static class MenuMan
         {
-            public static IntPtr Base;
+            public static nint Base;
 
             public enum MenuManData
             {
@@ -184,10 +214,7 @@ namespace SilkySouls.memory
                 LoadedFlag = 0x258
             }
         }
-
-        public static long OpenEnhanceShopWeapon;
-        public static long OpenEnhanceShopArmor;
-
+        
         public static int ShowEnhancedShopArmorOffset = -0x40;
 
         public enum LockedTarget
@@ -203,7 +230,7 @@ namespace SilkySouls.memory
 
         public static class EventFlagMan
         {
-            public static IntPtr Base;
+            public static nint Base;
             public const int FlagPtr = 0x0;
             public const int WarpFlag = 0x5B;
             public const int WarpFlagBit1 = 1;
@@ -247,13 +274,13 @@ namespace SilkySouls.memory
 
         public static class HgDraw
         {
-            public static IntPtr Base;
+            public static nint Base;
             public const int EzDraw = 0x58;
         }
 
         public static class SoloParamMan
         {
-            public static IntPtr Base;
+            public static nint Base;
             public const int ParamResCap = 0x570;
             public const int ItemLot = 0x38;
             public const int BkhDropRateBase = 0x32C30;
@@ -268,46 +295,45 @@ namespace SilkySouls.memory
 
         public static class WorldAiMan
         {
-            public static IntPtr Base;
+            public static nint Base;
 
             public static readonly int[] LuaGlobalTable = [0x17E8, 0x8, 0x28, 0x78];
         }
 
         public static class EmkEventIns
         {
-            public static IntPtr Base;
+            public static nint Base;
         }
 
         public static class Hooks
         {
             public static nint LastLockedTarget;
             public static nint AllNoDamage;
-            public static nint ItemSpawn;
             public static nint Draw;
-            public static nint TargetingView;
             public static nint InAirTimer;
             public static nint Keyboard;
             public static nint ControllerR2;
             public static nint ControllerL2;
             public static nint UpdateCoords;
             public static nint WarpCoords;
-            public static nint LuaIfCase;
-            public static nint LuaSwitchCase;
+            public static nint WarpAngle;
+            public static nint LuaLowerOrEqual;
+            public static nint LuaVmSwitch;
             public static nint BattleActivate;
             public static nint Emevd;
         }
 
         public static class Patches
         {
-            public static IntPtr DrawEventPatch;
-            public static IntPtr DrawSoundViewPatch;
-            public static IntPtr InfiniteDurabilityPatch;
-            public static IntPtr FourKingsPatch;
-            public static IntPtr NoRollPatch;
-            public static IntPtr QuitoutPatch;
+            public static nint DrawEventPatch;
+            public static nint DrawSoundViewPatch;
+            public static nint InfiniteDurabilityPatch;
+            public static nint FourKingsPatch;
+            public static nint NoRollPatch;
+            public static nint QuitoutPatch;
         }
 
-        public static class Funcs
+        public static class Functions
         {
             public static nint SetEvent;
             public static nint GetEvent;
@@ -317,6 +343,568 @@ namespace SilkySouls.memory
             public static nint OpenAttunement;
             public static nint AttunementWindowPrep;
             public static nint GetInventoryIndexByCatAndId;
+            public static nint Warp;
+            public static nint ItemDlgFunc;
+            public static nint LevelUpFunc;
+            public static nint RestoreCastsFunc;
+            public static nint ItemGet;
+            public static nint OpenEnhanceShopWeapon;       //TODO IMPLMENET EZSTATE
+            public static nint OpenEnhanceShopArmor;
         }
+
+        private static void InitializeBaseAddresses(nint moduleBase)
+        {
+            WorldChrMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CEE830,
+                Version1_0_1_1 => 0x1C7E820,
+                Version1_0_1_2 => 0x1D01FC0,
+                Version1_0_3_0 => 0x1D151B0,
+                Version1_0_3_1 => 0x1C77E50,
+                _ => 0
+            };
+            
+            DebugEventMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CF20B8,
+                Version1_0_1_1 => 0x1C820A8,
+                Version1_0_1_2 => 0x1D05848,
+                Version1_0_3_0 => 0x1D18A38,
+                Version1_0_3_1 => 0x1C7B6D8,
+                _ => 0
+            };
+
+            
+            DebugFlags.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CEE849,
+                Version1_0_1_1 => 0x1C7E839,
+                Version1_0_1_2 => 0x1D01FD9,
+                Version1_0_3_0 => 0x1D151C9,
+                Version1_0_3_1 => 0x1C77E59,
+                _ => 0
+            };
+
+
+            GameDataMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1D00F50,
+                Version1_0_1_1 => 0x1C90F40,
+                Version1_0_1_2 => 0x1D146E0,
+                Version1_0_3_0 => 0x1D278F0,
+                Version1_0_3_1 => 0x1C8A530,
+                _ => 0
+            };
+
+            ItemGetMenuManImpl.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CFFBD8,
+                Version1_0_1_1 => 0x1C8FBC8,
+                Version1_0_1_2 => 0x1D13358,
+                Version1_0_3_0 => 0x1D26578,
+                Version1_0_3_1 => 0x1C891A8,
+                _ => 0
+            };
+
+            FieldArea.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CF0A48,
+                Version1_0_1_1 => 0x1C80A38,
+                Version1_0_1_2 => 0x1D041D8,
+                Version1_0_3_0 => 0x1D173C8,
+                Version1_0_3_1 => 0x1C7A058,
+                _ => 0
+            };
+            
+            GameMan.Base = moduleBase + Version switch
+            {
+                // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1
+                Version1_0_1_2 => 0x1CFDC48,
+                Version1_0_3_0 => 0x1D10E18,
+                Version1_0_3_1 => 0x1C74E08,
+                _ => 0
+            };
+            
+            EventMan.Base = moduleBase + Version switch
+            {
+                // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+                Version1_0_3_0 => 0x1D18530,
+                Version1_0_3_1 => 0x1C7B1B0,
+                _ => 0
+            };
+
+            DamageManager.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CF0A40,
+                Version1_0_1_1 => 0x1C80A30,
+                Version1_0_1_2 => 0x1D041D0,
+                Version1_0_3_0 => 0x1D173C0,
+                Version1_0_3_1 => 0x1C7A050,
+                _ => 0
+            };
+            
+            
+            MenuMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CFF7C8,
+                Version1_0_1_1 => 0x1C8F7B8,
+                Version1_0_1_2 => 0x1D12F48,
+                Version1_0_3_0 => 0x1D26168,
+                Version1_0_3_1 => 0x1C88D98,
+                _ => 0
+            };
+
+            EventFlagMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CF2FD0,
+                Version1_0_1_1 => 0x1C82FC0,
+                Version1_0_1_2 => 0x1D06760,
+                Version1_0_3_0 => 0x1D19950,
+                Version1_0_3_1 => 0x1C7C5F0,
+                _ => 0
+            };
+
+            HgDraw.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1BDE5C0,
+                Version1_0_1_1 => 0x1B6E5A0,
+                Version1_0_1_2 => 0x1BF1D08,
+                Version1_0_3_0 => 0x1C04ED8,
+                Version1_0_3_1 => 0x1B68EC8,
+                _ => 0
+            };
+            
+            SoloParamMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CF49E0,
+                Version1_0_1_1 => 0x1C849D0,
+                Version1_0_1_2 => 0x1D08170,
+                Version1_0_3_0 => 0x1D1B360,
+                Version1_0_3_1 => 0x1C7E000,
+                _ => 0
+            };
+
+            WorldAiMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CF8EF8,
+                Version1_0_1_1 => 0x1C88EE8,
+                Version1_0_1_2 => 0x1D0C688,
+                Version1_0_3_0 => 0x1D1F878,
+                Version1_0_3_1 => 0x1C82508,
+                _ => 0
+            };
+            
+            EmkEventIns.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1D01740,
+                Version1_0_1_1 => 0x1C91730,
+                Version1_0_1_2 => 0x1D14F10,
+                Version1_0_3_0 => 0x1D28130,
+                Version1_0_3_1 => 0x1C8ADC0,
+                _ => 0
+            };
+
+
+            Hooks.LastLockedTarget = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x316EB5,
+                Version1_0_1_1 => 0x316BB5,
+                Version1_0_1_2 => 0x31A0D5,
+                Version1_0_3_0 => 0x320075,
+                Version1_0_3_1 => 0x3222C5,
+                _ => 0
+            };
+
+            Hooks.AllNoDamage = moduleBase + Version switch
+            {
+                // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+                Version1_0_3_0 => 0x3206C9,
+                Version1_0_3_1 => 0x322919,
+                _ => 0
+            };
+
+            Hooks.Draw = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x2C4C14,
+                Version1_0_1_1 => 0x2C4914,
+                Version1_0_1_2 => 0x2C7E34,
+                Version1_0_3_0 => 0x2CD384,
+                Version1_0_3_1 => 0x2CEE84,
+                _ => 0
+            };
+
+            Hooks.InAirTimer = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x2B1E56,
+                Version1_0_1_1 => 0x2B1B56,
+                Version1_0_1_2 => 0x2B4FA6,
+                Version1_0_3_0 => 0x2B95E6,
+                Version1_0_3_1 => 0x2BB0E6,
+                _ => 0
+            };
+
+            Hooks.Keyboard = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xC8FAC1,
+                Version1_0_1_1 => 0xC8F941,
+                Version1_0_1_2 => 0xC95561,
+                Version1_0_3_0 => 0xC9CB11,
+                Version1_0_3_1 => 0xCA06F1,
+                _ => 0
+            };
+
+            Hooks.ControllerR2 = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xC8F0CA,
+                Version1_0_1_1 => 0xC8EF4A,
+                Version1_0_1_2 => 0xC94B6A,
+                Version1_0_3_0 => 0xC9C11A,
+                Version1_0_3_1 => 0xC9FCFA,
+                _ => 0
+            };
+
+            Hooks.ControllerL2 = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xC8F0A0,
+                Version1_0_1_1 => 0xC8EF20,
+                Version1_0_1_2 => 0xC94B40,
+                Version1_0_3_0 => 0xC9C0F0,
+                Version1_0_3_1 => 0xC9FCD0,
+                _ => 0
+            };
+
+            Hooks.UpdateCoords = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x9B7313,
+                Version1_0_1_1 => 0x9B7193,
+                Version1_0_1_2 => 0x9BCDB3,
+                Version1_0_3_0 => 0x9C2923,
+                Version1_0_3_1 => 0x9C7243,
+                _ => 0
+            };
+
+            Hooks.WarpCoords = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x2BF58A,
+                Version1_0_1_1 => 0x2BF28A,
+                Version1_0_1_2 => 0x2C273A,
+                Version1_0_3_0 => 0x2C731A,
+                Version1_0_3_1 => 0x2C8E1A,
+                _ => 0
+            };
+
+            Hooks.WarpAngle = moduleBase + Version switch
+            {
+                // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1
+                Version1_0_1_2 => 0x2C277A,
+                Version1_0_3_0 => 0x2C735A,
+                Version1_0_3_1 => 0x2C8E5A,
+                _ => 0
+            };
+            
+            Hooks.LuaLowerOrEqual = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x106786A,
+                Version1_0_1_1 => 0x10676EA,
+                Version1_0_1_2 => 0xDCCFDA,
+                Version1_0_3_0 => 0xDD44DA,
+                Version1_0_3_1 => 0xDD80BA,
+                _ => 0
+            };
+
+            Hooks.LuaVmSwitch = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x106691F,
+                Version1_0_1_1 => 0x106679F,
+                Version1_0_1_2 => 0xDCC08F,
+                Version1_0_3_0 => 0xDD358F,
+                Version1_0_3_1 => 0xDD716F,
+                _ => 0
+            };
+
+            Hooks.BattleActivate = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x105B750,
+                Version1_0_1_1 => 0x105B5D0,
+                Version1_0_1_2 => 0xDC0EC0,
+                Version1_0_3_0 => 0xDC83C0,
+                Version1_0_3_1 => 0xDCBFA0,
+                _ => 0
+            };
+
+            Hooks.Emevd = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1557BC,
+                Version1_0_1_1 => 0x1554AC,
+                Version1_0_1_2 => 0x15796C,
+                Version1_0_3_0 => 0x15BE3C,
+                Version1_0_3_1 => 0x15D66C,
+                _ => 0
+            };
+            
+            Patches.DrawEventPatch = moduleBase + Version switch
+            {
+                // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+                Version1_0_3_0 => 0x49B6B7,
+                Version1_0_3_1 => 0x49c1b4,
+                _ => 0
+            };
+
+            Patches.DrawSoundViewPatch = moduleBase + Version switch
+            {
+                // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
+                Version1_0_3_0 => 0x622286,
+                Version1_0_3_1 => 0x624b86,
+                _ => 0
+            };
+            
+            Patches.InfiniteDurabilityPatch = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x73F1B0,
+                Version1_0_1_1 => 0x73EFE0,
+                Version1_0_1_2 => 0x744400,
+                Version1_0_3_0 => 0x74BA90,
+                Version1_0_3_1 => 0x74E770,
+                _ => 0
+            };
+
+            Patches.FourKingsPatch = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x34198E,
+                Version1_0_1_1 => 0x34168E,
+                Version1_0_1_2 => 0x344BAE,
+                Version1_0_3_0 => 0x34ADAE,
+                Version1_0_3_1 => 0x34D26E,
+                _ => 0
+            };
+
+            Patches.NoRollPatch = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x39011F,
+                Version1_0_1_1 => 0x38FE1F,
+                Version1_0_1_2 => 0x39334F,
+                Version1_0_3_0 => 0x39984F,
+                Version1_0_3_1 => 0x398E4F,
+                _ => 0
+            };
+
+            Patches.QuitoutPatch = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x7F35B5,
+                Version1_0_1_1 => 0x7F3435,
+                Version1_0_1_2 => 0x7F9055,
+                Version1_0_3_0 => 0x7FEC85,
+                Version1_0_3_1 => 0x8035A5,
+                _ => 0
+            };
+            
+            Functions.SetEvent = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x4E7490,
+                Version1_0_1_1 => 0x4E7240,
+                Version1_0_1_2 => 0x4EA770,
+                Version1_0_3_0 => 0x4F1470,
+                Version1_0_3_1 => 0x4F22B0,
+                _ => 0
+            };
+
+            Functions.GetEvent = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x4E75B0,
+                Version1_0_1_1 => 0x4E7360,
+                Version1_0_1_2 => 0x4EA890,
+                Version1_0_3_0 => 0x4F1590,
+                Version1_0_3_1 => 0x4F23D0,
+                _ => 0
+            };
+
+            Functions.ShopParamSave = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x70C970,
+                Version1_0_1_1 => 0x70C730,
+                Version1_0_1_2 => 0x711B30,
+                Version1_0_3_0 => 0x718E30,
+                Version1_0_3_1 => 0x71BB00,
+                _ => 0
+            };
+
+            Functions.OpenRegularShop = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x6C1290,
+                Version1_0_1_1 => 0x6C0FF0,
+                Version1_0_1_2 => 0x6C63F0,
+                Version1_0_3_0 => 0x6CD610,
+                Version1_0_3_1 => 0x6CFF20,
+                _ => 0
+            };
+            
+            Functions.Warp = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x4A0570,
+                Version1_0_1_1 => 0x4A0320,
+                Version1_0_1_2 => 0x4A3850,
+                Version1_0_3_0 => 0x4AA520,
+                Version1_0_3_1 => 0x4AAF30,
+                _ => 0
+            };
+            
+            Functions.ProcessEmevdCommand = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x7BE910,
+                Version1_0_1_1 => 0x7BE790,
+                Version1_0_1_2 => 0x7C4000,
+                Version1_0_3_0 => 0x7C9890,
+                Version1_0_3_1 => 0x7CDCE0,
+                _ => 0
+            };
+
+            
+            Functions.OpenAttunement = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x6E87E0,
+                Version1_0_1_1 => 0x6E8540,
+                Version1_0_1_2 => 0x6ED940,
+                Version1_0_3_0 => 0x6F4B90,
+                Version1_0_3_1 => 0x6F74A0,
+                _ => 0
+            };
+
+            Functions.AttunementWindowPrep = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x70C970,
+                Version1_0_1_1 => 0x70C730,
+                Version1_0_1_2 => 0x711B30,
+                Version1_0_3_0 => 0x718E30,
+                Version1_0_3_1 => 0x71BB00,
+                _ => 0
+            };
+
+            Functions.GetInventoryIndexByCatAndId = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x73A390,
+                Version1_0_1_1 => 0x73A1C0,
+                Version1_0_1_2 => 0x73F5E0,
+                Version1_0_3_0 => 0x746C70,
+                Version1_0_3_1 => 0x749950,
+                _ => 0
+            };
+
+            
+            Functions.ItemDlgFunc = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x719AF0,
+                Version1_0_1_1 => 0x7198B0,
+                Version1_0_1_2 => 0x71ECB0,
+                Version1_0_3_0 => 0x725FB0,
+                Version1_0_3_1 => 0x728C90,
+                _ => 0
+            };
+
+            Functions.LevelUpFunc = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x689920,
+                Version1_0_1_1 => 0x689680,
+                Version1_0_1_2 => 0x68E6E0,
+                Version1_0_3_0 => 0x695890,
+                Version1_0_3_1 => 0x6981A0,
+                _ => 0
+            };
+
+            Functions.RestoreCastsFunc = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x743B90,
+                Version1_0_1_1 => 0x7439C0,
+                Version1_0_1_2 => 0x748DE0,
+                Version1_0_3_0 => 0x750470,
+                Version1_0_3_1 => 0x753190,
+                _ => 0
+            };
+
+            Functions.ItemGet = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x738420,
+                Version1_0_1_1 => 0x738250,
+                Version1_0_1_2 => 0x73D670,
+                Version1_0_3_0 => 0x744D00,
+                Version1_0_3_1 => 0x7479E0,
+                _ => 0
+            };
+
+
+
+#if DEBUG
+            _baseAddr = moduleBase;
+            Console.WriteLine("--- Bases ---");
+            PrintOffset("WorldChrMan", WorldChrMan.Base);
+            PrintOffset("DebugEventMan", DebugEventMan.Base);
+            PrintOffset("DebugFlags", DebugFlags.Base);
+            PrintOffset("GameDataMan", GameDataMan.Base);
+            PrintOffset("ItemGetMenuManImpl", ItemGetMenuManImpl.Base);
+            PrintOffset("FieldArea", FieldArea.Base);
+            PrintOffset("GameMan", GameMan.Base);
+            PrintOffset("EventMan", EventMan.Base);
+            PrintOffset("DamageManager", DamageManager.Base);
+            PrintOffset("MenuMan", MenuMan.Base);
+            PrintOffset("EventFlagMan", EventFlagMan.Base);
+            PrintOffset("HgDraw", HgDraw.Base);
+            PrintOffset("SoloParamMan", SoloParamMan.Base);
+            PrintOffset("WorldAiMan", WorldAiMan.Base);
+            PrintOffset("EmkEventIns", EmkEventIns.Base);
+
+            Console.WriteLine("\n--- Hooks ---");
+            PrintOffset("LastLockedTarget", Hooks.LastLockedTarget);
+            PrintOffset("AllNoDamage", Hooks.AllNoDamage);
+            PrintOffset("Draw", Hooks.Draw);
+            PrintOffset("InAirTimer", Hooks.InAirTimer);
+            PrintOffset("Keyboard", Hooks.Keyboard);
+            PrintOffset("ControllerR2", Hooks.ControllerR2);
+            PrintOffset("ControllerL2", Hooks.ControllerL2);
+            PrintOffset("UpdateCoords", Hooks.UpdateCoords);
+            PrintOffset("WarpCoords", Hooks.WarpCoords);
+            PrintOffset("WarpAngle", Hooks.WarpAngle);
+            PrintOffset("LuaLowerOrEqual", Hooks.LuaLowerOrEqual);
+            PrintOffset("LuaVmSwitch", Hooks.LuaVmSwitch);
+            PrintOffset("BattleActivate", Hooks.BattleActivate);
+            PrintOffset("Emevd", Hooks.Emevd);
+
+            Console.WriteLine("\n--- Patches ---");
+            PrintOffset("DrawEventPatch", Patches.DrawEventPatch);
+            PrintOffset("DrawSoundViewPatch", Patches.DrawSoundViewPatch);
+            PrintOffset("InfiniteDurabilityPatch", Patches.InfiniteDurabilityPatch);
+            PrintOffset("FourKingsPatch", Patches.FourKingsPatch);
+            PrintOffset("NoRollPatch", Patches.NoRollPatch);
+            PrintOffset("QuitoutPatch", Patches.QuitoutPatch);
+
+            Console.WriteLine("\n--- Functions ---");
+            PrintOffset("SetEvent", Functions.SetEvent);
+            PrintOffset("GetEvent", Functions.GetEvent);
+            PrintOffset("ShopParamSave", Functions.ShopParamSave);
+            PrintOffset("OpenRegularShop", Functions.OpenRegularShop);
+            PrintOffset("ProcessEmevdCommand", Functions.ProcessEmevdCommand);
+            PrintOffset("OpenAttunement", Functions.OpenAttunement);
+            PrintOffset("AttunementWindowPrep", Functions.AttunementWindowPrep);
+            PrintOffset("GetInventoryIndexByCatAndId", Functions.GetInventoryIndexByCatAndId);
+            PrintOffset("Warp", Functions.Warp);
+            PrintOffset("ItemDlgFunc", Functions.ItemDlgFunc);
+            PrintOffset("LevelUpFunc", Functions.LevelUpFunc);
+            PrintOffset("RestoreCastsFunc", Functions.RestoreCastsFunc);
+            PrintOffset("ItemGet", Functions.ItemGet);
+            PrintOffset("OpenEnhanceShopWeapon", Functions.OpenEnhanceShopWeapon);
+            PrintOffset("OpenEnhanceShopArmor", Functions.OpenEnhanceShopArmor);
+
+            Console.WriteLine("\n====================================\n");
+#endif
+        }
+
+#if DEBUG
+        private static nint _baseAddr;
+        private static void PrintOffset(string name, nint value)
+        {
+            var rel = value - _baseAddr;
+            Console.WriteLine(rel <= 0
+                ? $"  {name,-40} *** NOT SET ***"
+                : $"  {name,-40} 0x{(long)value:X}  (0x{(long)rel:X})");
+        }
+#endif
     }
 }

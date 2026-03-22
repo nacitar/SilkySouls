@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using SilkySouls.Interfaces;
 using SilkySouls.memory;
+using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Memory
 {
@@ -32,73 +33,67 @@ namespace SilkySouls.Memory
             }
             
             
-            Offsets.WorldChrMan.Base = FindAddressByPattern(Patterns.WorldChrMan);
-            Offsets.DebugFlags.Base = FindAddressByPattern(Patterns.DebugFlags);
-            Offsets.Cam.Base = FindAddressByPattern(Patterns.CamBase);
-            Offsets.GameDataMan.Base = FindAddressByPattern(Patterns.GameDataMan);
-            Offsets.ItemGet = FindAddressByPattern(Patterns.ItemGetFunc);
-            Offsets.ItemGetMenuMan = FindAddressByPattern(Patterns.ItemGetMenuMan);
-            Offsets.ItemDlgFunc = FindAddressByPattern(Patterns.ItemGetDlgFunc);
-            Offsets.FieldArea.Base = FindAddressByPattern(Patterns.FieldArea);
-            Offsets.GameMan.Base = FindAddressByPattern(Patterns.GameMan);
-            Offsets.DamageMan.Base = FindAddressByPattern(Patterns.DamMan);
-            Offsets.MenuMan.Base = FindAddressByPattern(Patterns.MenuMan);
-            Offsets.EventFlagMan.Base = FindAddressByPattern(Patterns.EventFlagMan);
-            Offsets.LevelUpFunc = FindAddressByPattern(Patterns.LevelUpFunc);
-            Offsets.RestoreCastsFunc = FindAddressByPattern(Patterns.RestoreCastsFunc);
-            Offsets.HgDraw.Base = FindAddressByPattern(Patterns.HgDraw);
-            Offsets.WarpEvent = FindAddressByPattern(Patterns.WarpEvent);
-            Offsets.WarpFunc = FindAddressByPattern(Patterns.WarpFunc).ToInt64();
-            Offsets.SoloParamMan.Base = FindAddressByPattern(Patterns.SoloParamMan);
-            Offsets.OpenEnhanceShopWeapon = FindAddressByPattern(Patterns.OpenEnhanceShop).ToInt64();
-            Offsets.OpenEnhanceShopArmor = Offsets.OpenEnhanceShopWeapon - 0x40;
-            Offsets.WorldAiMan.Base = FindAddressByPattern(Patterns.WorldAiMan);
-            Offsets.EmkEventIns.Base = FindAddressByPattern(Patterns.EmkEventIns);
-            Offsets.DebugEventMan.Base = FindAddressByPattern(Patterns.DebugEventMan);
+            WorldChrMan.Base = FindAddressByPattern(Patterns.WorldChrMan);
+            DebugFlags.Base = FindAddressByPattern(Patterns.DebugFlags);
+            GameDataMan.Base = FindAddressByPattern(Patterns.GameDataMan);
+            Functions.ItemGet = FindAddressByPattern(Patterns.ItemGetFunc);
+            ItemGetMenuManImpl.Base = FindAddressByPattern(Patterns.ItemGetMenuMan);
+            Functions.ItemDlgFunc = FindAddressByPattern(Patterns.ItemGetDlgFunc);
+            FieldArea.Base = FindAddressByPattern(Patterns.FieldArea);
+            GameMan.Base = FindAddressByPattern(Patterns.GameMan);
+            DamageManager.Base = FindAddressByPattern(Patterns.DamMan);
+            MenuMan.Base = FindAddressByPattern(Patterns.MenuMan);
+            EventFlagMan.Base = FindAddressByPattern(Patterns.EventFlagMan);
+            Functions.LevelUpFunc = FindAddressByPattern(Patterns.LevelUpFunc);
+            Functions.RestoreCastsFunc = FindAddressByPattern(Patterns.RestoreCastsFunc);
+            HgDraw.Base = FindAddressByPattern(Patterns.HgDraw);
+            EventMan.Base = FindAddressByPattern(Patterns.WarpEvent);
+            Functions.Warp = FindAddressByPattern(Patterns.WarpFunc);
+            SoloParamMan.Base = FindAddressByPattern(Patterns.SoloParamMan);
+     
+            WorldAiMan.Base = FindAddressByPattern(Patterns.WorldAiMan);
+            EmkEventIns.Base = FindAddressByPattern(Patterns.EmkEventIns);
+            DebugEventMan.Base = FindAddressByPattern(Patterns.DebugEventMan);
 
             // Hooks
             TryPatternWithFallback("LastLockedTarget", Patterns.LastLockedTarget,
-                addr => Offsets.Hooks.LastLockedTarget = addr, saved);
+                addr => Hooks.LastLockedTarget = addr, saved);
             TryPatternWithFallback("AllNoDamage", Patterns.AllNoDamage,
-                addr => Offsets.Hooks.AllNoDamage = addr, saved);
-            TryPatternWithFallback("ItemSpawn", Patterns.ItemSpawnHook,
-                addr => Offsets.Hooks.ItemSpawn = addr, saved);
-            TryPatternWithFallback("Draw", Patterns.DrawHook, addr => Offsets.Hooks.Draw = addr, saved);
-            TryPatternWithFallback("TargetingView", Patterns.TargetingView,
-                addr => Offsets.Hooks.TargetingView = addr, saved);
-            TryPatternWithFallback("InAirTimer", Patterns.InAirTimer, addr => Offsets.Hooks.InAirTimer = addr,
+                addr => Hooks.AllNoDamage = addr, saved);
+            TryPatternWithFallback("Draw", Patterns.DrawHook, addr => Hooks.Draw = addr, saved);
+            TryPatternWithFallback("InAirTimer", Patterns.InAirTimer, addr => Hooks.InAirTimer = addr,
                 saved);
-            TryPatternWithFallback("Keyboard", Patterns.Keyboard, addr => Offsets.Hooks.Keyboard = addr,
+            TryPatternWithFallback("Keyboard", Patterns.Keyboard, addr => Hooks.Keyboard = addr,
                 saved);
             TryPatternWithFallback("ControllerR2", Patterns.ControllerR2,
-                addr => Offsets.Hooks.ControllerR2 = addr, saved);
+                addr => Hooks.ControllerR2 = addr, saved);
             TryPatternWithFallback("ControllerL2", Patterns.ControllerL2,
-                addr => Offsets.Hooks.ControllerL2 = addr, saved);
+                addr => Hooks.ControllerL2 = addr, saved);
             TryPatternWithFallback("UpdateCoords", Patterns.UpdateCoords,
-                addr => Offsets.Hooks.UpdateCoords = addr, saved);
-            TryPatternWithFallback("WarpCoords", Patterns.WarpCoords, addr => Offsets.Hooks.WarpCoords = addr,
+                addr => Hooks.UpdateCoords = addr, saved);
+            TryPatternWithFallback("WarpCoords", Patterns.WarpCoords, addr => Hooks.WarpCoords = addr,
                 saved);
-            TryPatternWithFallback("LuaIfCase", Patterns.LuaIfElseHook,
-                addr => Offsets.Hooks.LuaIfCase = addr, saved);
+            TryPatternWithFallback("LuaIfCase", Patterns.LuaLowerOrEqualHook,
+                addr => Hooks.LuaLowerOrEqual = addr, saved);
             TryPatternWithFallback("LuaSwitchCase", Patterns.LuaOpCodeSwitch,
-                addr => Offsets.Hooks.LuaSwitchCase = addr, saved);
+                addr => Hooks.LuaVmSwitch = addr, saved);
             TryPatternWithFallback("BattleActivate", Patterns.BattleActivateHook,
-                addr => Offsets.Hooks.BattleActivate = addr, saved); 
+                addr => Hooks.BattleActivate = addr, saved); 
             TryPatternWithFallback("Emevd", Patterns.EmevdCommandHook,
-                addr => Offsets.Hooks.Emevd = addr, saved);
+                addr => Hooks.Emevd = addr, saved);
 
 // Patches
             TryPatternWithFallback("FourKingsPatch", Patterns.FourKingsPatch,
-                addr => Offsets.Patches.FourKingsPatch = addr, saved);
-            TryPatternWithFallback("NoRollPatch", Patterns.NoRollPatch, addr => Offsets.Patches.NoRollPatch = addr,
+                addr => Patches.FourKingsPatch = addr, saved);
+            TryPatternWithFallback("NoRollPatch", Patterns.NoRollPatch, addr => Patches.NoRollPatch = addr,
                 saved);
             TryPatternWithFallback("InfiniteDurabilityPatch", Patterns.InfiniteDurabilityPatch,
-                addr => Offsets.Patches.InfiniteDurabilityPatch = addr, saved);
+                addr => Patches.InfiniteDurabilityPatch = addr, saved);
             TryPatternWithFallback("DrawEventPatch", Patterns.DrawEventPatch,
-                addr => Offsets.Patches.DrawEventPatch = addr, saved);
+                addr => Patches.DrawEventPatch = addr, saved);
             TryPatternWithFallback("DrawSoundViewPatch", Patterns.DrawSoundViewPatch,
-                addr => Offsets.Patches.DrawSoundViewPatch = addr, saved);
-            TryPatternWithFallback("QuitoutPatch", Patterns.QuitoutPatch, addr => Offsets.Patches.QuitoutPatch = addr,
+                addr => Patches.DrawSoundViewPatch = addr, saved);
+            TryPatternWithFallback("QuitoutPatch", Patterns.QuitoutPatch, addr => Patches.QuitoutPatch = addr,
                 saved);
             
             using (var writer = new StreamWriter(savePath))
@@ -108,68 +103,62 @@ namespace SilkySouls.Memory
             }
             
             
-            Offsets.Funcs.SetEvent = FindAddressByPattern(Patterns.SetEvent);
-            Offsets.Funcs.GetEvent = FindAddressByPattern(Patterns.GetEvent);
-            Offsets.Funcs.ShopParamSave = FindAddressByPattern(Patterns.ShopParamSave);
-            Offsets.Funcs.OpenRegularShop = FindAddressByPattern(Patterns.OpenRegularShop);
-            Offsets.Funcs.ProcessEmevdCommand = FindAddressByPattern(Patterns.ProcessEmevdCommand);
-            Offsets.Funcs.OpenAttunement = FindAddressByPattern(Patterns.OpenAttunement);
-            Offsets.Funcs.AttunementWindowPrep = FindAddressByPattern(Patterns.AttunementWindowPrep);
-            Offsets.Funcs.GetInventoryIndexByCatAndId = FindAddressByPattern(Patterns.GetInventoryIndexByCatAndId);
+            Functions.SetEvent = FindAddressByPattern(Patterns.SetEvent);
+            Functions.GetEvent = FindAddressByPattern(Patterns.GetEvent);
+            Functions.ShopParamSave = FindAddressByPattern(Patterns.ShopParamSave);
+            Functions.OpenRegularShop = FindAddressByPattern(Patterns.OpenRegularShop);
+            Functions.ProcessEmevdCommand = FindAddressByPattern(Patterns.ProcessEmevdCommand);
+            Functions.OpenAttunement = FindAddressByPattern(Patterns.OpenAttunement);
+            Functions.AttunementWindowPrep = FindAddressByPattern(Patterns.AttunementWindowPrep);
+            Functions.GetInventoryIndexByCatAndId = FindAddressByPattern(Patterns.GetInventoryIndexByCatAndId);
             
             
             #if DEBUG
-            Console.WriteLine($"WorldChrMan.Base: 0x{Offsets.WorldChrMan.Base.ToInt64():X}");
-            Console.WriteLine($"DebugFlags.Base: 0x{Offsets.DebugFlags.Base.ToInt64():X}");
-            Console.WriteLine($"Cam.Base: 0x{Offsets.Cam.Base.ToInt64():X}");
-            Console.WriteLine($"GameDataMan.Base: 0x{Offsets.GameDataMan.Base.ToInt64():X}");
-            Console.WriteLine($"ItemGet: 0x{Offsets.ItemGet:X}");
-            Console.WriteLine($"ItemGetMenuMan: 0x{Offsets.ItemGetMenuMan.ToInt64():X}");
-            Console.WriteLine($"ItemDlgFunc: 0x{Offsets.ItemDlgFunc:X}");
-            Console.WriteLine($"FieldArea.Base: 0x{Offsets.FieldArea.Base.ToInt64():X}");
-            Console.WriteLine($"GameMan.Base: 0x{Offsets.GameMan.Base.ToInt64():X}");
-            Console.WriteLine($"DamageMan.Base: 0x{Offsets.DamageMan.Base.ToInt64():X}");
-            Console.WriteLine($"DrawEventPatch: 0x{Offsets.Patches.DrawEventPatch.ToInt64():X}");
-            Console.WriteLine($"DrawSoundViewPatch: 0x{Offsets.Patches.DrawSoundViewPatch.ToInt64():X}");
-            Console.WriteLine($"MenuMan.Base: 0x{Offsets.MenuMan.Base.ToInt64():X}");
-            Console.WriteLine($"EventFlagMan.Base: 0x{Offsets.EventFlagMan.Base.ToInt64():X}");
-            Console.WriteLine($"LevelUpFunc: 0x{Offsets.LevelUpFunc:X}");
-            Console.WriteLine($"RestoreCastsFunc: 0x{Offsets.RestoreCastsFunc:X}");
-            Console.WriteLine($"HgDraw.Base: 0x{Offsets.HgDraw.Base.ToInt64():X}");
-            Console.WriteLine($"WarpEvent: 0x{Offsets.WarpEvent.ToInt64():X}");
-            Console.WriteLine($"WarpFunc: 0x{Offsets.WarpFunc:X}");
-            Console.WriteLine($"FastQuitout: 0x{Offsets.Patches.QuitoutPatch.ToInt64():X}");
-            Console.WriteLine($"WorldAiMan: 0x{Offsets.WorldAiMan.Base.ToInt64():X}");
-            Console.WriteLine($"EmkEventIns: 0x{Offsets.EmkEventIns.Base.ToInt64():X}");
-            Console.WriteLine($"DebugEventMan: 0x{Offsets.DebugEventMan.Base.ToInt64():X}");
-            Console.WriteLine($"SoloParamMan: 0x{Offsets.SoloParamMan.Base.ToInt64():X}");
+            Console.WriteLine($"WorldChrMan.Base: 0x{WorldChrMan.Base:X}");
+            Console.WriteLine($"DebugFlags.Base: 0x{DebugFlags.Base:X}");
+            Console.WriteLine($"GameDataMan.Base: 0x{GameDataMan.Base:X}");
+            Console.WriteLine($"ItemGet: 0x{Functions.ItemGet:X}");
+            Console.WriteLine($"ItemGetMenuMan: 0x{ItemGetMenuManImpl.Base:X}");
+            Console.WriteLine($"ItemDlgFunc: 0x{Functions.ItemDlgFunc:X}");
+            Console.WriteLine($"FieldArea.Base: 0x{FieldArea.Base:X}");
+            Console.WriteLine($"GameMan.Base: 0x{GameMan.Base:X}");
+            Console.WriteLine($"DamageMan.Base: 0x{DamageManager.Base:X}");
+            Console.WriteLine($"DrawEventPatch: 0x{Patches.DrawEventPatch:X}");
+            Console.WriteLine($"DrawSoundViewPatch: 0x{Patches.DrawSoundViewPatch:X}");
+            Console.WriteLine($"MenuMan.Base: 0x{MenuMan.Base:X}");
+            Console.WriteLine($"EventFlagMan.Base: 0x{EventFlagMan.Base:X}");
+            Console.WriteLine($"LevelUpFunc: 0x{Functions.LevelUpFunc:X}");
+            Console.WriteLine($"RestoreCastsFunc: 0x{Functions.RestoreCastsFunc:X}");
+            Console.WriteLine($"HgDraw.Base: 0x{HgDraw.Base:X}");
+            Console.WriteLine($"EventMan: 0x{(long)EventMan.Base:X}");
+            Console.WriteLine($"Warp: 0x{(long)Functions.Warp:X}");
+            Console.WriteLine($"FastQuitout: 0x{Patches.QuitoutPatch:X}");
+            Console.WriteLine($"WorldAiMan: 0x{WorldAiMan.Base:X}");
+            Console.WriteLine($"EmkEventIns: 0x{EmkEventIns.Base:X}");
+            Console.WriteLine($"DebugEventMan: 0x{DebugEventMan.Base:X}");
+            Console.WriteLine($"SoloParamMan: 0x{SoloParamMan.Base:X}");
+
+            Console.WriteLine($"Hooks.LastLockedTarget: 0x{Hooks.LastLockedTarget:X}");
+            Console.WriteLine($"Hooks.AllNoDamage: 0x{Hooks.AllNoDamage:X}");
+            Console.WriteLine($"Hooks.Draw: 0x{Hooks.Draw:X}");
+            Console.WriteLine($"Hooks.InAirTimer: 0x{Hooks.InAirTimer:X}");
+            Console.WriteLine($"Hooks.Keyboard: 0x{Hooks.Keyboard:X}");
+            Console.WriteLine($"Hooks.ControllerR2: 0x{Hooks.ControllerR2:X}");
+            Console.WriteLine($"Hooks.ControllerL2: 0x{Hooks.ControllerL2:X}");
+            Console.WriteLine($"Hooks.UpdateCoords: 0x{Hooks.UpdateCoords:X}");
+            Console.WriteLine($"Hooks.WarpCoords: 0x{Hooks.WarpCoords:X}");
+            Console.WriteLine($"Hooks.LuaIfElse: 0x{(long)Hooks.LuaLowerOrEqual:X}");
+            Console.WriteLine($"Hooks.Emevd: 0x{Hooks.Emevd:X}");
+            Console.WriteLine($"Hooks.Draw: 0x{Hooks.Draw:X}");
+            Console.WriteLine($"Patches.InfiniteDurabilityPatch: 0x{Patches.InfiniteDurabilityPatch:X}");
             
-            Console.WriteLine($"Weapon: 0x{Offsets.OpenEnhanceShopWeapon:X}");
-            Console.WriteLine($"Armor: 0x{Offsets.OpenEnhanceShopArmor:X}");
-            
-            Console.WriteLine($"Hooks.LastLockedTarget: 0x{Offsets.Hooks.LastLockedTarget:X}");
-            Console.WriteLine($"Hooks.AllNoDamage: 0x{Offsets.Hooks.AllNoDamage:X}");
-            Console.WriteLine($"Hooks.ItemSpawn: 0x{Offsets.Hooks.ItemSpawn:X}");
-            Console.WriteLine($"Hooks.Draw: 0x{Offsets.Hooks.Draw:X}");
-            Console.WriteLine($"Hooks.TargetingView: 0x{Offsets.Hooks.TargetingView:X}");
-            Console.WriteLine($"Hooks.InAirTimer: 0x{Offsets.Hooks.InAirTimer:X}");
-            Console.WriteLine($"Hooks.Keyboard: 0x{Offsets.Hooks.Keyboard:X}");
-            Console.WriteLine($"Hooks.ControllerR2: 0x{Offsets.Hooks.ControllerR2:X}");
-            Console.WriteLine($"Hooks.ControllerL2: 0x{Offsets.Hooks.ControllerL2:X}");
-            Console.WriteLine($"Hooks.UpdateCoords: 0x{Offsets.Hooks.UpdateCoords:X}");
-            Console.WriteLine($"Hooks.WarpCoords: 0x{Offsets.Hooks.WarpCoords:X}");
-            Console.WriteLine($"Hooks.LuaIfElse: 0x{(long)Offsets.Hooks.LuaIfCase:X}");
-            Console.WriteLine($"Hooks.Emevd: 0x{Offsets.Hooks.Emevd:X}");
-            Console.WriteLine($"Hooks.Draw: 0x{Offsets.Hooks.Draw:X}");
-            Console.WriteLine($"Patches.InfiniteDurabilityPatch: 0x{Offsets.Patches.InfiniteDurabilityPatch.ToInt64():X}");
-            
-            Console.WriteLine($"Funcs.SetEvent: 0x{Offsets.Funcs.SetEvent:X}");
-            Console.WriteLine($"Funcs.ShopParamSave: 0x{Offsets.Funcs.ShopParamSave:X}");
-            Console.WriteLine($"Funcs.OpenRegularShop: 0x{Offsets.Funcs.OpenRegularShop:X}");
-            Console.WriteLine($"Funcs.ProcessEmevdCommand: 0x{Offsets.Funcs.ProcessEmevdCommand:X}");
-            Console.WriteLine($"Funcs.OpenAttunement: 0x{Offsets.Funcs.OpenAttunement:X}");
-            Console.WriteLine($"Funcs.AttunementWindowPrep: 0x{Offsets.Funcs.AttunementWindowPrep:X}");
-            Console.WriteLine($"Funcs.GetEvent: 0x{Offsets.Funcs.GetEvent:X}");
+            Console.WriteLine($"Funcs.SetEvent: 0x{Functions.SetEvent:X}");
+            Console.WriteLine($"Funcs.ShopParamSave: 0x{Functions.ShopParamSave:X}");
+            Console.WriteLine($"Funcs.OpenRegularShop: 0x{Functions.OpenRegularShop:X}");
+            Console.WriteLine($"Funcs.ProcessEmevdCommand: 0x{Functions.ProcessEmevdCommand:X}");
+            Console.WriteLine($"Funcs.OpenAttunement: 0x{Functions.OpenAttunement:X}");
+            Console.WriteLine($"Funcs.AttunementWindowPrep: 0x{Functions.AttunementWindowPrep:X}");
+            Console.WriteLine($"Funcs.GetEvent: 0x{Functions.GetEvent:X}");
 #endif
         }
         

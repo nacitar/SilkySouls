@@ -64,14 +64,14 @@ namespace SilkySouls.Services
         internal void EnableHitboxView()
         {
             var hitboxAddr =
-                memoryService.FollowPointers(memoryService.Read<nint>(DamageMan.Base), new[] { DamageMan.HitboxFlag }, false);
+                memoryService.FollowPointers(memoryService.Read<nint>(DamageManager.Base), new[] { DamageManager.HitboxFlag }, false);
             memoryService.Write(hitboxAddr, 1);
         }
 
         internal void DisableHitboxView()
         {
             var hitboxAddr =
-                memoryService.FollowPointers(memoryService.Read<nint>(DamageMan.Base), new[] { DamageMan.HitboxFlag }, false);
+                memoryService.FollowPointers(memoryService.Read<nint>(DamageManager.Base), new[] { DamageManager.HitboxFlag }, false);
             memoryService.Write(hitboxAddr, 0);
         }
 
@@ -95,40 +95,7 @@ namespace SilkySouls.Services
             memoryService.Write(Patches.DrawEventPatch, (byte)0);
         }
 
-        private bool _targetViewIsInstalled;
-
-        public void EnableTargetingView()
-        {
-            if (!_targetViewIsInstalled)
-            {
-                nint targetViewOrigin = Hooks.TargetingView;
-                _targetView = CodeCaveOffsets.Base + CodeCaveOffsets.TargetView;
-
-                byte[] targetViewBytes =
-                {
-                    0xC6, 0x41, 0x48, 0x02, // mov    BYTE PTR [rcx+0x48],0x2
-                    0x40, 0x53, // push   rbx
-                    0x48, 0x83, 0xEC, 0x20, // sub    rsp,0x20
-                    0xE9,
-                };
-
-                int originOffset = (int)(targetViewOrigin + 6 -
-                                         (_targetView.ToInt64() + targetViewBytes.Length + 4));
-                targetViewBytes = targetViewBytes.Concat(BitConverter.GetBytes(originOffset)).ToArray();
-
-                memoryService.WriteBytes(_targetView, targetViewBytes);
-                hookManager.InstallHook(_targetView, targetViewOrigin,
-                    new byte[] { 0x40, 0x53, 0x48, 0x83, 0xEC, 0x20 });
-
-                _targetViewIsInstalled = true;
-            }
-            else
-            {
-                IntPtr valueAddr = _targetView + 3;
-                memoryService.WriteBytes(valueAddr, new byte[] { 0x02 });
-            }
-        }
-
+        
         public void DisableTargetingView()
         {
             IntPtr valueAddr = _targetView + 3;
@@ -137,7 +104,6 @@ namespace SilkySouls.Services
 
         public void ResetBools()
         {
-            _targetViewIsInstalled = false;
             _isEmevdCodeWritten = false;
         }
 
@@ -238,7 +204,7 @@ namespace SilkySouls.Services
                     (int)WorldChrMan.PlayerInsOffsets.PadMan
                 }, true);
 
-            var camPtr = memoryService.FollowPointers(memoryService.Read<nint>(Cam.Base), new[] { Cam.ChrCam, Cam.ChrExFollowCam }, true);
+            var camPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[] { FieldArea.ChrCam, FieldArea.ChrExFollowCam }, true);
 
             byte[] updateCoordsCodeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_UpdateCoords);
 
@@ -337,14 +303,14 @@ namespace SilkySouls.Services
 
         public void ShowUpgradeMenu(bool isWeapon)
         {
-            byte[] upgradeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenEnhanceShop);
-            var playerGameData = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
-                new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
-            byte[] bytes = BitConverter.GetBytes(playerGameData);
-            Array.Copy(bytes, 0, upgradeBytes, 2, bytes.Length);
-            bytes = BitConverter.GetBytes(isWeapon ? OpenEnhanceShopWeapon : OpenEnhanceShopArmor);
-            Array.Copy(bytes, 0, upgradeBytes, 16, bytes.Length);
-            memoryService.AllocateAndExecute(upgradeBytes);
+            // byte[] upgradeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenEnhanceShop);
+            // var playerGameData = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
+            //     new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
+            // byte[] bytes = BitConverter.GetBytes(playerGameData);
+            // Array.Copy(bytes, 0, upgradeBytes, 2, bytes.Length);
+            // bytes = BitConverter.GetBytes(isWeapon ? OpenEnhanceShopWeapon : OpenEnhanceShopArmor);
+            // Array.Copy(bytes, 0, upgradeBytes, 16, bytes.Length);
+            // memoryService.AllocateAndExecute(upgradeBytes);
         }
 
         public void ToggleDeathCam(bool isDeathCamEnabled) =>
@@ -359,9 +325,9 @@ namespace SilkySouls.Services
             Array.Copy(bytes, 0, openRegularShopBytes, 0x0 + 2, 8);
             bytes = BitConverter.GetBytes(shopParams[1]);
             Array.Copy(bytes, 0, openRegularShopBytes, 0xA + 2, 8);
-            bytes = BitConverter.GetBytes(Funcs.ShopParamSave);
+            bytes = BitConverter.GetBytes(Functions.ShopParamSave);
             Array.Copy(bytes, 0, openRegularShopBytes, 0x14 + 2, 8);
-            bytes = BitConverter.GetBytes(Funcs.OpenRegularShop);
+            bytes = BitConverter.GetBytes(Functions.OpenRegularShop);
             Array.Copy(bytes, 0, openRegularShopBytes, 0x24 + 2, 8);
             memoryService.AllocateAndExecute(openRegularShopBytes);
         }
@@ -369,9 +335,9 @@ namespace SilkySouls.Services
         public void OpenAttunement()
         {
             var codeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenAttunement);
-            var bytes = BitConverter.GetBytes(Funcs.AttunementWindowPrep);
+            var bytes = BitConverter.GetBytes(Functions.AttunementWindowPrep);
             Array.Copy(bytes, 0, codeBytes, 0xE + 2, 8);
-            bytes = BitConverter.GetBytes(Funcs.OpenAttunement);
+            bytes = BitConverter.GetBytes(Functions.OpenAttunement);
             Array.Copy(bytes, 0, codeBytes, 0x22 + 2, 8);
             memoryService.AllocateAndExecute(codeBytes);
         }

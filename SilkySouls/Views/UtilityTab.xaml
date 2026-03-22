@@ -64,11 +64,7 @@
                               IsEnabled="{Binding IsDrawEnabled}"
                               IsChecked="{Binding IsDrawEventEnabled}"
                               Margin="0,2" />
-
-                    <CheckBox Content="Targeting View (Kinda useless)"
-                              IsEnabled="{Binding IsDrawEnabled}"
-                              IsChecked="{Binding IsTargetingViewEnabled}"
-                              Margin="0,2" />
+                    
                 </UniformGrid>
             </StackPanel>
         </Border>

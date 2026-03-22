@@ -84,7 +84,6 @@ namespace SilkySouls.ViewModels
                     IsHitboxEnabled = false;
                     IsDrawEventEnabled = false;
                     IsSoundViewEnabled = false;
-                    IsTargetingViewEnabled = false;
                 }
             }
         }
@@ -140,23 +139,7 @@ namespace SilkySouls.ViewModels
             }
         }
 
-        public bool IsTargetingViewEnabled
-        {
-            get => _isTargetingViewEnabled;
-            set
-            {
-                if (!SetProperty(ref _isTargetingViewEnabled, value)) return;
-                if (_isTargetingViewEnabled)
-                {
-                    _utilityService.EnableTargetingView();
-                }
-                else
-                {
-                    _utilityService.DisableTargetingView();
-                }
-            }
-        }
-
+        
         public bool IsNoClipEnabled
         {
             get => _isNoClipEnabled;
@@ -237,8 +220,6 @@ namespace SilkySouls.ViewModels
                 _utilityService.EnableSoundView();
             if (IsDrawEventEnabled)
                 _utilityService.EnableDrawEvent();
-            if (IsTargetingViewEnabled)
-                _utilityService.EnableTargetingView();
             if (IsFilterRemoveEnabled)
                 _utilityService.ToggleFilter(IsFilterRemoveEnabled);
             if (IsDeathCamEnabled)

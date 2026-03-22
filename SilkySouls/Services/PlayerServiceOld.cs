@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
-using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
-using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Services
@@ -84,26 +81,5 @@ namespace SilkySouls.Services
             memoryService.WriteBytes(coordsUpdate, originBytes);
             memoryService.WriteBytes(coordsUpdate + 0x252, new byte[] { 0x0F, 0x29, 0x81, 0x20, 0x01, 0x00, 0x00 });
         }
-        
-
-        
-        public void BreakWeapon(int slotOffset)
-        {
-            var playerGameData = memoryService.Read<nint>(memoryService.Read<nint>(GameDataMan.Base) +
-                                                          (int)GameDataMan.GameDataOffsets.PlayerGameData);
-            int equippedWep = memoryService.Read<int>(playerGameData + slotOffset);
-
-            var equipGameData = memoryService.Read<nint>(playerGameData + (int)GameDataMan.PlayerGameData.EquipGameData);
-            var bytes = AsmLoader.GetAsmBytes(AsmScript.BreakRightHandWep);
-            AsmHelper.WriteAbsoluteAddresses(bytes, [
-                (equipGameData, 0x0 + 2),
-                (equippedWep, 0x12 + 2),
-                (Funcs.GetInventoryIndexByCatAndId, 0x20 + 2)
-            ]);
-            
-            memoryService.AllocateAndExecute(bytes);
-        }
     }
-    
-    
 }

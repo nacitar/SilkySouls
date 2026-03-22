@@ -47,17 +47,9 @@
             2,
             7
         );
-
-        public static readonly Pattern CamBase = new Pattern(
-            new byte[] { 0x83, 0xBF, 0x88, 0x00, 0x00, 0x00, 0x03, 0x75 },
-            "xxxxxxxx",
-            15,
-            AddressingMode.Relative,
-            3,
-            7
-        );
-
-        public static readonly Pattern LuaIfElseHook = new Pattern(
+        
+        
+        public static readonly Pattern LuaLowerOrEqualHook = new Pattern(
             new byte[] { 0xE8, 0x00, 0x00, 0x00, 0x00, 0x41, 0x3B, 0xC7, 0x0F, 0x84 },
             "x????xxxxx",
             0,
@@ -305,13 +297,7 @@
             "xxxxxxxx",
             0,
             AddressingMode.Absolute);
-
-        public static readonly Pattern ItemSpawnHook = new Pattern(
-            new byte[] { 0xEB, 0x03, 0x48, 0x8B, 0x3F, 0x48, 0x3B, 0x7E, 0x28, 0x75, 0x00, 0xC6 },
-            "xxxxxxxxxx?x",
-            11,
-            AddressingMode.Absolute);
-
+        
         public static readonly Pattern EmevdCommandHook = new Pattern(
             new byte[]
             {
@@ -329,16 +315,7 @@
             "x????xxxxxxxxx",
             29,
             AddressingMode.Absolute);
-
-        public static readonly Pattern TargetingView = new Pattern(
-            new byte[]
-            {
-                0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B, 0xD9, 0x48, 0x8B, 0x49, 0x08, 0x48, 0x85, 0xC9, 0x74,
-                0x64
-            },
-            "xxxxxxxxxxxxxxxxxx",
-            0,
-            AddressingMode.Absolute);
+        
 
         public static readonly Pattern InAirTimer = new Pattern(
             new byte[] { 0xF3, 0x0F, 0x58, 0x9B },

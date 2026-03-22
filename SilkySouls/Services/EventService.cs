@@ -29,7 +29,7 @@ namespace SilkySouls.Services
             Array.Copy(bytes, 0, setEventBytes, 0xA + 2, 8);
             bytes = BitConverter.GetBytes(setVal);
             Array.Copy(bytes, 0, setEventBytes, 0x14 + 2, 4);
-            bytes = BitConverter.GetBytes(Funcs.SetEvent);
+            bytes = BitConverter.GetBytes(Functions.SetEvent);
             Array.Copy(bytes, 0, setEventBytes, 0x24 + 2, 8);
             memoryService.AllocateAndExecute(setEventBytes);
         }
@@ -48,7 +48,7 @@ namespace SilkySouls.Services
             AsmHelper.WriteAbsoluteAddresses(getEventBytes, [
                 (memoryService.Read<nint>(EventFlagMan.Base), 0x0 + 2),
                 (eventId, 0xA + 2),
-                (Funcs.GetEvent, 0x14 + 2),
+                (Functions.GetEvent, 0x14 + 2),
                 (CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult, 0x28 + 2)
             ]);
             

@@ -123,6 +123,30 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 218234880,1322961
+        ///234881024,1402961
+        ///234946560,1412962
+        ///251723776,1512961
+        ///268435456,1602961
+        ///201326592,1202961
+        ///167772160,1002960
+        ///167903232,1022960
+        ///302055424,1812960
+        ///201392128,1212962
+        ///184549376,1102960
+        ///251658240,1502961
+        ///218103808,1302960
+        ///218169344,1312960
+        ///285212672,1702960
+        ///167837696,1012962.
+        /// </summary>
+        internal static string BonfiresByBlockId {
+            get {
+                return ResourceManager.GetString("BonfiresByBlockId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 49 bf 00 00 00 00 00    movabs r15,0x0
         ///00 00 00
         ///4c 89 f9                mov    rcx,r15
