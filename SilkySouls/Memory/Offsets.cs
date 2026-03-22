@@ -740,11 +740,12 @@ namespace SilkySouls.memory
             
             Functions.Warp = moduleBase + Version switch
             {
-                Version1_0_1_0 => 0x4A0570,
-                Version1_0_1_1 => 0x4A0320,
-                Version1_0_1_2 => 0x4A3850,
-                Version1_0_3_0 => 0x4AA520,
-                Version1_0_3_1 => 0x4AAF30,
+                Version1_0_1_0 => 0x47BD60,
+                Version1_0_1_1 => 0x47BB10,
+                Version1_0_1_2 => 0x47F040,
+                Version1_0_3_0 => 0x485CE0,
+                Version1_0_3_1 => 0x4867E0,
+
                 _ => 0
             };
             

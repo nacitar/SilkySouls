@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Numerics;
 using SilkySouls.Models;
 
 namespace SilkySouls.Utilities
@@ -63,19 +65,19 @@ namespace SilkySouls.Utilities
                     {
                         int id = int.Parse(parts[0]);
 
-                        float[] coords = null;
+                        Vector3? coords = null;
                         float angle = 0f;
                         if (parts[1] != "0")
                         {
                             string[] coordsString = parts[1].Split('|');
-
-                            angle = float.Parse(coordsString[coordsString.Length - 1], System.Globalization.CultureInfo.InvariantCulture);
-
-                            coords = new float[coordsString.Length];
-                            for (int i = 0; i < coordsString.Length; i++)
-                            {
-                                coords[i] = float.Parse(coordsString[i], System.Globalization.CultureInfo.InvariantCulture);
-                            }
+    
+                            coords = new Vector3(
+                                float.Parse(coordsString[0], CultureInfo.InvariantCulture),
+                                float.Parse(coordsString[1], CultureInfo.InvariantCulture),
+                                float.Parse(coordsString[2], CultureInfo.InvariantCulture)
+                            );
+    
+                            angle = float.Parse(coordsString[3], CultureInfo.InvariantCulture);
                         }
 
                         string mainArea = parts[2];

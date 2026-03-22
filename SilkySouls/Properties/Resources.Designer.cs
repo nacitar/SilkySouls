@@ -730,15 +730,12 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 51                      push   rcx
-        ///48 b9 00 00 00 00 00    movabs rcx,0x0
-        ///00 00 00
-        ///44 0f 10 39             movups xmm15,XMMWORD PTR [rcx]
+        ///   Looks up a localized string similar to 44 0f 10 3d 00 00 00    movups xmm15,XMMWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+        ///00 
         ///44 0f 11 b8 90 0a 00    movups XMMWORD PTR [rax+0xa90],xmm15
-        ///00
+        ///00 
         ///45 0f 57 ff             xorps  xmm15,xmm15
-        ///59                      pop    rcx
-        ///e9 00 00 00 00          jmp    21 &lt;_main+0x21&gt;.
+        ///e9 00 00 00 00          jmp    19 &lt;_main+0x19&gt;.
         /// </summary>
         internal static string WarpAngle {
             get {
@@ -747,15 +744,12 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 51                      push   rcx
-        ///48 b9 00 00 00 00 00    movabs rcx,0x0
-        ///00 00 00
-        ///44 0f 10 39             movups xmm15,XMMWORD PTR [rcx]
+        ///   Looks up a localized string similar to 44 0f 10 3d 00 00 00    movups xmm15,XMMWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+        ///00 
         ///44 0f 11 b8 80 0a 00    movups XMMWORD PTR [rax+0xa80],xmm15
-        ///00
+        ///00 
         ///45 0f 57 ff             xorps  xmm15,xmm15
-        ///59                      pop    rcx
-        ///e9 00 00 00 00          jmp    21 &lt;_main+0x21&gt;.
+        ///e9 00 00 00 00          jmp    19 &lt;_main+0x19&gt;.
         /// </summary>
         internal static string WarpCoords {
             get {

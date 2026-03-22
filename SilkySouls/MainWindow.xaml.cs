@@ -61,7 +61,6 @@ namespace SilkySouls
 
             var playerServiceOld = new PlayerServiceOld(_memoryService);
             
-            var travelServiceOld = new TravelServiceOld(_memoryService, _hookManager);
             var eventService = new EventService(_memoryService, _hookManager);
             var utilityService = new UtilityService(_memoryService, _hookManager);
             var enemyService = new EnemyService(_memoryService, _hookManager);
@@ -73,7 +72,7 @@ namespace SilkySouls
             _playerViewModel = new PlayerViewModel(playerServiceOld, playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
-            var travelViewModel = new TravelViewModel(travelServiceOld, hotkeyManager, _utilityViewModel, _stateService);
+            var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
             var eventViewModel = new EventViewModel(eventService, _stateService);
             var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService);
             _itemViewModel = new ItemViewModel(_itemService, _stateService);

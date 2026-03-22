@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Models;
-using SilkySouls.Services;
 using SilkySouls.Utilities;
 
 namespace SilkySouls.ViewModels
 {
     public class TravelViewModel : BaseViewModel
     {
-        private readonly TravelServiceOld _travelServiceOld;
+        private readonly ITravelService _travelService;
         private readonly HotkeyManager _hotkeyManager;
         private readonly UtilityViewModel _utilityViewModel;
 
@@ -22,10 +21,11 @@ namespace SilkySouls.ViewModels
         private string _preSearchMainArea;
         private readonly ObservableCollection<WarpLocation> _searchResultsCollection = new();
 
-        public TravelViewModel(TravelServiceOld travelServiceOld, HotkeyManager hotkeyManager,
+        public TravelViewModel(ITravelService travelService,
+            HotkeyManager hotkeyManager,
             UtilityViewModel utilityViewModel, IStateService stateService)
         {
-            _travelServiceOld = travelServiceOld;
+            _travelService = travelService;
             _hotkeyManager = hotkeyManager;
             _utilityViewModel = utilityViewModel;
 
@@ -144,12 +144,23 @@ namespace SilkySouls.ViewModels
             if (SelectedWarpLocation == null) return;
             if (_utilityViewModel.IsNoClipEnabled) _utilityViewModel.DisableNoClip();
 
-            _ = Task.Run(() => _travelServiceOld.Warp(SelectedWarpLocation));
+            if (SelectedWarpLocation.HasCoordinates)
+            {
+                _ = Task.Run(() => _travelService.WarpWithCoords(
+                    SelectedWarpLocation.Coords.Value,
+                    SelectedWarpLocation.Angle,
+                    SelectedWarpLocation.Id)
+                );
+            }
+            else
+            {
+                _travelService.Warp(SelectedWarpLocation.Id);
+            }
         }
 
         public void UnlockAllBonfires()
         {
-            _travelServiceOld.UnlockBonfireWarps();
+            _travelService.UnlockBonfireWarps();
         }
 
         #endregion

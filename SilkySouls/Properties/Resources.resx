@@ -1161,15 +1161,12 @@ ff d0                   call   rax
 c3                      ret</value>
   </data>
   <data name="WarpCoords" xml:space="preserve">
-    <value>51                      push   rcx
-48 b9 00 00 00 00 00    movabs rcx,0x0
-00 00 00
-44 0f 10 39             movups xmm15,XMMWORD PTR [rcx]
+    <value>44 0f 10 3d 00 00 00    movups xmm15,XMMWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+00 
 44 0f 11 b8 80 0a 00    movups XMMWORD PTR [rax+0xa80],xmm15
-00
+00 
 45 0f 57 ff             xorps  xmm15,xmm15
-59                      pop    rcx
-e9 00 00 00 00          jmp    21 &lt;_main+0x21&gt;</value>
+e9 00 00 00 00          jmp    19 &lt;_main+0x19&gt;</value>
   </data>
   <data name="LockedTarget" xml:space="preserve">
     <value>48 89 fa                mov    rdx,rdi
@@ -1188,15 +1185,12 @@ e9 00 00 00 00          jmp    21 &lt;_main+0x21&gt;</value>
 e9 00 00 00 00          jmp    26 &lt;exit+0xa&gt;</value>
   </data>
   <data name="WarpAngle" xml:space="preserve">
-    <value>51                      push   rcx
-48 b9 00 00 00 00 00    movabs rcx,0x0
-00 00 00
-44 0f 10 39             movups xmm15,XMMWORD PTR [rcx]
+    <value>44 0f 10 3d 00 00 00    movups xmm15,XMMWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+00 
 44 0f 11 b8 90 0a 00    movups XMMWORD PTR [rax+0xa90],xmm15
-00
+00 
 45 0f 57 ff             xorps  xmm15,xmm15
-59                      pop    rcx
-e9 00 00 00 00          jmp    21 &lt;_main+0x21&gt;</value>
+e9 00 00 00 00          jmp    19 &lt;_main+0x19&gt;</value>
   </data>
   <data name="OpenEnhanceShop" xml:space="preserve">
     <value>48 b9 00 00 00 00 00    movabs rcx,0x0
