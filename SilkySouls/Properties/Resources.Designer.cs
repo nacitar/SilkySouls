@@ -217,6 +217,28 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 48 89 e5                mov    rbp,rsp
+        ///48 81 ec 08 04 00 00    sub    rsp,0x408
+        ///4c 8d 8d 40 fe ff ff    lea    r9,[rbp-0x1c0]
+        ///49 c7 01 00 00 00 00    mov    QWORD PTR [r9],0x0
+        ///49 c7 41 08 00 00 00    mov    QWORD PTR [r9+0x8],0x0
+        ///00 
+        ///48 a1 00 00 00 00 00    movabs rax,ds:0x0
+        ///00 00 00 
+        ///48 89 c2                mov    rdx,rax
+        ///48 8d 8d 50 fe ff ff    lea    rcx,[rbp-0x1b0]
+        ///41 b8 00 00 00 00       mov    r8d,0x0
+        ///48 c7 44 24 28 00 00    mov    QWORD PTR [rsp+0x28],0x0
+        ///00 00 
+        ///c7 44 24 30 ff ff ff    m [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ExecuteEmevd {
+            get {
+                return ResourceManager.GetString("ExecuteEmevd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 48 b9 00 00 00 00 00    movabs rcx,0x0
         ///00 00 00
         ///48 ba 00 00 00 00 00    movabs rdx,0x0

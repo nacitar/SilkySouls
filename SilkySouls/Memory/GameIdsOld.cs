@@ -1,6 +1,6 @@
 ﻿namespace SilkySouls.Memory
 {
-    public static class GameIds
+    public static class GameIdsOld
     {
         public static class EventFlags
         {

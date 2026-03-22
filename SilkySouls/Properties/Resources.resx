@@ -1522,4 +1522,45 @@ c3                      ret</value>
 285212672,1702960
 167837696,1012962</value>
   </data>
+  <data name="ExecuteEmevd" xml:space="preserve">
+    <value>48 89 e5                mov    rbp,rsp
+48 81 ec 08 04 00 00    sub    rsp,0x408
+4c 8d 8d 40 fe ff ff    lea    r9,[rbp-0x1c0]
+49 c7 01 00 00 00 00    mov    QWORD PTR [r9],0x0
+49 c7 41 08 00 00 00    mov    QWORD PTR [r9+0x8],0x0
+00 
+48 a1 00 00 00 00 00    movabs rax,ds:0x0
+00 00 00 
+48 89 c2                mov    rdx,rax
+48 8d 8d 50 fe ff ff    lea    rcx,[rbp-0x1b0]
+41 b8 00 00 00 00       mov    r8d,0x0
+48 c7 44 24 28 00 00    mov    QWORD PTR [rsp+0x28],0x0
+00 00 
+c7 44 24 30 ff ff ff    mov    DWORD PTR [rsp+0x30],0xffffffff
+ff 
+c7 44 24 38 ff ff ff    mov    DWORD PTR [rsp+0x38],0xffffffff
+ff 
+48 b8 00 00 00 00 00    movabs rax,0x0
+00 00 00 
+ff d0                   call   rax
+48 8d 8d f0 fd ff ff    lea    rcx,[rbp-0x210]
+c7 01 fe fe fe fe       mov    DWORD PTR [rcx],0xfefefefe
+c7 41 04 fe fe fe fe    mov    DWORD PTR [rcx+0x4],0xfefefefe
+4c 8d 85 50 fe ff ff    lea    r8,[rbp-0x1b0]
+49 89 88 b0 00 00 00    mov    QWORD PTR [r8+0xb0],rcx
+48 b8 00 00 00 00 00    movabs rax,0x0
+00 00 00 
+48 8d 08                lea    rcx,[rax]
+49 89 88 b8 00 00 00    mov    QWORD PTR [r8+0xb8],rcx
+48 a1 00 00 00 00 00    movabs rax,ds:0x0
+00 00 00 
+48 8b 48 30             mov    rcx,QWORD PTR [rax+0x30]
+b8 0a d7 a3 3c          mov    eax,0x3ca3d70a
+66 0f 6e c8             movd   xmm1,eax
+48 b8 00 00 00 00 00    movabs rax,0x0
+00 00 00 
+ff d0                   call   rax
+48 81 c4 08 04 00 00    add    rsp,0x408
+c3                      ret</value>
+  </data>
 </root>

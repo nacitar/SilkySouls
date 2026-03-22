@@ -77,5 +77,7 @@ namespace SilkySouls.Memory
 
             public const int GetEventResult = 0x13B0;
 
+            public const int EmevdArgs = 0x1400;
+
     }
 }

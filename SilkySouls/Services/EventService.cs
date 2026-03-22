@@ -58,20 +58,20 @@ namespace SilkySouls.Services
         
         public void RingGargBell()
         {
-            SetEvent(GameIds.EventFlags.GargBell, 1);
-            if (GetEvent(GameIds.EventFlags.QuelaagBell))SetEvent(GameIds.EventFlags.Sens, 1);
+            SetEvent(GameIdsOld.EventFlags.GargBell, 1);
+            if (GetEvent(GameIdsOld.EventFlags.QuelaagBell))SetEvent(GameIdsOld.EventFlags.Sens, 1);
         }
         public void RingQuelaagBell()
         {
-            SetEvent(GameIds.EventFlags.QuelaagBell, 1);
-            if (GetEvent(GameIds.EventFlags.GargBell))SetEvent(GameIds.EventFlags.Sens, 1);
+            SetEvent(GameIdsOld.EventFlags.QuelaagBell, 1);
+            if (GetEvent(GameIdsOld.EventFlags.GargBell))SetEvent(GameIdsOld.EventFlags.Sens, 1);
         }
         
         public async Task OpenSensGate(int sens)
         {
             SetEvent(sens, 1);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.ReproduceObjectAnimation,
-                GameIds.EmevdCommandParams.SensDoor);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.ReproduceObjectAnimation,
+                GameIdsOld.EmevdCommandParams.SensDoor);
             await Task.Delay(1000);
             hookManager.UninstallHook(_emevdCodeLoc);
         }
@@ -149,19 +149,19 @@ namespace SilkySouls.Services
 
         public async Task PlaceLordVessel()
         {
-            SetEvent(GameIds.EventFlags.PlaceLordVessel, 1);
-            SetEvent(GameIds.EventFlags.DukesAfterLordVessel, 1);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.DeactiveObject, GameIds.EmevdCommandParams.DukesFogDeactiveObject);
+            SetEvent(GameIdsOld.EventFlags.PlaceLordVessel, 1);
+            SetEvent(GameIdsOld.EventFlags.DukesAfterLordVessel, 1);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeactiveObject, GameIdsOld.EmevdCommandParams.DukesFogDeactiveObject);
             await Task.Delay(5);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.DeleteMapSfx, GameIds.EmevdCommandParams.DukesFogDeleteMapSfx);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeleteMapSfx, GameIdsOld.EmevdCommandParams.DukesFogDeleteMapSfx);
             await Task.Delay(5);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.DeactiveObject, GameIds.EmevdCommandParams.DemonRuinsFogDeactiveObject);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeactiveObject, GameIdsOld.EmevdCommandParams.DemonRuinsFogDeactiveObject);
             await Task.Delay(5);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.DeleteMapSfx, GameIds.EmevdCommandParams.DemonRuinsFogDeleteMapSfx);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeleteMapSfx, GameIdsOld.EmevdCommandParams.DemonRuinsFogDeleteMapSfx);
             await Task.Delay(5);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.DeactiveObject, GameIds.EmevdCommandParams.NitoFogDeactiveObject);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeactiveObject, GameIdsOld.EmevdCommandParams.NitoFogDeactiveObject);
             await Task.Delay(5);
-            ExecuteEmevdCommand(GameIds.EmevdCommands.DeleteMapSfx, GameIds.EmevdCommandParams.NitoFogDeleteMapSfx);
+            ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeleteMapSfx, GameIdsOld.EmevdCommandParams.NitoFogDeleteMapSfx);
             await Task.Delay(500);
             hookManager.UninstallHook(_emevdCodeLoc);
         }

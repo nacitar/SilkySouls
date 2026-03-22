@@ -61,97 +61,97 @@ namespace SilkySouls.Views
 
         private void MaleUdMerchant_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.MaleUdMerchant);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.MaleUdMerchant);
         }
 
         private void FemaleUdMerchant_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.FemaleUdMerchant);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.FemaleUdMerchant);
         }
 
         private void Zena_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Zena);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Zena);
         }
 
         private void Patches_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Patches);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Patches);
         }
 
         private void Shiva_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Shiva);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Shiva);
         }
 
         private void Griggs_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Griggs);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Griggs);
         }
 
         private void Dusk_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Dusk);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Dusk);
         }
 
         private void Ingward_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Ingward);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Ingward);
         }
 
         private void Laurentius_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Laurentius);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Laurentius);
         }
 
         private void Eingyi_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Eingyi);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Eingyi);
         }
 
         private void Quelana_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Quelana);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Quelana);
         }
 
         private void Petrus_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Petrus);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Petrus);
         }
 
         private void Reah_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Reah);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Reah);
         }
 
         private void Oswald_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Oswald);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Oswald);
         }
 
         private void Logan_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Logan);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Logan);
         }
 
         private void CrestfallenMerchant_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.CrestfallenMerchant);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.CrestfallenMerchant);
         }
 
         private void Chester_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Chester);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Chester);
         }
 
         private void Elizabeth_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Elizabeth);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Elizabeth);
         }
 
         private void Gough_Click(object sender, RoutedEventArgs e)
         {
-            _utilityViewModel.OpenShop(GameIds.ShopParams.Gough);
+            _utilityViewModel.OpenShop(GameIdsOld.ShopParams.Gough);
         }
         
         private void Feed_Click(object sender, RoutedEventArgs e)

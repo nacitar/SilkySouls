@@ -1,4 +1,7 @@
-﻿using SilkySouls.Enums;
+﻿using System.Windows.Input;
+using SilkySouls.Core;
+using SilkySouls.Enums;
+using SilkySouls.GameIds;
 using SilkySouls.Interfaces;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
@@ -15,17 +18,28 @@ namespace SilkySouls.ViewModels
 
         private readonly EnemyService _enemyService;
         private readonly HotkeyManager _hotkeyManager;
+        private readonly IEmevdService _emevdService;
 
-        public EnemyViewModel(EnemyService enemyService, HotkeyManager hotkeyManager, IStateService stateService)
+        public EnemyViewModel(EnemyService enemyService, HotkeyManager hotkeyManager, IStateService stateService,
+            IEmevdService emevdService)
         {
             _enemyService = enemyService;
             _hotkeyManager = hotkeyManager;
+            _emevdService = emevdService;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
 
             RegisterHotkeys();
+            TestCommand = new DelegateCommand(Test);
         }
+
+        private void Test()
+        {
+            _emevdService.ExecuteEmevdCommand(Emevd.EmevdCommands.ForceCharacterDeath);
+        }
+
+        public ICommand  TestCommand { get; set; }
 
         private void RegisterHotkeys()
         {

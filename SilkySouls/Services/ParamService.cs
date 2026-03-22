@@ -3,7 +3,6 @@
 using System;
 using SilkySouls.Interfaces;
 using SilkySouls.memory;
-using SilkySouls.Memory;
 
 namespace SilkySouls.Services
 {

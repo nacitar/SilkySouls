@@ -46,34 +46,37 @@ namespace SilkySouls
                 Top = SettingsManager.Default.WindowTop;
             }
             else WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            
+
             var hotkeyManager = new HotkeyManager(_memoryService);
             _hookManager = new HookManager(_memoryService);
-            
+
             IGameTickService gameTickService = new GameTickService(_stateService);
 
             ITravelService travelService = new TravelService(_memoryService, _hookManager);
+            IEmevdService emevdService = new EmevdService(_memoryService);
             IPlayerService playerService = new PlayerService(_memoryService, travelService);
-            
+
             ITargetService targetService = new TargetService(_memoryService, _hookManager);
 
             _aobScanner = new AoBScanner(_memoryService);
-            
-            
+
+
             var eventService = new EventService(_memoryService, _hookManager);
             var utilityService = new UtilityService(_memoryService, _hookManager);
             var enemyService = new EnemyService(_memoryService, _hookManager);
             IParamService paramService = new ParamService(_memoryService);
             _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
-            
+
 
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService, gameTickService);
-            TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
-            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
+            TargetViewModel targetViewModel =
+                new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
+            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService,
+                _stateService);
             var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
             var eventViewModel = new EventViewModel(eventService, _stateService);
-            var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService);
+            var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService, emevdService);
             _itemViewModel = new ItemViewModel(_itemService, _stateService);
             _settingsViewModel = new SettingsViewModel(settingsService, hotkeyManager);
 
@@ -88,25 +91,25 @@ namespace SilkySouls
 
             MainTabControl.Items.Add(new TabItem { Header = "Player", Content = playerTab });
             MainTabControl.Items.Add(new TabItem { Header = "Travel", Content = travelTab });
-            MainTabControl.Items.Add(new TabItem { Header = "Event", Content = eventTab });
-            MainTabControl.Items.Add(new TabItem { Header = "Utility", Content = utilityTab });
             MainTabControl.Items.Add(new TabItem { Header = "Enemies", Content = enemyTab });
             MainTabControl.Items.Add(new TabItem { Header = "Target", Content = targetTab });
+            MainTabControl.Items.Add(new TabItem { Header = "Utility", Content = utilityTab });
+            MainTabControl.Items.Add(new TabItem { Header = "Event", Content = eventTab });
             MainTabControl.Items.Add(new TabItem { Header = "Items", Content = itemTab });
             MainTabControl.Items.Add(new TabItem { Header = "Settings", Content = settingsTab });
 
             _settingsViewModel.ApplyStartUpOptions();
             Closing += MainWindow_Closing;
-            
+
             _gameLoadedTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromMilliseconds(25)
             };
             _gameLoadedTimer.Tick += Timer_Tick;
             _gameLoadedTimer.Start();
-            
+
             VersionChecker.UpdateVersionText(AppVersion);
-            
+
             if (SettingsManager.Default.EnableUpdateChecks)
             {
                 VersionChecker.CheckForUpdates(this);
@@ -114,7 +117,6 @@ namespace SilkySouls
         }
 
         private bool _loaded;
-        private bool _hasScanned;
         private bool _hasAllocatedMemory;
         private bool _hasCheckedPatch;
 
@@ -124,17 +126,17 @@ namespace SilkySouls
             {
                 IsAttachedText.Text = "Attached to game";
                 IsAttachedText.Foreground = (SolidColorBrush)Application.Current.Resources["AttachedBrush"];
-                
+
                 if (!_hasCheckedPatch)
                 {
                     if (!PatchManager.Initialize(_memoryService))
                     {
                         _aobScanner.Scan();
-                        _hasScanned = true;
                     }
+
                     _hasCheckedPatch = true;
                 }
-                
+
 
                 if (!_hasAllocatedMemory)
                 {
@@ -144,9 +146,9 @@ namespace SilkySouls
 #endif
                     _hasAllocatedMemory = true;
                 }
-                
+
                 _utilityViewModel.TryRestoreAttachedFeatures();
-                
+
                 if (_stateService.IsLoaded())
                 {
                     if (_loaded) return;
@@ -175,7 +177,6 @@ namespace SilkySouls
                 IsAttachedText.Foreground = (SolidColorBrush)Application.Current.Resources["NotAttachedBrush"];
             }
         }
-
 
         private void TrySetGameStartPrefs()
         {
@@ -209,10 +210,9 @@ namespace SilkySouls
                 DragMove();
             }
         }
-        
+
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-      
             SettingsManager.Default.WindowLeft = Left;
             SettingsManager.Default.WindowTop = Top;
             SettingsManager.Default.Save();

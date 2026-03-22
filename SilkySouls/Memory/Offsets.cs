@@ -305,6 +305,11 @@ namespace SilkySouls.memory
             public static nint Base;
         }
 
+        public static class EmkSystem
+        {
+            public static nint Base;
+        }
+
         public static class Hooks
         {
             public static nint LastLockedTarget;
@@ -339,7 +344,7 @@ namespace SilkySouls.memory
             public static nint GetEvent;
             public static nint ShopParamSave;
             public static nint OpenRegularShop;
-            public static nint ProcessEmevdCommand;
+            public static nint ExecuteEmevdCommand;
             public static nint OpenAttunement;
             public static nint AttunementWindowPrep;
             public static nint GetInventoryIndexByCatAndId;
@@ -348,6 +353,7 @@ namespace SilkySouls.memory
             public static nint LevelUpFunc;
             public static nint RestoreCastsFunc;
             public static nint ItemGet;
+            public static nint EmkEventInsCtor;
             public static nint OpenEnhanceShopWeapon;       //TODO IMPLMENET EZSTATE
             public static nint OpenEnhanceShopArmor;
         }
@@ -503,6 +509,17 @@ namespace SilkySouls.memory
                 Version1_0_3_1 => 0x1C8ADC0,
                 _ => 0
             };
+            
+            EmkSystem.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1D01740,
+                Version1_0_1_1 => 0x1C91730,
+                Version1_0_1_2 => 0x1D14F10,
+                Version1_0_3_0 => 0x1D28130,
+                Version1_0_3_1 => 0x1C8ADC0,
+                _ => 0
+            };
+
 
 
             Hooks.LastLockedTarget = moduleBase + Version switch
@@ -749,7 +766,7 @@ namespace SilkySouls.memory
                 _ => 0
             };
             
-            Functions.ProcessEmevdCommand = moduleBase + Version switch
+            Functions.ExecuteEmevdCommand = moduleBase + Version switch
             {
                 Version1_0_1_0 => 0x7BE910,
                 Version1_0_1_1 => 0x7BE790,
@@ -831,6 +848,15 @@ namespace SilkySouls.memory
                 _ => 0
             };
 
+            Functions.EmkEventInsCtor = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x7C4BA0,
+                Version1_0_1_1 => 0x7C4A20,
+                Version1_0_1_2 => 0x7CA290,
+                Version1_0_3_0 => 0x7CFB20,
+                Version1_0_3_1 => 0x7D3F70,
+                _ => 0
+            };
 
 
 #if DEBUG
@@ -851,6 +877,7 @@ namespace SilkySouls.memory
             PrintOffset("SoloParamMan", SoloParamMan.Base);
             PrintOffset("WorldAiMan", WorldAiMan.Base);
             PrintOffset("EmkEventIns", EmkEventIns.Base);
+            PrintOffset("EmkSystem", EmkSystem.Base);
 
             Console.WriteLine("\n--- Hooks ---");
             PrintOffset("LastLockedTarget", Hooks.LastLockedTarget);
@@ -881,7 +908,7 @@ namespace SilkySouls.memory
             PrintOffset("GetEvent", Functions.GetEvent);
             PrintOffset("ShopParamSave", Functions.ShopParamSave);
             PrintOffset("OpenRegularShop", Functions.OpenRegularShop);
-            PrintOffset("ProcessEmevdCommand", Functions.ProcessEmevdCommand);
+            PrintOffset("ExecuteEmevdCommand", Functions.ExecuteEmevdCommand);
             PrintOffset("OpenAttunement", Functions.OpenAttunement);
             PrintOffset("AttunementWindowPrep", Functions.AttunementWindowPrep);
             PrintOffset("GetInventoryIndexByCatAndId", Functions.GetInventoryIndexByCatAndId);
@@ -890,6 +917,7 @@ namespace SilkySouls.memory
             PrintOffset("LevelUpFunc", Functions.LevelUpFunc);
             PrintOffset("RestoreCastsFunc", Functions.RestoreCastsFunc);
             PrintOffset("ItemGet", Functions.ItemGet);
+            PrintOffset("EmkEventInsCtor", Functions.EmkEventInsCtor);
             PrintOffset("OpenEnhanceShopWeapon", Functions.OpenEnhanceShopWeapon);
             PrintOffset("OpenEnhanceShopArmor", Functions.OpenEnhanceShopArmor);
 

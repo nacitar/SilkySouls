@@ -5,8 +5,6 @@ using System.Runtime.InteropServices;
 using H.Hooks;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.Memory;
-using SilkySouls.Services;
 
 namespace SilkySouls.Utilities
 {

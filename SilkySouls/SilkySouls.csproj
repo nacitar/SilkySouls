@@ -109,6 +109,8 @@
     <Compile Include="Enums\GameVersion.cs" />
     <Compile Include="Enums\HotkeyActions.cs" />
     <Compile Include="Enums\State.cs" />
+    <Compile Include="GameIds\Emevd.cs" />
+    <Compile Include="Interfaces\IEmevdService.cs" />
     <Compile Include="Interfaces\IEnemyService.cs" />
     <Compile Include="Interfaces\IEventLogReader.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
@@ -127,7 +129,7 @@
     <Compile Include="Memory\AsmHelper.cs" />
     <Compile Include="Memory\BitFlag.cs" />
     <Compile Include="Memory\CodeCaveOffsets.cs" />
-    <Compile Include="Memory\GameIds.cs" />
+    <Compile Include="Memory\GameIdsOld.cs" />
     <Compile Include="Memory\HookManager.cs" />
     <Compile Include="Memory\MemoryBlock.cs" />
     <Compile Include="Memory\Pattern.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="Models\Position.cs" />
     <Compile Include="Models\WarpLocation.cs" />
     <Compile Include="Models\UpgradeType.cs" />
+    <Compile Include="Services\EmevdService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\GameTickService.cs" />
     <Compile Include="Services\ItemService.cs" />

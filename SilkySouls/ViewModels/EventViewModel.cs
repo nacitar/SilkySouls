@@ -119,14 +119,14 @@ namespace SilkySouls.ViewModels
             IsDisableEventsEnabled = false;
         }
         
-        public void UnlockKalameet() => _eventService.SetMultipleEventsOn(GameIds.EventFlags.UnlockKalameet);
-        public void NewLondoNoWater() => _eventService.SetEvent(GameIds.EventFlags.NewLondoWater, 1);
+        public void UnlockKalameet() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.UnlockKalameet);
+        public void NewLondoNoWater() => _eventService.SetEvent(GameIdsOld.EventFlags.NewLondoWater, 1);
         public void RingGargBell() => _eventService.RingGargBell();
         public void RingQuelaggBell() => _eventService.RingQuelaagBell();
-        public void OpenSens() => _ = _eventService.OpenSensGate(GameIds.EventFlags.Sens);
+        public void OpenSens() => _ = _eventService.OpenSensGate(GameIdsOld.EventFlags.Sens);
         public void PlaceLordVessel() => _ = _eventService.PlaceLordVessel();
-        public void LaurentiusToFirelink() => _eventService.SetEvent(GameIds.EventFlags.LaurentiusToFirelink, 1);
-        public void LoganToFirelink() => _eventService.SetMultipleEventsOn(GameIds.EventFlags.LoganToFirelink);
-        public void GriggsToFirelink() => _eventService.SetMultipleEventsOn(GameIds.EventFlags.GriggsToFirelink);
+        public void LaurentiusToFirelink() => _eventService.SetEvent(GameIdsOld.EventFlags.LaurentiusToFirelink, 1);
+        public void LoganToFirelink() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.LoganToFirelink);
+        public void GriggsToFirelink() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.GriggsToFirelink);
     }
 }
