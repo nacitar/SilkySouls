@@ -27,9 +27,6 @@ public enum AsmScript
     NoClip_ZDirection_L2,
     NoClip_ZDirection_KB,
     NoClip_UpdateCoords,
-    OpenEnhanceShop,
-    OpenRegularShop,
-    OpenAttunement,
     
     SetEvent,
     GetEvent,

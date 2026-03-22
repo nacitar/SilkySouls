@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Models;
@@ -35,18 +37,28 @@ namespace SilkySouls.ViewModels
             _mainAreas = new ObservableCollection<string>();
             _areaLocations = new ObservableCollection<WarpLocation>();
 
+            WarpCommand = new DelegateCommand(Warp);
+            UnlockAllBonfiresCommand = new DelegateCommand(() => _travelService.UnlockBonfireWarps());
+
             LoadLocations();
             RegisterHotkeys();
         }
 
+        #region Commands
+
+        public ICommand WarpCommand { get; }
+        public ICommand UnlockAllBonfiresCommand { get; }
+
+        #endregion
+
         #region Properties
 
-        private bool _areButtonsEnabled;
+        private bool _areOptionsEnabled;
 
-        public bool AreButtonsEnabled
+        public bool AreOptionsEnabled
         {
-            get => _areButtonsEnabled;
-            set => SetProperty(ref _areButtonsEnabled, value);
+            get => _areOptionsEnabled;
+            set => SetProperty(ref _areOptionsEnabled, value);
         }
 
         private ObservableCollection<string> _mainAreas;
@@ -137,9 +149,9 @@ namespace SilkySouls.ViewModels
 
         #endregion
 
-        #region Public Methods
+        #region Private Methods
 
-        public void Warp()
+        private void Warp()
         {
             if (SelectedWarpLocation == null) return;
             if (_utilityViewModel.IsNoClipEnabled) _utilityViewModel.DisableNoClip();
@@ -158,23 +170,14 @@ namespace SilkySouls.ViewModels
             }
         }
 
-        public void UnlockAllBonfires()
-        {
-            _travelService.UnlockBonfireWarps();
-        }
-
-        #endregion
-
-        #region Private Methods
-
         private void OnNotLoaded()
         {
-            AreButtonsEnabled = false;
+            AreOptionsEnabled = false;
         }
 
         private void OnLoaded()
         {
-            AreButtonsEnabled = true;
+            AreOptionsEnabled = true;
         }
 
         private void RegisterHotkeys()

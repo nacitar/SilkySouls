@@ -332,11 +332,7 @@ namespace SilkySouls.memory
         {
             public static nint SetEvent;
             public static nint GetEvent;
-            public static nint ShopParamSave;
-            public static nint OpenRegularShop;
             public static nint ExecuteEmevdCommand;
-            public static nint OpenAttunement;
-            public static nint AttunementWindowPrep;
             public static nint GetInventoryIndexByCatAndId;
             public static nint Warp;
             public static nint ItemDlgFunc;
@@ -347,8 +343,6 @@ namespace SilkySouls.memory
             public static nint SetExternalEventTempParam;
             public static nint ExternalEventTempCtor;
             public static nint ExecuteTalkEvent;
-            public static nint OpenEnhanceShopWeapon;       //TODO IMPLMENET EZSTATE
-            public static nint OpenEnhanceShopArmor;
         }
 
         private static void InitializeBaseAddresses(nint moduleBase)
@@ -727,26 +721,6 @@ namespace SilkySouls.memory
                 Version1_0_3_1 => 0x4F23D0,
                 _ => 0
             };
-
-            Functions.ShopParamSave = moduleBase + Version switch
-            {
-                Version1_0_1_0 => 0x70C970,
-                Version1_0_1_1 => 0x70C730,
-                Version1_0_1_2 => 0x711B30,
-                Version1_0_3_0 => 0x718E30,
-                Version1_0_3_1 => 0x71BB00,
-                _ => 0
-            };
-
-            Functions.OpenRegularShop = moduleBase + Version switch
-            {
-                Version1_0_1_0 => 0x6C1290,
-                Version1_0_1_1 => 0x6C0FF0,
-                Version1_0_1_2 => 0x6C63F0,
-                Version1_0_3_0 => 0x6CD610,
-                Version1_0_3_1 => 0x6CFF20,
-                _ => 0
-            };
             
             Functions.Warp = moduleBase + Version switch
             {
@@ -766,27 +740,6 @@ namespace SilkySouls.memory
                 Version1_0_1_2 => 0x7C4000,
                 Version1_0_3_0 => 0x7C9890,
                 Version1_0_3_1 => 0x7CDCE0,
-                _ => 0
-            };
-
-            
-            Functions.OpenAttunement = moduleBase + Version switch
-            {
-                Version1_0_1_0 => 0x6E87E0,
-                Version1_0_1_1 => 0x6E8540,
-                Version1_0_1_2 => 0x6ED940,
-                Version1_0_3_0 => 0x6F4B90,
-                Version1_0_3_1 => 0x6F74A0,
-                _ => 0
-            };
-
-            Functions.AttunementWindowPrep = moduleBase + Version switch
-            {
-                Version1_0_1_0 => 0x70C970,
-                Version1_0_1_1 => 0x70C730,
-                Version1_0_1_2 => 0x711B30,
-                Version1_0_3_0 => 0x718E30,
-                Version1_0_3_1 => 0x71BB00,
                 _ => 0
             };
 
@@ -929,11 +882,7 @@ namespace SilkySouls.memory
             Console.WriteLine("\n--- Functions ---");
             PrintOffset("SetEvent", Functions.SetEvent);
             PrintOffset("GetEvent", Functions.GetEvent);
-            PrintOffset("ShopParamSave", Functions.ShopParamSave);
-            PrintOffset("OpenRegularShop", Functions.OpenRegularShop);
             PrintOffset("ExecuteEmevdCommand", Functions.ExecuteEmevdCommand);
-            PrintOffset("OpenAttunement", Functions.OpenAttunement);
-            PrintOffset("AttunementWindowPrep", Functions.AttunementWindowPrep);
             PrintOffset("GetInventoryIndexByCatAndId", Functions.GetInventoryIndexByCatAndId);
             PrintOffset("Warp", Functions.Warp);
             PrintOffset("ItemDlgFunc", Functions.ItemDlgFunc);
@@ -944,9 +893,7 @@ namespace SilkySouls.memory
             PrintOffset("SetExternalEventTempParam", Functions.SetExternalEventTempParam);
             PrintOffset("ExternalEventTempCtor", Functions.ExternalEventTempCtor);
             PrintOffset("ExecuteTalkEvent", Functions.ExecuteTalkEvent);
-            PrintOffset("OpenEnhanceShopWeapon", Functions.OpenEnhanceShopWeapon);
-            PrintOffset("OpenEnhanceShopArmor", Functions.OpenEnhanceShopArmor);
-
+            
             Console.WriteLine("\n====================================\n");
 #endif
         }

@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Models;
@@ -15,34 +17,13 @@ namespace SilkySouls.ViewModels
     public class ItemViewModel : BaseViewModel
     {
         private readonly ItemService _itemService;
-        private ItemCategory _selectedCategory;
-        private Item _selectedItem;
-        private int _selectedQuantity = 1;
-        private int _selectedUpgrade;
-        private string _selectedInfusionType = "Normal";
-        private int _maxUpgradeLevel = 15;
-        private bool _quantityEnabled;
-        private int _maxQuantity;
-        private bool _canUpgrade;
-        private bool _canInfuse;
-
-        private bool _areOptionsEnabled;
-
-        private string _searchText = string.Empty;
 
         private readonly Dictionary<string, ObservableCollection<Item>> _itemsByCategory;
         private readonly Dictionary<string, InfusionType> _infusionTypes = new Dictionary<string, InfusionType>();
-
-        private ObservableCollection<ItemCategory> _categories;
-        private ObservableCollection<Item> _items;
-        private ObservableCollection<string> _availableInfusions;
-
-        private bool _autoSpawnEnabled;
-        private Item _selectedAutoSpawnWeapon;
+        private readonly ObservableCollection<Item> _searchResultsCollection = new ObservableCollection<Item>();
 
         private string _preSearchCategory;
         private bool _isSearchActive;
-        private readonly ObservableCollection<Item> _searchResultsCollection = new ObservableCollection<Item>();
 
         public ItemViewModel(ItemService itemService, IStateService stateService)
         {
@@ -56,53 +37,23 @@ namespace SilkySouls.ViewModels
             _availableInfusions = new ObservableCollection<string>();
             _itemsByCategory = new Dictionary<string, ObservableCollection<Item>>();
 
+            SpawnItemCommand = new DelegateCommand(SpawnItem);
+            MassSpawnCommand = new DelegateCommand(MassSpawn);
+
             LoadData();
             InitInfusions();
         }
 
-        private void InitInfusions()
-        {
-            _infusionTypes.Add("Normal", new InfusionType(0, 15, false));
-            _infusionTypes.Add("Chaos", new InfusionType(900, 5, true));
-            _infusionTypes.Add("Crystal", new InfusionType(100, 5, false));
-            _infusionTypes.Add("Divine", new InfusionType(600, 10, false));
-            _infusionTypes.Add("Enchanted", new InfusionType(500, 5, true));
-            _infusionTypes.Add("Fire", new InfusionType(800, 10, false));
-            _infusionTypes.Add("Lightning", new InfusionType(200, 5, false));
-            _infusionTypes.Add("Magic", new InfusionType(400, 10, false));
-            _infusionTypes.Add("Occult", new InfusionType(700, 5, true));
-            _infusionTypes.Add("Raw", new InfusionType(300, 5, true));
-        }
+        #region Commands
 
+        public ICommand SpawnItemCommand { get; }
+        public ICommand MassSpawnCommand { get; }
 
-        private void LoadData()
-        {
-            Categories.Add(new ItemCategory(0x00000000, "Ammo"));
-            Categories.Add(new ItemCategory(0x10000000, "Armor"));
-            Categories.Add(new ItemCategory(0x40000000, "Consumables"));
-            Categories.Add(new ItemCategory(0x40000000, "Infinite Use Items"));
-            Categories.Add(new ItemCategory(0x40000000, "Key Items"));
-            Categories.Add(new ItemCategory(0x20000000, "Rings"));
-            Categories.Add(new ItemCategory(0x40000000, "Spells"));
-            Categories.Add(new ItemCategory(0x40000000, "Upgrade Materials"));
-            Categories.Add(new ItemCategory(0x00000000, "Weapons"));
+        #endregion
 
-            _itemsByCategory.Add("Ammo", new ObservableCollection<Item>(DataLoader.GetItemList("Ammo")));
-            _itemsByCategory.Add("Armor", new ObservableCollection<Item>(DataLoader.GetItemList("Armor")));
-            _itemsByCategory.Add("Consumables", new ObservableCollection<Item>(DataLoader.GetItemList("Consumables")));
-            _itemsByCategory.Add("Infinite Use Items",
-                new ObservableCollection<Item>(DataLoader.GetItemList("InfiniteUseItems")));
-            _itemsByCategory.Add("Key Items", new ObservableCollection<Item>(DataLoader.GetItemList("KeyItems")));
-            _itemsByCategory.Add("Rings", new ObservableCollection<Item>(DataLoader.GetItemList("Rings")));
-            _itemsByCategory.Add("Spells", new ObservableCollection<Item>(DataLoader.GetItemList("Spells")));
-            _itemsByCategory.Add("Upgrade Materials",
-                new ObservableCollection<Item>(DataLoader.GetItemList("UpgradeMaterials")));
-            _itemsByCategory.Add("Weapons", new ObservableCollection<Item>(DataLoader.GetItemList("Weapons")));
+        #region Properties
 
-            SelectedCategory = Categories.FirstOrDefault();
-            SelectedMassSpawnCategory = Categories.FirstOrDefault().Name;
-            SelectedAutoSpawnWeapon = _itemsByCategory["Weapons"].FirstOrDefault();
-        }
+        private bool _areOptionsEnabled;
 
         public bool AreOptionsEnabled
         {
@@ -110,11 +61,15 @@ namespace SilkySouls.ViewModels
             set => SetProperty(ref _areOptionsEnabled, value);
         }
 
+        private ObservableCollection<ItemCategory> _categories;
+
         public ObservableCollection<ItemCategory> Categories
         {
             get => _categories;
             private set => SetProperty(ref _categories, value);
         }
+
+        private ObservableCollection<Item> _items;
 
         public ObservableCollection<Item> Items
         {
@@ -122,12 +77,15 @@ namespace SilkySouls.ViewModels
             set => SetProperty(ref _items, value);
         }
 
+        private ObservableCollection<string> _availableInfusions;
+
         public ObservableCollection<string> AvailableInfusions
         {
             get => _availableInfusions;
             private set => SetProperty(ref _availableInfusions, value);
         }
 
+        private ItemCategory _selectedCategory;
 
         public ItemCategory SelectedCategory
         {
@@ -150,11 +108,15 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private bool _canUpgrade;
+
         public bool CanUpgrade
         {
             get => _canUpgrade;
             private set => SetProperty(ref _canUpgrade, value);
         }
+
+        private bool _canInfuse;
 
         public bool CanInfuse
         {
@@ -162,17 +124,23 @@ namespace SilkySouls.ViewModels
             private set => SetProperty(ref _canInfuse, value);
         }
 
+        private int _maxUpgradeLevel = 15;
+
         public int MaxUpgradeLevel
         {
             get => _maxUpgradeLevel;
             private set => SetProperty(ref _maxUpgradeLevel, value);
         }
 
+        private bool _quantityEnabled;
+
         public bool QuantityEnabled
         {
             get => _quantityEnabled;
             private set => SetProperty(ref _quantityEnabled, value);
         }
+
+        private int _maxQuantity;
 
         public int MaxQuantity
         {
@@ -185,6 +153,8 @@ namespace SilkySouls.ViewModels
             get => _isSearchActive;
             private set => SetProperty(ref _isSearchActive, value);
         }
+
+        private string _searchText = string.Empty;
 
         public string SearchText
         {
@@ -221,25 +191,7 @@ namespace SilkySouls.ViewModels
             }
         }
 
-        private void ApplyFilter()
-        {
-            _searchResultsCollection.Clear();
-            var searchTextLower = SearchText.ToLower();
-
-            foreach (var category in _itemsByCategory)
-            {
-                foreach (var item in category.Value)
-                {
-                    if (item.Name.ToLower().Contains(searchTextLower))
-                    {
-                        item.CategoryName = category.Key;
-                        _searchResultsCollection.Add(item);
-                    }
-                }
-            }
-
-            Items = _searchResultsCollection;
-        }
+        private Item _selectedItem;
 
         public Item SelectedItem
         {
@@ -329,6 +281,8 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private int _selectedQuantity = 1;
+
         public int SelectedQuantity
         {
             get => _selectedQuantity;
@@ -339,11 +293,15 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private int _selectedUpgrade;
+
         public int SelectedUpgrade
         {
             get => _selectedUpgrade;
             set => SetProperty(ref _selectedUpgrade, Math.Max(0, Math.Min(value, MaxUpgradeLevel)));
         }
+
+        private string _selectedInfusionType = "Normal";
 
         public string SelectedInfusionType
         {
@@ -360,10 +318,119 @@ namespace SilkySouls.ViewModels
             }
         }
 
-        public void SpawnItem()
+        private bool _autoSpawnEnabled;
+
+        public bool AutoSpawnEnabled
+        {
+            get => _autoSpawnEnabled;
+            set => SetProperty(ref _autoSpawnEnabled, value);
+        }
+
+        private Item _selectedAutoSpawnWeapon;
+
+        public Item SelectedAutoSpawnWeapon
+        {
+            get => _selectedAutoSpawnWeapon;
+            set => SetProperty(ref _selectedAutoSpawnWeapon, value);
+        }
+
+        public ObservableCollection<Item> WeaponList => new ObservableCollection<Item>(_itemsByCategory["Weapons"]);
+
+        private string _selectedMassSpawnCategory;
+
+        public string SelectedMassSpawnCategory
+        {
+            get => _selectedMassSpawnCategory;
+            set => SetProperty(ref _selectedMassSpawnCategory, value);
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void TrySpawnWeaponPref()
+        {
+            if (AutoSpawnEnabled && SelectedAutoSpawnWeapon != null)
+            {
+                int itemId = SelectedAutoSpawnWeapon.Id;
+
+                _itemService.ItemSpawn(
+                    itemId,
+                    0x00000000,
+                    1);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void InitInfusions()
+        {
+            _infusionTypes.Add("Normal", new InfusionType(0, 15, false));
+            _infusionTypes.Add("Chaos", new InfusionType(900, 5, true));
+            _infusionTypes.Add("Crystal", new InfusionType(100, 5, false));
+            _infusionTypes.Add("Divine", new InfusionType(600, 10, false));
+            _infusionTypes.Add("Enchanted", new InfusionType(500, 5, true));
+            _infusionTypes.Add("Fire", new InfusionType(800, 10, false));
+            _infusionTypes.Add("Lightning", new InfusionType(200, 5, false));
+            _infusionTypes.Add("Magic", new InfusionType(400, 10, false));
+            _infusionTypes.Add("Occult", new InfusionType(700, 5, true));
+            _infusionTypes.Add("Raw", new InfusionType(300, 5, true));
+        }
+
+        private void LoadData()
+        {
+            Categories.Add(new ItemCategory(0x00000000, "Ammo"));
+            Categories.Add(new ItemCategory(0x10000000, "Armor"));
+            Categories.Add(new ItemCategory(0x40000000, "Consumables"));
+            Categories.Add(new ItemCategory(0x40000000, "Infinite Use Items"));
+            Categories.Add(new ItemCategory(0x40000000, "Key Items"));
+            Categories.Add(new ItemCategory(0x20000000, "Rings"));
+            Categories.Add(new ItemCategory(0x40000000, "Spells"));
+            Categories.Add(new ItemCategory(0x40000000, "Upgrade Materials"));
+            Categories.Add(new ItemCategory(0x00000000, "Weapons"));
+
+            _itemsByCategory.Add("Ammo", new ObservableCollection<Item>(DataLoader.GetItemList("Ammo")));
+            _itemsByCategory.Add("Armor", new ObservableCollection<Item>(DataLoader.GetItemList("Armor")));
+            _itemsByCategory.Add("Consumables", new ObservableCollection<Item>(DataLoader.GetItemList("Consumables")));
+            _itemsByCategory.Add("Infinite Use Items",
+                new ObservableCollection<Item>(DataLoader.GetItemList("InfiniteUseItems")));
+            _itemsByCategory.Add("Key Items", new ObservableCollection<Item>(DataLoader.GetItemList("KeyItems")));
+            _itemsByCategory.Add("Rings", new ObservableCollection<Item>(DataLoader.GetItemList("Rings")));
+            _itemsByCategory.Add("Spells", new ObservableCollection<Item>(DataLoader.GetItemList("Spells")));
+            _itemsByCategory.Add("Upgrade Materials",
+                new ObservableCollection<Item>(DataLoader.GetItemList("UpgradeMaterials")));
+            _itemsByCategory.Add("Weapons", new ObservableCollection<Item>(DataLoader.GetItemList("Weapons")));
+
+            SelectedCategory = Categories.FirstOrDefault();
+            SelectedMassSpawnCategory = Categories.FirstOrDefault().Name;
+            SelectedAutoSpawnWeapon = _itemsByCategory["Weapons"].FirstOrDefault();
+        }
+
+        private void ApplyFilter()
+        {
+            _searchResultsCollection.Clear();
+            var searchTextLower = SearchText.ToLower();
+
+            foreach (var category in _itemsByCategory)
+            {
+                foreach (var item in category.Value)
+                {
+                    if (item.Name.ToLower().Contains(searchTextLower))
+                    {
+                        item.CategoryName = category.Key;
+                        _searchResultsCollection.Add(item);
+                    }
+                }
+            }
+
+            Items = _searchResultsCollection;
+        }
+
+        private void SpawnItem()
         {
             if (_selectedItem == null) return;
-
 
             int itemId = _selectedItem.Id;
             int categoryId;
@@ -376,7 +443,7 @@ namespace SilkySouls.ViewModels
             {
                 categoryId = _selectedCategory.Id;
             }
-            
+
             if (CanInfuse)
             {
                 itemId += _infusionTypes[SelectedInfusionType].Offset;
@@ -401,52 +468,7 @@ namespace SilkySouls.ViewModels
                 SelectedQuantity);
         }
 
-        public bool AutoSpawnEnabled
-        {
-            get => _autoSpawnEnabled;
-            set => SetProperty(ref _autoSpawnEnabled, value);
-        }
-
-        public Item SelectedAutoSpawnWeapon
-        {
-            get => _selectedAutoSpawnWeapon;
-            set => SetProperty(ref _selectedAutoSpawnWeapon, value);
-        }
-
-        public ObservableCollection<Item> WeaponList => new ObservableCollection<Item>(_itemsByCategory["Weapons"]);
-
-        private void OnNotLoaded()
-        {
-            AreOptionsEnabled = false;
-        }
-
-        private void OnLoaded()
-        {
-            AreOptionsEnabled = true;
-        }
-
-        public void TrySpawnWeaponPref()
-        {
-            if (AutoSpawnEnabled && SelectedAutoSpawnWeapon != null)
-            {
-                int itemId = SelectedAutoSpawnWeapon.Id;
-
-                _itemService.ItemSpawn(
-                    itemId,
-                    0x00000000,
-                    1);
-            }
-        }
-
-        private string _selectedMassSpawnCategory;
-
-        public string SelectedMassSpawnCategory
-        {
-            get => _selectedMassSpawnCategory;
-            set => SetProperty(ref _selectedMassSpawnCategory, value);
-        }
-
-        public void MassSpawn()
+        private void MassSpawn()
         {
             Task.Run(() =>
             {
@@ -471,5 +493,17 @@ namespace SilkySouls.ViewModels
                 }
             });
         }
+
+        private void OnNotLoaded()
+        {
+            AreOptionsEnabled = false;
+        }
+
+        private void OnLoaded()
+        {
+            AreOptionsEnabled = true;
+        }
+
+        #endregion
     }
 }

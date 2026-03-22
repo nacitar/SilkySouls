@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.GameIds;
@@ -10,12 +10,6 @@ namespace SilkySouls.ViewModels
 {
     public class EnemyViewModel : BaseViewModel
     {
-        private bool _areOptionsEnabled;
-
-        private bool _isAllNoDamageEnabled;
-        private bool _isAllNoDeathEnabled;
-        private bool _is4KingsTimerStopped;
-
         private readonly EnemyService _enemyService;
         private readonly HotkeyManager _hotkeyManager;
         private readonly IEmevdService _emevdService;
@@ -30,23 +24,20 @@ namespace SilkySouls.ViewModels
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
 
-            RegisterHotkeys();
             TestCommand = new DelegateCommand(Test);
+
+            RegisterHotkeys();
         }
 
-        private void Test()
-        {
-            _emevdService.ExecuteEmevdCommand(Emevd.EmevdCommands.ForceCharacterDeath);
-        }
+        #region Commands
 
-        public ICommand  TestCommand { get; set; }
+        public ICommand TestCommand { get; }
 
-        private void RegisterHotkeys()
-        {
-            _hotkeyManager.RegisterAction(HotkeyActions.DisableAi, () => { IsDisableAiEnabled = !IsDisableAiEnabled; });
-            _hotkeyManager.RegisterAction(HotkeyActions.AllNoDeath, () => { IsAllNoDeathEnabled = !IsAllNoDeathEnabled; });
-            _hotkeyManager.RegisterAction(HotkeyActions.AllNoDamage, () => { IsAllNoDamageEnabled = !IsAllNoDamageEnabled; });
-        }
+        #endregion
+
+        #region Properties
+
+        private bool _areOptionsEnabled;
 
         public bool AreOptionsEnabled
         {
@@ -67,7 +58,9 @@ namespace SilkySouls.ViewModels
                 }
             }
         }
-        
+
+        private bool _isAllNoDamageEnabled;
+
         public bool IsAllNoDamageEnabled
         {
             get => _isAllNoDamageEnabled;
@@ -79,6 +72,8 @@ namespace SilkySouls.ViewModels
                 }
             }
         }
+
+        private bool _isAllNoDeathEnabled;
 
         public bool IsAllNoDeathEnabled
         {
@@ -92,6 +87,8 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private bool _is4KingsTimerStopped;
+
         public bool Is4KingsTimerStopped
         {
             get => _is4KingsTimerStopped;
@@ -102,6 +99,22 @@ namespace SilkySouls.ViewModels
                     _enemyService.Toggle4KingsTimer(_is4KingsTimerStopped);
                 }
             }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void Test()
+        {
+            _emevdService.ExecuteEmevdCommand(Emevd.EmevdCommands.ForceCharacterDeath);
+        }
+
+        private void RegisterHotkeys()
+        {
+            _hotkeyManager.RegisterAction(HotkeyActions.DisableAi, () => { IsDisableAiEnabled = !IsDisableAiEnabled; });
+            _hotkeyManager.RegisterAction(HotkeyActions.AllNoDeath, () => { IsAllNoDeathEnabled = !IsAllNoDeathEnabled; });
+            _hotkeyManager.RegisterAction(HotkeyActions.AllNoDamage, () => { IsAllNoDamageEnabled = !IsAllNoDamageEnabled; });
         }
 
         private void OnNotLoaded()
@@ -121,5 +134,7 @@ namespace SilkySouls.ViewModels
                 _enemyService.Toggle4KingsTimer(true);
             AreOptionsEnabled = true;
         }
+
+        #endregion
     }
 }

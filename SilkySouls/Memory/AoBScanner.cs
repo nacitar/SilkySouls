@@ -105,11 +105,7 @@ namespace SilkySouls.Memory
             
             Functions.SetEvent = FindAddressByPattern(Patterns.SetEvent);
             Functions.GetEvent = FindAddressByPattern(Patterns.GetEvent);
-            Functions.ShopParamSave = FindAddressByPattern(Patterns.ShopParamSave);
-            Functions.OpenRegularShop = FindAddressByPattern(Patterns.OpenRegularShop);
             Functions.ExecuteEmevdCommand = FindAddressByPattern(Patterns.ProcessEmevdCommand);
-            Functions.OpenAttunement = FindAddressByPattern(Patterns.OpenAttunement);
-            Functions.AttunementWindowPrep = FindAddressByPattern(Patterns.AttunementWindowPrep);
             Functions.GetInventoryIndexByCatAndId = FindAddressByPattern(Patterns.GetInventoryIndexByCatAndId);
             
             
@@ -153,11 +149,7 @@ namespace SilkySouls.Memory
             Console.WriteLine($"Patches.InfiniteDurabilityPatch: 0x{Patches.InfiniteDurabilityPatch:X}");
             
             Console.WriteLine($"Funcs.SetEvent: 0x{Functions.SetEvent:X}");
-            Console.WriteLine($"Funcs.ShopParamSave: 0x{Functions.ShopParamSave:X}");
-            Console.WriteLine($"Funcs.OpenRegularShop: 0x{Functions.OpenRegularShop:X}");
             Console.WriteLine($"Funcs.ProcessEmevdCommand: 0x{Functions.ExecuteEmevdCommand:X}");
-            Console.WriteLine($"Funcs.OpenAttunement: 0x{Functions.OpenAttunement:X}");
-            Console.WriteLine($"Funcs.AttunementWindowPrep: 0x{Functions.AttunementWindowPrep:X}");
             Console.WriteLine($"Funcs.GetEvent: 0x{Functions.GetEvent:X}");
 #endif
         }

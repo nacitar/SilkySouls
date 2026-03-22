@@ -214,7 +214,7 @@
         );
 
         public static readonly Pattern OpenEnhanceShop = new Pattern(
-            new byte[] { 0xE8, 0x00, 0x00, 0x00, 0x00, 0xE9, 0xA1, 0xED },
+            [0xE8, 0x00, 0x00, 0x00, 0x00, 0xE9, 0xA1, 0xED],
             "x????xxx",
             0,
             AddressingMode.Relative,

@@ -1,33 +1,27 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
+using SilkySouls.Memory;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
+using static SilkySouls.GameIds.EzState;
 using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.ViewModels
 {
     public class UtilityViewModel : BaseViewModel
     {
-        private bool _isDrawEnabled;
-        private bool _isHitboxEnabled;
-        private bool _isSoundViewEnabled;
-        private bool _isDrawEventEnabled;
-        private bool _isTargetingViewEnabled;
-        private bool _isNoClipEnabled;
-        private bool _isDeathCamEnabled;
-        private bool _isFilterRemoveEnabled;
-
-        private bool _areButtonsEnabled;
-        private bool _areAttachedOptionsEnabled;
-        private bool _areAttachedOptionsRestored;
-
         private bool _wasNoDeathEnabled;
         private bool _wasNoDmgEnabled;
+
+        private bool _areAttachedOptionsRestored;
 
         private readonly UtilityService _utilityService;
         private readonly PlayerViewModel _playerViewModel;
         private readonly IParamService _paramService;
+        private readonly IEzStateService _ezStateService;
         private readonly HotkeyManager _hotkeyManager;
 
         public const int EquipParamGoodsTableIdx = 3;
@@ -36,30 +30,54 @@ namespace SilkySouls.ViewModels
         public const int IconIdOffset = 0x2C;
 
         public UtilityViewModel(UtilityService utilityService, HotkeyManager hotkeyManager,
-            PlayerViewModel playerViewModel, IParamService paramService, IStateService stateService)
+            PlayerViewModel playerViewModel, IParamService paramService, IStateService stateService,
+            IEzStateService ezStateService)
         {
             _utilityService = utilityService;
             _playerViewModel = playerViewModel;
             _paramService = paramService;
+            _ezStateService = ezStateService;
             _hotkeyManager = hotkeyManager;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
 
+            ShowLevelUpMenuCommand = new DelegateCommand(ShowLevelUpMenu);
+            ShowAttunementMenuCommand = new DelegateCommand(ShowAttunementMenu);
+            UpgradeWeaponCommand = new DelegateCommand(UpgradeWeapon);
+            UpgradeArmorCommand = new DelegateCommand(UpgradeArmor);
+            OpenFeedMenuCommand = new DelegateCommand(OpenFeedMenu);
+            OpenWarpMenuCommand = new DelegateCommand(OpenWarpMenu);
+            OpenBottomlessBoxCommand = new DelegateCommand(OpenBottomlessBox);
+            OpenShopCommand = new DelegateCommand<int[]>(OpenShop);
+
             RegisterHotkeys();
         }
 
-        private void RegisterHotkeys()
+        #region Commands
+
+        public ICommand ShowLevelUpMenuCommand { get; }
+        public ICommand ShowAttunementMenuCommand { get; }
+        public ICommand UpgradeWeaponCommand { get; }
+        public ICommand UpgradeArmorCommand { get; }
+        public ICommand OpenFeedMenuCommand { get; }
+        public ICommand OpenWarpMenuCommand { get; }
+        public ICommand OpenBottomlessBoxCommand { get; }
+        public ICommand OpenShopCommand { get; }
+
+        #endregion
+
+        #region Properties
+
+        private bool _areOptionsEnabled;
+
+        public bool AreOptionsEnabled
         {
-            _hotkeyManager.RegisterAction(HotkeyActions.NoClip, () => { IsNoClipEnabled = !IsNoClipEnabled; });
-            
+            get => _areOptionsEnabled;
+            set => SetProperty(ref _areOptionsEnabled, value);
         }
-        
-        public bool AreButtonsEnabled
-        {
-            get => _areButtonsEnabled;
-            set => SetProperty(ref _areButtonsEnabled, value);
-        }
+
+        private bool _areAttachedOptionsEnabled;
 
         public bool AreAttachedOptionsEnabled
         {
@@ -67,6 +85,7 @@ namespace SilkySouls.ViewModels
             set => SetProperty(ref _areAttachedOptionsEnabled, value);
         }
 
+        private bool _isDrawEnabled;
 
         public bool IsDrawEnabled
         {
@@ -88,6 +107,8 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private bool _isHitboxEnabled;
+
         public bool IsHitboxEnabled
         {
             get => _isHitboxEnabled;
@@ -104,6 +125,8 @@ namespace SilkySouls.ViewModels
                 }
             }
         }
+
+        private bool _isSoundViewEnabled;
 
         public bool IsSoundViewEnabled
         {
@@ -122,6 +145,8 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private bool _isDrawEventEnabled;
+
         public bool IsDrawEventEnabled
         {
             get => _isDrawEventEnabled;
@@ -139,7 +164,8 @@ namespace SilkySouls.ViewModels
             }
         }
 
-        
+        private bool _isNoClipEnabled;
+
         public bool IsNoClipEnabled
         {
             get => _isNoClipEnabled;
@@ -167,6 +193,8 @@ namespace SilkySouls.ViewModels
             }
         }
 
+        private bool _isDeathCamEnabled;
+
         public bool IsDeathCamEnabled
         {
             get => _isDeathCamEnabled;
@@ -176,7 +204,9 @@ namespace SilkySouls.ViewModels
                 _utilityService.ToggleDeathCam(_isDeathCamEnabled);
             }
         }
-        
+
+        private bool _isFilterRemoveEnabled;
+
         public bool IsFilterRemoveEnabled
         {
             get => _isFilterRemoveEnabled;
@@ -186,9 +216,9 @@ namespace SilkySouls.ViewModels
                 _utilityService.ToggleFilter(_isFilterRemoveEnabled);
             }
         }
-        
+
         private bool _isGuaranteedBkhEnabled;
-        
+
         public bool IsGuaranteedBkhEnabled
         {
             get => _isGuaranteedBkhEnabled;
@@ -196,20 +226,67 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isGuaranteedBkhEnabled, value))
                 {
-                    if (AreButtonsEnabled)
+                    if (AreOptionsEnabled)
                     {
-                       var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
+                        var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
                         _paramService.WriteInt32(estusRow, IconIdOffset, LordVesselIconId);
                         _utilityService.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
                     }
                 }
             }
         }
-        
+
+        #endregion
+
+        #region Public Methods
+
+        public void ResetAttached()
+        {
+            IsNoClipEnabled = false;
+            _areAttachedOptionsRestored = false;
+        }
+
+        public void TryRestoreAttachedFeatures()
+        {
+            if (_areAttachedOptionsRestored) return;
+            if (IsDrawEnabled)
+            {
+                if (!_utilityService.EnableDraw()) return;
+            }
+
+            _areAttachedOptionsRestored = true;
+        }
+
+        public void DisableNoClip()
+        {
+            _utilityService.DisableNoClip();
+            IsNoClipEnabled = false;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void ShowLevelUpMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.LevelUpMenu);
+        private void ShowAttunementMenu() => _ezStateService.ExecuteTalkCommand(TalkCommands.OpenAttunement);
+        private void UpgradeWeapon() => _ezStateService.ExecuteTalkCommand(TalkCommands.OpenEnhanceWeapon);
+        private void UpgradeArmor() => _ezStateService.ExecuteTalkCommand(TalkCommands.OpenEnhanceArmor);
+        private void OpenFeedMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.Feed);
+        private void OpenWarpMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.Warp);
+        private void OpenBottomlessBox() => _utilityService.ShowMenu(MenuMan.MenuManData.BottomlessBox);
+
+        private void OpenShop(int[] shopParams) =>
+            _ezStateService.ExecuteTalkCommand(TalkCommands.OpenRegularShop(shopParams[0], shopParams[1]));
+
+        private void RegisterHotkeys()
+        {
+            _hotkeyManager.RegisterAction(HotkeyActions.NoClip, () => { IsNoClipEnabled = !IsNoClipEnabled; });
+        }
+
         private void OnNotLoaded()
         {
             IsNoClipEnabled = false;
-            AreButtonsEnabled = false;
+            AreOptionsEnabled = false;
         }
 
         private void OnLoaded()
@@ -233,53 +310,15 @@ namespace SilkySouls.ViewModels
                     var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
                     _paramService.WriteInt32(estusRow, IconIdOffset, LordVesselIconId);
                 });
-
             }
             else
             {
                 _utilityService.SetGuaranteedBkhDrop(false);
             }
-            AreButtonsEnabled = true;
+
+            AreOptionsEnabled = true;
         }
 
-        public void ResetAttached()
-        {
-            IsNoClipEnabled = false;
-            _areAttachedOptionsRestored = false;
-            _utilityService.ResetBools();
-        }
-
-        public void TryRestoreAttachedFeatures()
-        {
-            if (_areAttachedOptionsRestored) return;
-            if (IsDrawEnabled)
-            {
-                if (!_utilityService.EnableDraw()) return;
-            }
-
-            _areAttachedOptionsRestored = true;
-        }
-
-        public void ShowLevelUpMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.LevelUpMenu);
-        
-        public void ShowAttunementMenu() => _utilityService.OpenAttunement();
-        
-
-        public void ShowUpgradeMenu(bool isWeapon) => _utilityService.ShowUpgradeMenu(isWeapon);
-
-       
-        public void OpenShop(ulong[] shopParams) => _utilityService.OpenRegularShop(shopParams);
-        
-        public void OpenFeedMenu()=> _utilityService.ShowMenu(MenuMan.MenuManData.Feed);
-        
-        public void OpenWarpMenu()=> _utilityService.ShowMenu(MenuMan.MenuManData.Warp);
-
-        public void OpenBottomlessBox() => _utilityService.ShowMenu(MenuMan.MenuManData.BottomlessBox);
-
-        public void DisableNoClip()
-        {
-            _utilityService.DisableNoClip();
-            IsNoClipEnabled = false;
-        }
+        #endregion
     }
 }

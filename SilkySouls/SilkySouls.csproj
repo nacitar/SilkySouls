@@ -111,6 +111,7 @@
     <Compile Include="Enums\State.cs" />
     <Compile Include="GameIds\Emevd.cs" />
     <Compile Include="GameIds\EzState.cs" />
+    <Compile Include="GameIds\ShopParams.cs" />
     <Compile Include="Interfaces\IEmevdService.cs" />
     <Compile Include="Interfaces\IEnemyService.cs" />
     <Compile Include="Interfaces\IEventLogReader.cs" />

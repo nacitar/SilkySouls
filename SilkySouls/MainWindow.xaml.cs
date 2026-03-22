@@ -53,14 +53,14 @@ namespace SilkySouls
             IGameTickService gameTickService = new GameTickService(_stateService);
 
             ITravelService travelService = new TravelService(_memoryService, _hookManager);
-            IEmevdService emevdService = new EmevdService(_memoryService);
             IPlayerService playerService = new PlayerService(_memoryService, travelService);
 
             ITargetService targetService = new TargetService(_memoryService, _hookManager);
 
             _aobScanner = new AoBScanner(_memoryService);
 
-
+            IEmevdService emevdService = new EmevdService(_memoryService);
+            IEzStateService ezStateService = new EzStateService(_memoryService);
             var eventService = new EventService(_memoryService);
             var utilityService = new UtilityService(_memoryService, _hookManager);
             var enemyService = new EnemyService(_memoryService, _hookManager);
@@ -73,7 +73,7 @@ namespace SilkySouls
             TargetViewModel targetViewModel =
                 new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService,
-                _stateService);
+                _stateService, ezStateService);
             var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
             var eventViewModel = new EventViewModel(eventService, _stateService);
             var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService, emevdService);

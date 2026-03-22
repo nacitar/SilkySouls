@@ -9,18 +9,14 @@ public static class EzState
         public int CommandId { get; } = commandId;
         public int[] Params { get; } = @params;
     }
-    
+
     public static class TalkCommands
     {
-        public static TalkCommand OpenDialog(int type, int textId, int result, int style, int unk) =>
-            new(17, [type, textId, result, style, unk]);
-
-        public static readonly TalkCommand OpenUpgrade = new(24, [0]);
-        public static readonly TalkCommand LevelUp = new(31, []);
-        public static readonly TalkCommand OpenAttunement = new(28, [-1, -1]);
-        public static readonly TalkCommand OpenChest = new(30, []);
-        public static readonly TalkCommand OpenSell = new(46, [-1, -1]);
-        public static readonly TalkCommand OpenAow = new(48, []);
+        public static TalkCommand OpenRegularShop(int start, int end) => new(22, [start, end]);
+        public static readonly TalkCommand OpenRepairShop = new(23, []);
+        public static readonly TalkCommand OpenEnhanceWeapon = new(24, [0]);
+        public static readonly TalkCommand OpenEnhanceArmor = new(24, [10]);
+        public static readonly TalkCommand OpenAttunement = new(28, [10000, 10099]);
         
     }
 }

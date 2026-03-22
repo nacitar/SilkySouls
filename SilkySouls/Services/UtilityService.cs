@@ -11,11 +11,8 @@ namespace SilkySouls.Services
 {
     public class UtilityService(IMemoryService memoryService, HookManager hookManager)
     {
-        private IntPtr _targetView;
         private IntPtr _draw;
         private nint _drawOrigin;
-        private IntPtr _emevdCodeLoc;
-        private bool _isEmevdCodeWritten;
 
         private readonly byte[] _drawOriginBytes = { 0x44, 0x8B, 0xC6, 0xBA, 0x16, 0x00, 0x00, 0x00 };
 
@@ -94,19 +91,7 @@ namespace SilkySouls.Services
         {
             memoryService.Write(Patches.DrawEventPatch, (byte)0);
         }
-
         
-        public void DisableTargetingView()
-        {
-            IntPtr valueAddr = _targetView + 3;
-            memoryService.WriteBytes(valueAddr, new byte[] { 0x00 });
-        }
-
-        public void ResetBools()
-        {
-            _isEmevdCodeWritten = false;
-        }
-
         public void EnableNoClip()
         {
             var zDirectionAddr = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionVariable;
@@ -301,47 +286,12 @@ namespace SilkySouls.Services
             memoryService.Write(menuPtr, menuType == MenuMan.MenuManData.Warp ? (byte)2 : (byte)1);
         }
 
-        public void ShowUpgradeMenu(bool isWeapon)
-        {
-            // byte[] upgradeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenEnhanceShop);
-            // var playerGameData = memoryService.FollowPointers(memoryService.Read<nint>(GameDataMan.Base),
-            //     new[] { (int)GameDataMan.GameDataOffsets.PlayerGameData }, true);
-            // byte[] bytes = BitConverter.GetBytes(playerGameData);
-            // Array.Copy(bytes, 0, upgradeBytes, 2, bytes.Length);
-            // bytes = BitConverter.GetBytes(isWeapon ? OpenEnhanceShopWeapon : OpenEnhanceShopArmor);
-            // Array.Copy(bytes, 0, upgradeBytes, 16, bytes.Length);
-            // memoryService.AllocateAndExecute(upgradeBytes);
-        }
-
+        
         public void ToggleDeathCam(bool isDeathCamEnabled) =>
             memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
                 isDeathCamEnabled ? (byte)1 : (byte)0);
 
         
-        public void OpenRegularShop(ulong[] shopParams)
-        {
-            var openRegularShopBytes = AsmLoader.GetAsmBytes(AsmScript.OpenRegularShop);
-            var bytes = BitConverter.GetBytes(shopParams[0]);
-            Array.Copy(bytes, 0, openRegularShopBytes, 0x0 + 2, 8);
-            bytes = BitConverter.GetBytes(shopParams[1]);
-            Array.Copy(bytes, 0, openRegularShopBytes, 0xA + 2, 8);
-            bytes = BitConverter.GetBytes(Functions.ShopParamSave);
-            Array.Copy(bytes, 0, openRegularShopBytes, 0x14 + 2, 8);
-            bytes = BitConverter.GetBytes(Functions.OpenRegularShop);
-            Array.Copy(bytes, 0, openRegularShopBytes, 0x24 + 2, 8);
-            memoryService.AllocateAndExecute(openRegularShopBytes);
-        }
-
-        public void OpenAttunement()
-        {
-            var codeBytes = AsmLoader.GetAsmBytes(AsmScript.OpenAttunement);
-            var bytes = BitConverter.GetBytes(Functions.AttunementWindowPrep);
-            Array.Copy(bytes, 0, codeBytes, 0xE + 2, 8);
-            bytes = BitConverter.GetBytes(Functions.OpenAttunement);
-            Array.Copy(bytes, 0, codeBytes, 0x22 + 2, 8);
-            memoryService.AllocateAndExecute(codeBytes);
-        }
-
         public void SetGuaranteedBkhDrop(bool setValue)
         {
             var bkhPtr = memoryService.FollowPointers(memoryService.Read<nint>(SoloParamMan.Base), new[]
