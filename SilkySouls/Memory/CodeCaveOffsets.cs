@@ -79,5 +79,8 @@ namespace SilkySouls.Memory
 
             public const int EmevdArgs = 0x1400;
 
+            public const int EzStateTalkCode = 0x1500;
+            public const int EzStateTalkParams = 0x1600;
+
     }
 }

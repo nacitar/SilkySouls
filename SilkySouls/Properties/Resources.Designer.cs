@@ -239,6 +239,25 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 48 89 e5                mov    rbp,rsp
+        ///48 81 ec 98 05 00 00    sub    rsp,0x598
+        ///48 8d 8d e0 fb ff ff    lea    rcx,[rbp-0x420]
+        ///ba 00 00 00 00          mov    edx,0x0
+        ///e8 00 00 00 00          call   1b &lt;_main+0x1b&gt;
+        ///48 8d 8d c8 fb ff ff    lea    rcx,[rbp-0x438]
+        ///48 8d 95 c8 fa ff ff    lea    rdx,[rbp-0x538]
+        ///48 89 51 10             mov    QWORD PTR [rcx+0x10],rdx
+        ///4c 8d 85 a8 fa ff ff    lea    r8,[rbp-0x558]
+        ///4c 89 82 98 00 00 00    mov    QWORD PTR [rdx+0x98],r8
+        ///49 89 50 18             mov    QWORD P [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ExecuteTalkEvent {
+            get {
+                return ResourceManager.GetString("ExecuteTalkEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 48 b9 00 00 00 00 00    movabs rcx,0x0
         ///00 00 00
         ///48 ba 00 00 00 00 00    movabs rdx,0x0
@@ -642,36 +661,16 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 83 3d 00 00 00 00 01    cmp    DWORD PTR [rip+0x0],0x1        # 7 &lt;_main+0x7&gt;
-        ///0f 84 16 01 00 00       je     123 &lt;executeOriginal&gt;
-        ///c7 05 00 00 00 00 01    mov    DWORD PTR [rip+0x0],0x1        # 17 &lt;_main+0x17&gt;
-        ///00 00 00
-        ///50                      push   rax
-        ///53                      push   rbx
-        ///51                      push   rcx
-        ///52                      push   rdx
-        ///56                      push   rsi
-        ///57                      push   rdi
-        ///41 50                   push   r8
-        ///41 51                   push   r9
-        ///41 [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ScriptCommands {
-            get {
-                return ResourceManager.GetString("ScriptCommands", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 48 b9 00 00 00 00 00    movabs rcx,0x0
-        ///00 00 00
+        ///00 00 00 
         ///48 ba 00 00 00 00 00    movabs rdx,0x0
-        ///00 00 00
-        ///41 b8 01 00 00 00       mov    r8d,0x1
+        ///00 00 00 
+        ///49 b8 00 00 00 00 00    movabs r8,0x0
+        ///00 00 00 
         ///41 b9 00 00 00 00       mov    r9d,0x0
         ///48 83 ec 48             sub    rsp,0x48
         ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
+        ///00 00 00 
         ///ff d0                   call   rax
         ///48 83 c4 48             add    rsp,0x48
         ///c3                      ret.

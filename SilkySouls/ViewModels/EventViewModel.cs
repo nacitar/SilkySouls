@@ -59,7 +59,7 @@ namespace SilkySouls.ViewModels
         
             if (!int.TryParse(trimmedFlagId, out int flagIdValue) || flagIdValue <= 0)
                 return;
-            _eventService.SetEvent(flagIdValue, FlagStateIndex == 0 ? 1 : 0);
+            _eventService.SetEvent(flagIdValue, FlagStateIndex == 0);
         }
         
         public string GetFlagId
@@ -120,12 +120,12 @@ namespace SilkySouls.ViewModels
         }
         
         public void UnlockKalameet() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.UnlockKalameet);
-        public void NewLondoNoWater() => _eventService.SetEvent(GameIdsOld.EventFlags.NewLondoWater, 1);
+        public void NewLondoNoWater() => _eventService.SetEvent(GameIdsOld.EventFlags.NewLondoWater, true);
         public void RingGargBell() => _eventService.RingGargBell();
         public void RingQuelaggBell() => _eventService.RingQuelaagBell();
-        public void OpenSens() => _ = _eventService.OpenSensGate(GameIdsOld.EventFlags.Sens);
-        public void PlaceLordVessel() => _ = _eventService.PlaceLordVessel();
-        public void LaurentiusToFirelink() => _eventService.SetEvent(GameIdsOld.EventFlags.LaurentiusToFirelink, 1);
+        public void OpenSens() =>  _eventService.OpenSensGate(GameIdsOld.EventFlags.Sens);
+        public void PlaceLordVessel() =>  _eventService.PlaceLordVessel();
+        public void LaurentiusToFirelink() => _eventService.SetEvent(GameIdsOld.EventFlags.LaurentiusToFirelink, true);
         public void LoganToFirelink() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.LoganToFirelink);
         public void GriggsToFirelink() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.GriggsToFirelink);
     }

@@ -34,6 +34,7 @@ public enum AsmScript
     SetEvent,
     GetEvent,
     ExecuteEmevd,
+    ExecuteTalkEvent,
     
     ItemSpawn,
     

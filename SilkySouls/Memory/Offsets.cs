@@ -64,13 +64,6 @@ namespace SilkySouls.memory
             public const int CoordsPtr2 = 0x28;
             public const int CoordsPtr3 = 0x50;
             public const int CoordsPtr4 = 0x20;
-
-            public enum Coords
-            {
-                X = 0x120,
-                Z = 0x124,
-                Y = 0x128,
-            }
         }
 
         public static class ChrIns
@@ -182,15 +175,12 @@ namespace SilkySouls.memory
         public static class GameMan
         {
             public static nint Base;
-            public const int BonfireCoords = 0xA80;
             public const int LastBonfire = 0xB34;
         }
 
         public static class EventMan
         {
             public static nint Base;
-
-            public const int FrpgEventProxy = 0x8;
         }
 
         public static class DamageManager
@@ -354,6 +344,9 @@ namespace SilkySouls.memory
             public static nint RestoreCastsFunc;
             public static nint ItemGet;
             public static nint EmkEventInsCtor;
+            public static nint SetExternalEventTempParam;
+            public static nint ExternalEventTempCtor;
+            public static nint ExecuteTalkEvent;
             public static nint OpenEnhanceShopWeapon;       //TODO IMPLMENET EZSTATE
             public static nint OpenEnhanceShopArmor;
         }
@@ -857,6 +850,36 @@ namespace SilkySouls.memory
                 Version1_0_3_1 => 0x7D3F70,
                 _ => 0
             };
+            
+            Functions.SetExternalEventTempParam = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xCD5750,
+                Version1_0_1_1 => 0xCD55D0,
+                Version1_0_1_2 => 0xE9B510,
+                Version1_0_3_0 => 0xEA29A0,
+                Version1_0_3_1 => 0xEA6580,
+                _ => 0
+            };
+
+            Functions.ExternalEventTempCtor = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xCD5650,
+                Version1_0_1_1 => 0xCD54D0,
+                Version1_0_1_2 => 0xE9B410,
+                Version1_0_3_0 => 0xEA28A0,
+                Version1_0_3_1 => 0xEA6480,
+                _ => 0
+            };
+
+            Functions.ExecuteTalkEvent = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x4D0940,
+                Version1_0_1_1 => 0x4D06F0,
+                Version1_0_1_2 => 0x4D3C20,
+                Version1_0_3_0 => 0x4DA920,
+                Version1_0_3_1 => 0x4DB340,
+                _ => 0
+            };
 
 
 #if DEBUG
@@ -918,6 +941,9 @@ namespace SilkySouls.memory
             PrintOffset("RestoreCastsFunc", Functions.RestoreCastsFunc);
             PrintOffset("ItemGet", Functions.ItemGet);
             PrintOffset("EmkEventInsCtor", Functions.EmkEventInsCtor);
+            PrintOffset("SetExternalEventTempParam", Functions.SetExternalEventTempParam);
+            PrintOffset("ExternalEventTempCtor", Functions.ExternalEventTempCtor);
+            PrintOffset("ExecuteTalkEvent", Functions.ExecuteTalkEvent);
             PrintOffset("OpenEnhanceShopWeapon", Functions.OpenEnhanceShopWeapon);
             PrintOffset("OpenEnhanceShopArmor", Functions.OpenEnhanceShopArmor);
 

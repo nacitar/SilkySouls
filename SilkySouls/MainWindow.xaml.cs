@@ -61,7 +61,7 @@ namespace SilkySouls
             _aobScanner = new AoBScanner(_memoryService);
 
 
-            var eventService = new EventService(_memoryService, _hookManager);
+            var eventService = new EventService(_memoryService);
             var utilityService = new UtilityService(_memoryService, _hookManager);
             var enemyService = new EnemyService(_memoryService, _hookManager);
             IParamService paramService = new ParamService(_memoryService);
