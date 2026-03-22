@@ -44,7 +44,7 @@ namespace SilkySouls.memory
 
             public const int PlayerIns = 0x68;
 
-            public static readonly int[] CurrentBlockId = [PlayerIns, 0x370, 0x10, 0x288];
+            public static readonly int[] CurrentBlockId = [0x370, 0x10, 0x288];
 
             public enum BaseOffsets
             {
@@ -103,7 +103,7 @@ namespace SilkySouls.memory
             public static readonly int[] NpcParam = [0x580, 0x8];
 
             public static readonly int[] PhysicsModule = [ChrCtrl, 0x28];
-            public const int Angle = 0x0;
+            public const int Angle = 0x4;
             public const int Coords = 0x10;
 
             public enum NpcParamOffsets

@@ -58,8 +58,7 @@ namespace SilkySouls
             ITargetService targetService = new TargetService(_memoryService, _hookManager);
 
             _aobScanner = new AoBScanner(_memoryService);
-
-            var playerServiceOld = new PlayerServiceOld(_memoryService);
+            
             
             var eventService = new EventService(_memoryService, _hookManager);
             var utilityService = new UtilityService(_memoryService, _hookManager);
@@ -69,7 +68,7 @@ namespace SilkySouls
             var settingsService = new SettingsService(_memoryService);
             
 
-            _playerViewModel = new PlayerViewModel(playerServiceOld, playerService, hotkeyManager, _stateService, gameTickService);
+            _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel = new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
             _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService, _stateService);
             var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);

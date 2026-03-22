@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
@@ -22,8 +23,11 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
 
     private readonly Dictionary<uint, int> _bonfiresByBlockId = DataLoader.LoadDict<uint, int>("BonfiresByBlockId");
 
-    private Position _position1 = new();
-    private Position _position2 = new();
+    private readonly Position[] _positions =
+    [
+        new(0, Vector3.Zero, 0f),
+        new(0, Vector3.Zero, 0f)
+    ];
 
     public int GetHp() => memoryService.Read<int>(GetPlayerIns() + ChrIns.Health);
 
@@ -43,12 +47,33 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
     
     public void SavePosition(int index)
     {
-        throw new NotImplementedException();
+        var posToSave = _positions[index];
+        var playerIns = GetPlayerIns();
+        var blockIdPtr = memoryService.FollowPointers(playerIns, WorldChrMan.CurrentBlockId, false);
+        var physicsModule = memoryService.FollowPointers(playerIns, ChrIns.PhysicsModule, true);
+        
+        posToSave.BlockId = memoryService.Read<uint>(blockIdPtr);
+        posToSave.Coords = memoryService.Read<Vector3>(physicsModule + ChrIns.Coords);
+        posToSave.Angle = memoryService.Read<float>(physicsModule + ChrIns.Angle);
     }
 
     public void RestorePositon(int index)
     {
-        throw new NotImplementedException();
+        var savedPos = _positions[index];
+        var blockIdPtr = memoryService.FollowPointers(GetPlayerIns(), WorldChrMan.CurrentBlockId, false);
+        var currentBlockId = memoryService.Read<uint>(blockIdPtr);
+
+        if (currentBlockId != savedPos.BlockId)
+        {
+            var bonfireId = _bonfiresByBlockId[savedPos.BlockId];
+            _ = Task.Run(() => travelService.WarpWithCoords(savedPos.Coords, savedPos.Angle, bonfireId));
+        }
+        else
+        {
+            var physicsModule = memoryService.FollowPointers(GetPlayerIns(), ChrIns.PhysicsModule, true);
+            memoryService.Write(physicsModule + ChrIns.Coords, savedPos.Coords);
+            memoryService.Write(physicsModule + ChrIns.Angle, savedPos.Angle);
+        }
     }
 
     public int GetNewGame() =>

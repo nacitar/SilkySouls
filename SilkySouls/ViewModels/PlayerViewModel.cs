@@ -14,7 +14,6 @@ namespace SilkySouls.ViewModels
 {
     public class PlayerViewModel : BaseViewModel
     {
-        private readonly PlayerServiceOld _playerServiceOld;
         private readonly IPlayerService _playerService;
         private readonly HotkeyManager _hotkeyManager;
         private readonly IGameTickService _gameTickService;
@@ -31,10 +30,9 @@ namespace SilkySouls.ViewModels
         private bool _wasNoDeathEnabled;
         private int _currentSoulLevel;
 
-        public PlayerViewModel(PlayerServiceOld playerServiceOld, IPlayerService playerService,
+        public PlayerViewModel(IPlayerService playerService,
             HotkeyManager hotkeyManager, IStateService stateService, IGameTickService gameTickService)
         {
-            _playerServiceOld = playerServiceOld;
             _playerService = playerService;
             _hotkeyManager = hotkeyManager;
             _gameTickService = gameTickService;
@@ -576,7 +574,7 @@ namespace SilkySouls.ViewModels
                 state.Sp = _playerService.GetSp();
             }
 
-            _playerServiceOld.SavePos(index);
+            _playerService.SavePosition(index);
         }
 
         private void RestorePos(int index)
@@ -585,7 +583,7 @@ namespace SilkySouls.ViewModels
             _wasNoDeathEnabled = IsNoDeathEnabled;
             IsNoDamageEnabled = true;
             _isNoDeathEnabled = true;
-            _playerServiceOld.RestorePos(index);
+            _playerService.RestorePositon(index);
             IsNoDamageEnabled = _wasNoDamageEnabled;
             IsNoDeathEnabled = _wasNoDeathEnabled;
             if (!IsStateIncluded) return;
