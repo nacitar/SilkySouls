@@ -54,7 +54,7 @@ public class TargetService(IMemoryService memoryService, HookManager hookManager
         memoryService.Write(GetChrIns() + ChrIns.Health, value);
 
     public Vector3 GetPosition() =>
-        memoryService.Read<Vector3>(GetChrIns() + ChrIns.Coords);
+        memoryService.Read<Vector3>(GetChrIns() + ChrIns.ReadOnlyCoords);
 
     public bool IsAiDisabled() =>
         memoryService.IsBitSet(GetChrIns() + ChrIns.NoUpdate.Offset, ChrIns.NoUpdate.Bit);

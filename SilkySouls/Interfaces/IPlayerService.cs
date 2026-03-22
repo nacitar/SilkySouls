@@ -15,7 +15,17 @@ public interface IPlayerService
     int GetSp();
     void SetSp(int sp);
     Vector3 GetPosition();
-
+    int GetNewGame();
+    void SetNewGame(int newGame);
+    float GetSpeed();
+    void SetSpeed(float speed);
+    void ToggleChrDebugFlag(int offset, bool isEnabled);
+    void ToggleNoDamage(bool isEnabled);
+    void ToggleInfiniteStamina(bool isEnabled);
+    void ToggleNoGoodsConsume(bool isEnabled);
+    void ToggleInfinitePoise(bool isEnabled);
+    void ToggleInfiniteDurability(bool isEnabled);
+    void ToggleNoRoll(bool isEnabled);
 
 
     void RestoreSpellCasts();

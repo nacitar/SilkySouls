@@ -33,9 +33,6 @@
                                          Value="{Binding CurrentHp}"
                                          TextAlignment="Center"
                                          Width="100"
-                                         PreviewKeyDown="HealthUpDown_PreviewKeyDown"
-                                         LostFocus="HealthUpDown_LostFocus"
-                                         Loaded="HealthUpDown_Loaded"
                                          IsEnabled="{Binding AreOptionsEnabled}"
                                          BorderBrush="#3F3F46"/>
                     <TextBlock Text="{Binding CurrentMaxHp, StringFormat=Max: {0}}" 
@@ -229,9 +226,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Vitality"/>
@@ -250,9 +244,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Attunement"/>
@@ -271,9 +262,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Endurance"/>
@@ -292,9 +280,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Strength"/>
@@ -313,9 +298,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Dexterity"/>
@@ -335,9 +317,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Resistance"/>
@@ -356,9 +335,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Intelligence"/>
@@ -377,9 +353,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Faith"/>
@@ -398,9 +371,6 @@
                                              Minimum="1"
                                              Maximum="99"
                                              Grid.Column="0"
-                                             PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                             LostFocus="Stat_LostFocus"
-                                             Loaded="StatUpDowns_Loaded"
                                              IsEnabled="{Binding AreOptionsEnabled}"
                                              BorderBrush="#3F3F46"
                                              Tag="Humanity"/>
@@ -425,10 +395,6 @@
                                             Maximum="999999999"
                                             Grid.Column="0"
                                             Grid.Row="0"
-                                            PreviewKeyDown="StatUpDown_PreviewKeyDown"
-                                            LostFocus="Stat_LostFocus"
-                                            Loaded="StatUpDowns_Loaded"
-                                            GotFocus="PauseUpdates_GotFocus"
                                             Tag="Souls"
                                             IsEnabled="{Binding AreOptionsEnabled}"
                                             BorderBrush="#3F3F46" />

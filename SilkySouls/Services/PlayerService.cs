@@ -33,7 +33,67 @@ public class PlayerService(IMemoryService memoryService) : IPlayerService
 
     public void SetSp(int sp) => memoryService.Write(GetPlayerIns() + ChrIns.Stamina, sp);
 
-    public Vector3 GetPosition() => memoryService.Read<Vector3>(GetPlayerIns() + ChrIns.Coords);
+    public Vector3 GetPosition() => memoryService.Read<Vector3>(GetPlayerIns() + ChrIns.ReadOnlyCoords);
+
+    public int GetNewGame() =>
+        memoryService.Read<int>(memoryService.Read<nint>(GameDataMan.Base) + (int)GameDataMan.GameDataOffsets.Ng);
+
+    public void SetNewGame(int value) =>
+        memoryService.Write(memoryService.Read<nint>(GameDataMan.Base) + (int)GameDataMan.GameDataOffsets.Ng, value);
+
+    public float GetSpeed()
+    {
+        var targetSpeedPtr = memoryService.FollowPointers(GetPlayerIns(), ChrIns.AnimSpeed, false);
+        return memoryService.Read<float>(targetSpeedPtr);
+    }
+
+    public void SetSpeed(float speed)
+    {
+        var targetSpeedPtr = memoryService.FollowPointers(GetPlayerIns(), ChrIns.AnimSpeed, false);
+
+        memoryService.Write(targetSpeedPtr, speed);
+    }
+
+    public void ToggleChrDebugFlag(int offset, bool isEnabled) =>
+        memoryService.Write(DebugFlags.Base + offset, isEnabled);
+
+    public void ToggleNoDamage(bool isEnabled) =>
+        memoryService.SetBitValue(GetPlayerIns() + ChrIns.NoDamage.Offset, ChrIns.NoDamage.Bit, isEnabled);
+
+    public void ToggleInfiniteStamina(bool isEnabled) =>
+        memoryService.SetBitValue(GetPlayerIns() + ChrIns.InfiniteStam.Offset, ChrIns.InfiniteStam.Bit, isEnabled);
+
+    public void ToggleNoGoodsConsume(bool isEnabled) =>
+        memoryService.SetBitValue(GetPlayerIns() + ChrIns.NoGoodsConsume.Offset, ChrIns.NoGoodsConsume.Bit, isEnabled);
+
+    public void ToggleInfinitePoise(bool isEnabled) =>
+        memoryService.SetBitValue(GetPlayerIns() + ChrIns.InfinitePoise.Offset, ChrIns.InfinitePoise.Bit, isEnabled);
+
+    public void ToggleInfiniteDurability(bool isEnabled)
+    {
+        if (isEnabled) memoryService.Write(Patches.InfiniteDurabilityPatch + 0x1, (byte)0x89);
+        else memoryService.Write(Patches.InfiniteDurabilityPatch + 0x1, (byte)0x88);
+    }
+
+    public void ToggleNoRoll(bool isEnabled)
+    {
+        var noRollPatchPtr = Patches.NoRollPatch;
+        var noBackstepPatchPtr = noRollPatchPtr + 0xFF;
+        if (isEnabled)
+        {
+            memoryService.Write(noRollPatchPtr + 0x6, (byte)0);
+            memoryService.Write(noRollPatchPtr + 0xD, (byte)0);
+            memoryService.Write(noBackstepPatchPtr + 0x6, (byte)0);
+            memoryService.Write(noBackstepPatchPtr + 0xD, (byte)0);
+        }
+        else
+        {
+            memoryService.Write(noRollPatchPtr + 0x6, (byte)1);
+            memoryService.Write(noRollPatchPtr + 0xD, (byte)1);
+            memoryService.Write(noBackstepPatchPtr + 0x6, (byte)1);
+            memoryService.Write(noBackstepPatchPtr + 0xD, (byte)1);
+        }
+    }
 
     public void RestoreSpellCasts()
     {

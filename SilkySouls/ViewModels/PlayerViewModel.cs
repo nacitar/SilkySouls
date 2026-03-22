@@ -161,7 +161,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoDeathEnabled, value))
                 {
-                    _playerServiceOld.ToggleNoDeath(_isNoDeathEnabled ? 1 : 0);
+                    _playerService.ToggleChrDebugFlag(DebugFlags.NoDeath, _isNoDeathEnabled);
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoDamageEnabled, value))
                 {
-                    _playerServiceOld.ToggleNoDamage(_isNoDamageEnabled);
+                    _playerService.ToggleNoDamage(_isNoDamageEnabled);
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfiniteStaminaEnabled, value))
                 {
-                    _playerServiceOld.ToggleInfiniteStamina(_isInfiniteStaminaEnabled);
+                    _playerService.ToggleInfiniteStamina(_isInfiniteStaminaEnabled);
                 }
             }
         }
@@ -203,7 +203,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoGoodsConsumeEnabled, value))
                 {
-                    _playerServiceOld.ToggleNoGoodsConsume(_isNoGoodsConsumeEnabled);
+                    _playerService.ToggleNoGoodsConsume(_isNoGoodsConsumeEnabled);
                 }
             }
         }
@@ -217,7 +217,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfiniteCastsEnabled, value))
                 {
-                    _playerServiceOld.ToggleInfiniteCasts(_isInfiniteCastsEnabled ? 1 : 0);
+                    _playerService.ToggleChrDebugFlag(DebugFlags.InfiniteCasts, _isInfiniteCastsEnabled);
                 }
             }
         }
@@ -231,7 +231,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfiniteDurabilityEnabled, value))
                 {
-                    _playerServiceOld.ToggleInfiniteDurability(_isInfiniteDurabilityEnabled);
+                    _playerService.ToggleInfiniteDurability(_isInfiniteDurabilityEnabled);
                 }
             }
         }
@@ -245,7 +245,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isOneShotEnabled, value))
                 {
-                    _playerServiceOld.ToggleOneShot(_isOneShotEnabled ? 1 : 0);
+                    _playerService.ToggleChrDebugFlag(DebugFlags.OneShot, _isOneShotEnabled);
                 }
             }
         }
@@ -259,7 +259,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInvisibleEnabled, value))
                 {
-                    _playerServiceOld.ToggleInvisible(_isInvisibleEnabled ? 1 : 0);
+                    _playerService.ToggleChrDebugFlag(DebugFlags.Invisible, _isInvisibleEnabled);
                 }
             }
         }
@@ -273,7 +273,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isSilentEnabled, value))
                 {
-                    _playerServiceOld.ToggleSilent(_isSilentEnabled ? 1 : 0);
+                    _playerService.ToggleChrDebugFlag(DebugFlags.Silent, _isSilentEnabled);
                 }
             }
         }
@@ -287,7 +287,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isNoAmmoConsumeEnabled, value))
                 {
-                    _playerServiceOld.ToggleNoAmmoConsume(_isNoAmmoConsumeEnabled ? 1 : 0);
+                    _playerService.ToggleChrDebugFlag(DebugFlags.NoAmmoConsume, _isNoAmmoConsumeEnabled);
                 }
             }
         }
@@ -301,7 +301,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isInfinitePoiseEnabled, value))
                 {
-                    _playerServiceOld.ToggleInfinitePoise(_isInfinitePoiseEnabled);
+                    _playerService.ToggleInfinitePoise(_isInfinitePoiseEnabled);
                 }
             }
         }
@@ -322,7 +322,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isNoRollEnabled, value)) return;
-                _playerServiceOld.ToggleNoRoll(_isNoRollEnabled);
+                _playerService.ToggleNoRoll(_isNoRollEnabled);
             }
         }
 
@@ -423,7 +423,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _newGame, value))
                 {
-                    _playerServiceOld.SetNewGame(value);
+                    _playerService.SetNewGame(value);
                 }
             }
         }
@@ -437,7 +437,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _playerSpeed, value))
                 {
-                    _playerServiceOld.SetPlayerSpeed(value);
+                    _playerService.SetSpeed(value);
                 }
             }
         }
@@ -476,8 +476,8 @@ namespace SilkySouls.ViewModels
         public void TrySetNgPref()
         {
             if (IsAutoSetNewGameSixEnabled)
-                _playerServiceOld.SetNewGame(7);
-            NewGame = _playerServiceOld.GetNewGame();
+                _playerService.SetNewGame(7);
+            NewGame = _playerService.GetNewGame();
         }
 
         #endregion
@@ -492,30 +492,18 @@ namespace SilkySouls.ViewModels
 
         private void OnLoaded()
         {
-            if (IsNoDeathEnabled)
-                _playerServiceOld.ToggleNoDeath(1);
-            if (IsNoDamageEnabled)
-                _playerServiceOld.ToggleNoDamage(true);
-            if (IsInfiniteStaminaEnabled)
-                _playerServiceOld.ToggleInfiniteStamina(true);
-            if (IsNoGoodsConsumeEnabled)
-                _playerServiceOld.ToggleNoGoodsConsume(true);
-            if (IsInfiniteCastsEnabled)
-                _playerServiceOld.ToggleInfiniteCasts(1);
-            if (IsOneShotEnabled)
-                _playerServiceOld.ToggleOneShot(1);
-            if (IsInvisibleEnabled)
-                _playerServiceOld.ToggleInvisible(1);
-            if (IsSilentEnabled)
-                _playerServiceOld.ToggleSilent(1);
-            if (IsNoAmmoConsumeEnabled)
-                _playerServiceOld.ToggleNoAmmoConsume(1);
-            if (IsInfinitePoiseEnabled)
-                _playerServiceOld.ToggleInfinitePoise(true);
-            if (IsInfiniteDurabilityEnabled)
-                _playerServiceOld.ToggleInfiniteDurability(true);
-            if (IsNoRollEnabled)
-                _playerServiceOld.ToggleNoRoll(true);
+            if (IsNoDeathEnabled) _playerService.ToggleChrDebugFlag(DebugFlags.NoDeath, true);
+            if (IsNoDamageEnabled) _playerService.ToggleNoDamage(true);
+            if (IsInfiniteStaminaEnabled) _playerService.ToggleInfiniteStamina(true);
+            if (IsNoGoodsConsumeEnabled) _playerService.ToggleNoGoodsConsume(true);
+            if (IsInfiniteCastsEnabled) _playerService.ToggleChrDebugFlag(DebugFlags.InfiniteCasts, true);
+            if (IsOneShotEnabled) _playerService.ToggleChrDebugFlag(DebugFlags.OneShot, true);
+            if (IsInvisibleEnabled) _playerService.ToggleChrDebugFlag(DebugFlags.Invisible, true);
+            if (IsSilentEnabled) _playerService.ToggleChrDebugFlag(DebugFlags.Silent, true);
+            if (IsNoAmmoConsumeEnabled) _playerService.ToggleChrDebugFlag(DebugFlags.NoAmmoConsume, true);
+            if (IsInfinitePoiseEnabled) _playerService.ToggleInfinitePoise(true);
+            if (IsInfiniteDurabilityEnabled) _playerService.ToggleInfiniteDurability(true);
+            if (IsNoRollEnabled) _playerService.ToggleNoRoll(true);
             AreOptionsEnabled = true;
             LoadStats();
             _gameTickService.Subscribe(PlayerTick);
@@ -547,7 +535,7 @@ namespace SilkySouls.ViewModels
             CurrentHp = _playerService.GetHp();
             CurrentMaxHp = _playerService.GetMaxHp();
             Souls = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Souls);
-            PlayerSpeed = _playerServiceOld.GetPlayerSpeed();
+            PlayerSpeed = _playerService.GetSpeed();
             var pos = _playerService.GetPosition();
             PosX = pos.X;
             PosY = pos.Z;
@@ -573,8 +561,8 @@ namespace SilkySouls.ViewModels
             Faith = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Faith);
             Humanity = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Humanity);
             Souls = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.Souls);
-            NewGame = _playerServiceOld.GetNewGame();
-            PlayerSpeed = _playerServiceOld.GetPlayerSpeed();
+            NewGame = _playerService.GetNewGame();
+            PlayerSpeed = _playerService.GetSpeed();
             SoulLevel = _playerService.GetPlayerStat(GameDataMan.PlayerGameData.SoulLevel);
         }
 
