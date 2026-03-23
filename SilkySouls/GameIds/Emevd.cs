@@ -46,6 +46,6 @@ public static class Emevd
 
     public static class EmevdCommands
     {
-        public static readonly EmevdCommand ForceCharacterDeath = new(2004, 4, 10000, false);
+        
     }
 }

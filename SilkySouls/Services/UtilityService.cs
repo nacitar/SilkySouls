@@ -74,22 +74,22 @@ namespace SilkySouls.Services
 
         internal void EnableSoundView()
         {
-            memoryService.Write(Patches.DrawSoundViewPatch, (byte)1);
+            memoryService.Write(Patches.DrawSoundView, (byte)1);
         }
 
         internal void DisableSoundView()
         {
-            memoryService.Write(Patches.DrawSoundViewPatch, (byte)0);
+            memoryService.Write(Patches.DrawSoundView, (byte)0);
         }
 
         public void EnableDrawEvent()
         {
-            memoryService.Write(Patches.DrawEventPatch, (byte)1);
+            memoryService.Write(Patches.DrawEvent, (byte)1);
         }
 
         public void DisableDrawEvent()
         {
-            memoryService.Write(Patches.DrawEventPatch, (byte)0);
+            memoryService.Write(Patches.DrawEvent, (byte)0);
         }
         
         public void EnableNoClip()

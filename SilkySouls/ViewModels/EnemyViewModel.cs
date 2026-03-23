@@ -1,7 +1,4 @@
-using System.Windows.Input;
-using SilkySouls.Core;
 using SilkySouls.Enums;
-using SilkySouls.GameIds;
 using SilkySouls.Interfaces;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
@@ -23,15 +20,12 @@ namespace SilkySouls.ViewModels
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
-
-            TestCommand = new DelegateCommand(Test);
-
+            
             RegisterHotkeys();
         }
 
         #region Commands
-
-        public ICommand TestCommand { get; }
+        
 
         #endregion
 
@@ -104,11 +98,7 @@ namespace SilkySouls.ViewModels
         #endregion
 
         #region Private Methods
-
-        private void Test()
-        {
-            _emevdService.ExecuteEmevdCommand(Emevd.EmevdCommands.ForceCharacterDeath);
-        }
+        
 
         private void RegisterHotkeys()
         {

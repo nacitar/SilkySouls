@@ -320,12 +320,13 @@ namespace SilkySouls.memory
 
         public static class Patches
         {
-            public static nint DrawEventPatch;
-            public static nint DrawSoundViewPatch;
-            public static nint InfiniteDurabilityPatch;
-            public static nint FourKingsPatch;
-            public static nint NoRollPatch;
-            public static nint QuitoutPatch;
+            public static nint DrawEvent;
+            public static nint DrawSoundView;
+            public static nint InfiniteDurability;
+            public static nint FourKings;
+            public static nint NoRoll;
+            public static nint NoBackStep;
+            public static nint Quitout;
         }
 
         public static class Functions
@@ -646,7 +647,7 @@ namespace SilkySouls.memory
                 _ => 0
             };
             
-            Patches.DrawEventPatch = moduleBase + Version switch
+            Patches.DrawEvent = moduleBase + Version switch
             {
                 // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
                 Version1_0_3_0 => 0x49B6B7,
@@ -654,7 +655,7 @@ namespace SilkySouls.memory
                 _ => 0
             };
 
-            Patches.DrawSoundViewPatch = moduleBase + Version switch
+            Patches.DrawSoundView = moduleBase + Version switch
             {
                 // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
                 Version1_0_3_0 => 0x622286,
@@ -662,7 +663,7 @@ namespace SilkySouls.memory
                 _ => 0
             };
             
-            Patches.InfiniteDurabilityPatch = moduleBase + Version switch
+            Patches.InfiniteDurability = moduleBase + Version switch
             {
                 Version1_0_1_0 => 0x73F1B0,
                 Version1_0_1_1 => 0x73EFE0,
@@ -672,7 +673,7 @@ namespace SilkySouls.memory
                 _ => 0
             };
 
-            Patches.FourKingsPatch = moduleBase + Version switch
+            Patches.FourKings = moduleBase + Version switch
             {
                 Version1_0_1_0 => 0x34198E,
                 Version1_0_1_1 => 0x34168E,
@@ -682,7 +683,7 @@ namespace SilkySouls.memory
                 _ => 0
             };
 
-            Patches.NoRollPatch = moduleBase + Version switch
+            Patches.NoRoll = moduleBase + Version switch
             {
                 Version1_0_1_0 => 0x39011F,
                 Version1_0_1_1 => 0x38FE1F,
@@ -691,8 +692,18 @@ namespace SilkySouls.memory
                 Version1_0_3_1 => 0x398E4F,
                 _ => 0
             };
-
-            Patches.QuitoutPatch = moduleBase + Version switch
+            
+            Patches.NoBackStep = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x39021E,
+                Version1_0_1_1 => 0x38FF1E,
+                Version1_0_1_2 => 0x39344E,
+                Version1_0_3_0 => 0x39994E,
+                Version1_0_3_1 => 0x398F4E,
+                _ => 0
+            };
+            
+            Patches.Quitout = moduleBase + Version switch
             {
                 Version1_0_1_0 => 0x7F35B5,
                 Version1_0_1_1 => 0x7F3435,
@@ -872,12 +883,13 @@ namespace SilkySouls.memory
             PrintOffset("Emevd", Hooks.Emevd);
 
             Console.WriteLine("\n--- Patches ---");
-            PrintOffset("DrawEventPatch", Patches.DrawEventPatch);
-            PrintOffset("DrawSoundViewPatch", Patches.DrawSoundViewPatch);
-            PrintOffset("InfiniteDurabilityPatch", Patches.InfiniteDurabilityPatch);
-            PrintOffset("FourKingsPatch", Patches.FourKingsPatch);
-            PrintOffset("NoRollPatch", Patches.NoRollPatch);
-            PrintOffset("QuitoutPatch", Patches.QuitoutPatch);
+            PrintOffset("DrawEvent", Patches.DrawEvent);
+            PrintOffset("DrawSoundView", Patches.DrawSoundView);
+            PrintOffset("InfiniteDurability", Patches.InfiniteDurability);
+            PrintOffset("FourKings", Patches.FourKings);
+            PrintOffset("NoRoll", Patches.NoRoll);
+            PrintOffset("NoBackStep", Patches.NoBackStep);
+            PrintOffset("Quitout", Patches.Quitout);
 
             Console.WriteLine("\n--- Functions ---");
             PrintOffset("SetEvent", Functions.SetEvent);

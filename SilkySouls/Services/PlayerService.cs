@@ -112,27 +112,27 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
 
     public void ToggleInfiniteDurability(bool isEnabled)
     {
-        if (isEnabled) memoryService.Write(Patches.InfiniteDurabilityPatch + 0x1, (byte)0x89);
-        else memoryService.Write(Patches.InfiniteDurabilityPatch + 0x1, (byte)0x88);
+        if (isEnabled) memoryService.Write(Patches.InfiniteDurability + 0x1, (byte)0x89);
+        else memoryService.Write(Patches.InfiniteDurability + 0x1, (byte)0x88);
     }
 
     public void ToggleNoRoll(bool isEnabled)
     {
-        var noRollPatchPtr = Patches.NoRollPatch;
-        var noBackstepPatchPtr = noRollPatchPtr + 0xFF;
+        var noRollPatchPtr = Patches.NoRoll;
+        var noBackStepPatchPtr = Patches.NoBackStep;
         if (isEnabled)
         {
             memoryService.Write(noRollPatchPtr + 0x6, (byte)0);
             memoryService.Write(noRollPatchPtr + 0xD, (byte)0);
-            memoryService.Write(noBackstepPatchPtr + 0x6, (byte)0);
-            memoryService.Write(noBackstepPatchPtr + 0xD, (byte)0);
+            memoryService.Write(noBackStepPatchPtr + 0x6, (byte)0);
+            memoryService.Write(noBackStepPatchPtr + 0xD, (byte)0);
         }
         else
         {
             memoryService.Write(noRollPatchPtr + 0x6, (byte)1);
             memoryService.Write(noRollPatchPtr + 0xD, (byte)1);
-            memoryService.Write(noBackstepPatchPtr + 0x6, (byte)1);
-            memoryService.Write(noBackstepPatchPtr + 0xD, (byte)1);
+            memoryService.Write(noBackStepPatchPtr + 0x6, (byte)1);
+            memoryService.Write(noBackStepPatchPtr + 0xD, (byte)1);
         }
     }
 

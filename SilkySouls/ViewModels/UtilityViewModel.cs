@@ -3,7 +3,6 @@ using System.Windows.Input;
 using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.Memory;
 using SilkySouls.Services;
 using SilkySouls.Utilities;
 using static SilkySouls.GameIds.EzState;

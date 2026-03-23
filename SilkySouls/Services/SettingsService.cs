@@ -17,7 +17,7 @@ namespace SilkySouls.Services
 
         public void ToggleFastQuitout(int value)
         {
-            memoryService.Write(Offsets.Patches.QuitoutPatch, (byte)value);
+            memoryService.Write(Offsets.Patches.Quitout, (byte)value);
         }
         
     }

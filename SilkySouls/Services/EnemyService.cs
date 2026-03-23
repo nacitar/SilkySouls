@@ -47,7 +47,7 @@ namespace SilkySouls.Services
 
         public void Toggle4KingsTimer(bool is4KingsTimerStopped)
         {
-            var patchLocation = Offsets.Patches.FourKingsPatch;
+            var patchLocation = Offsets.Patches.FourKings;
             if (is4KingsTimerStopped) memoryService.WriteBytes(patchLocation, new byte[] {0x90, 0x90, 0x90, 0x90, 0x90});
             else memoryService.WriteBytes(patchLocation, new byte[]{ 0xF3, 0x0F, 0x11, 0x47, 0x10 });
         }

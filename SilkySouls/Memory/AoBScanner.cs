@@ -84,16 +84,16 @@ namespace SilkySouls.Memory
 
 // Patches
             TryPatternWithFallback("FourKingsPatch", Patterns.FourKingsPatch,
-                addr => Patches.FourKingsPatch = addr, saved);
-            TryPatternWithFallback("NoRollPatch", Patterns.NoRollPatch, addr => Patches.NoRollPatch = addr,
+                addr => Patches.FourKings = addr, saved);
+            TryPatternWithFallback("NoRollPatch", Patterns.NoRollPatch, addr => Patches.NoRoll = addr,
                 saved);
             TryPatternWithFallback("InfiniteDurabilityPatch", Patterns.InfiniteDurabilityPatch,
-                addr => Patches.InfiniteDurabilityPatch = addr, saved);
+                addr => Patches.InfiniteDurability = addr, saved);
             TryPatternWithFallback("DrawEventPatch", Patterns.DrawEventPatch,
-                addr => Patches.DrawEventPatch = addr, saved);
+                addr => Patches.DrawEvent = addr, saved);
             TryPatternWithFallback("DrawSoundViewPatch", Patterns.DrawSoundViewPatch,
-                addr => Patches.DrawSoundViewPatch = addr, saved);
-            TryPatternWithFallback("QuitoutPatch", Patterns.QuitoutPatch, addr => Patches.QuitoutPatch = addr,
+                addr => Patches.DrawSoundView = addr, saved);
+            TryPatternWithFallback("QuitoutPatch", Patterns.QuitoutPatch, addr => Patches.Quitout = addr,
                 saved);
             
             using (var writer = new StreamWriter(savePath))
@@ -119,8 +119,8 @@ namespace SilkySouls.Memory
             Console.WriteLine($"FieldArea.Base: 0x{FieldArea.Base:X}");
             Console.WriteLine($"GameMan.Base: 0x{GameMan.Base:X}");
             Console.WriteLine($"DamageMan.Base: 0x{DamageManager.Base:X}");
-            Console.WriteLine($"DrawEventPatch: 0x{Patches.DrawEventPatch:X}");
-            Console.WriteLine($"DrawSoundViewPatch: 0x{Patches.DrawSoundViewPatch:X}");
+            Console.WriteLine($"DrawEventPatch: 0x{Patches.DrawEvent:X}");
+            Console.WriteLine($"DrawSoundViewPatch: 0x{Patches.DrawSoundView:X}");
             Console.WriteLine($"MenuMan.Base: 0x{MenuMan.Base:X}");
             Console.WriteLine($"EventFlagMan.Base: 0x{EventFlagMan.Base:X}");
             Console.WriteLine($"LevelUpFunc: 0x{Functions.LevelUpFunc:X}");
@@ -128,7 +128,7 @@ namespace SilkySouls.Memory
             Console.WriteLine($"HgDraw.Base: 0x{HgDraw.Base:X}");
             Console.WriteLine($"EventMan: 0x{(long)EventMan.Base:X}");
             Console.WriteLine($"Warp: 0x{(long)Functions.Warp:X}");
-            Console.WriteLine($"FastQuitout: 0x{Patches.QuitoutPatch:X}");
+            Console.WriteLine($"FastQuitout: 0x{Patches.Quitout:X}");
             Console.WriteLine($"WorldAiMan: 0x{WorldAiMan.Base:X}");
             Console.WriteLine($"EmkEventIns: 0x{EmkEventIns.Base:X}");
             Console.WriteLine($"DebugEventMan: 0x{DebugEventMan.Base:X}");
@@ -146,7 +146,7 @@ namespace SilkySouls.Memory
             Console.WriteLine($"Hooks.LuaIfElse: 0x{(long)Hooks.LuaLowerOrEqual:X}");
             Console.WriteLine($"Hooks.Emevd: 0x{Hooks.Emevd:X}");
             Console.WriteLine($"Hooks.Draw: 0x{Hooks.Draw:X}");
-            Console.WriteLine($"Patches.InfiniteDurabilityPatch: 0x{Patches.InfiniteDurabilityPatch:X}");
+            Console.WriteLine($"Patches.InfiniteDurabilityPatch: 0x{Patches.InfiniteDurability:X}");
             
             Console.WriteLine($"Funcs.SetEvent: 0x{Functions.SetEvent:X}");
             Console.WriteLine($"Funcs.ProcessEmevdCommand: 0x{Functions.ExecuteEmevdCommand:X}");
