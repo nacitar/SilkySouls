@@ -51,8 +51,10 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
         var playerIns = GetPlayerIns();
         var blockIdPtr = memoryService.FollowPointers(playerIns, WorldChrMan.CurrentBlockId, false);
         var physicsModule = memoryService.FollowPointers(playerIns, ChrIns.PhysicsModule, true);
+        var havokCoords = memoryService.FollowPointers(physicsModule, ChrIns.HavokCoords, false);
         
         posToSave.BlockId = memoryService.Read<uint>(blockIdPtr);
+        posToSave.Coords = memoryService.Read<Vector3>(havokCoords);
         posToSave.Coords = memoryService.Read<Vector3>(physicsModule + ChrIns.Coords);
         posToSave.Angle = memoryService.Read<float>(physicsModule + ChrIns.Angle);
     }
@@ -71,6 +73,8 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
         else
         {
             var physicsModule = memoryService.FollowPointers(GetPlayerIns(), ChrIns.PhysicsModule, true);
+            var havokCoords = memoryService.FollowPointers(physicsModule, ChrIns.HavokCoords, false);
+            memoryService.Write(havokCoords, savedPos.Coords);
             memoryService.Write(physicsModule + ChrIns.Coords, savedPos.Coords);
             memoryService.Write(physicsModule + ChrIns.Angle, savedPos.Angle);
         }

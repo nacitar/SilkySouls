@@ -14,6 +14,7 @@ public enum AsmScript
     
     
     AllNoDamage,
+    DisableFourKingsGenerator,
     
     LockedTarget,
     RepeatActIdCheck,

@@ -1,17 +1,24 @@
+using System.Windows.Input;
+using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.Services;
+using SilkySouls.memory;
 using SilkySouls.Utilities;
+using static SilkySouls.GameIds.Emevd;
 
 namespace SilkySouls.ViewModels
 {
     public class EnemyViewModel : BaseViewModel
     {
-        private readonly EnemyService _enemyService;
+        private readonly IEnemyService _enemyService;
         private readonly HotkeyManager _hotkeyManager;
         private readonly IEmevdService _emevdService;
 
-        public EnemyViewModel(EnemyService enemyService, HotkeyManager hotkeyManager, IStateService stateService,
+        public const int FourKingsHitEventEntityId = 1603300;
+        public const int FourKingsGeneratorId = 1603000;
+
+        public EnemyViewModel(IEnemyService enemyService, HotkeyManager hotkeyManager,
+            IStateService stateService,
             IEmevdService emevdService)
         {
             _enemyService = enemyService;
@@ -19,14 +26,24 @@ namespace SilkySouls.ViewModels
             _emevdService = emevdService;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
+            stateService.Subscribe(State.FadedIn, OnFadedIn);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
             
             RegisterHotkeys();
+            
+            TestCommand = new DelegateCommand(Test);
         }
 
+        
         #region Commands
         
+        private void Test()
+        {
+         
+        }
 
+        public ICommand  TestCommand { get; set; }
+        
         #endregion
 
         #region Properties
@@ -48,7 +65,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isDisableAiEnabled, value))
                 {
-                    _enemyService.ToggleAi(_isDisableAiEnabled ? 1 : 0);
+                    _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.DisableAi, _isDisableAiEnabled);
                 }
             }
         }
@@ -62,7 +79,8 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isAllNoDamageEnabled, value))
                 {
-                    _enemyService.ToggleAllNoDamage(_isAllNoDamageEnabled ? 1 : 0);
+                    if (!AreOptionsEnabled) return;
+                    _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.AllNoDamage, _isAllNoDamageEnabled);
                 }
             }
         }
@@ -76,7 +94,7 @@ namespace SilkySouls.ViewModels
             {
                 if (SetProperty(ref _isAllNoDeathEnabled, value))
                 {
-                    _enemyService.ToggleAllNoDeath(_isAllNoDeathEnabled ? 1 : 0);
+                    _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.AllNoDeath, _isAllNoDeathEnabled);
                 }
             }
         }
@@ -88,13 +106,12 @@ namespace SilkySouls.ViewModels
             get => _is4KingsTimerStopped;
             set
             {
-                if (SetProperty(ref _is4KingsTimerStopped, value))
-                {
-                    _enemyService.Toggle4KingsTimer(_is4KingsTimerStopped);
-                }
+                if (!SetProperty(ref _is4KingsTimerStopped, value)) return;
+                _enemyService.DisableFourKingsGenerator(_is4KingsTimerStopped);
+                SetGeneratorStateIfInArena(_is4KingsTimerStopped);
             }
         }
-
+        
         #endregion
 
         #region Private Methods
@@ -110,19 +127,28 @@ namespace SilkySouls.ViewModels
         private void OnNotLoaded()
         {
             AreOptionsEnabled = false;
+            _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.AllNoDamage, false);
+        }
+        
+        private void OnFadedIn()
+        {
+            if (IsAllNoDamageEnabled) _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.AllNoDamage, true);
         }
 
         private void OnLoaded()
         {
-            if (IsDisableAiEnabled)
-                _enemyService.ToggleAi(1);
-            if (IsAllNoDamageEnabled)
-                _enemyService.ToggleAllNoDamage(1);
-            if (IsAllNoDeathEnabled)
-                _enemyService.ToggleAllNoDeath(1);
-            if (Is4KingsTimerStopped)
-                _enemyService.Toggle4KingsTimer(true);
             AreOptionsEnabled = true;
+            if (IsDisableAiEnabled) _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.DisableAi, true);
+            if (IsAllNoDeathEnabled) _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.AllNoDeath, true);
+            if (Is4KingsTimerStopped) _enemyService.DisableFourKingsGenerator(true);
+        }
+        
+        private void SetGeneratorStateIfInArena(bool is4KingsTimerStopped)
+        {
+            if (!AreOptionsEnabled) return;
+            var isPlayerOnHit = _emevdService.ExecuteEmevdCommand(EmevdCommands.IsPlayerStandingOnHit(FourKingsHitEventEntityId));
+            if (!isPlayerOnHit.HasValue || !isPlayerOnHit.Value) return;
+            _emevdService.ExecuteEmevdCommand(EmevdCommands.SetGeneratorState(FourKingsGeneratorId, !is4KingsTimerStopped));
         }
 
         #endregion

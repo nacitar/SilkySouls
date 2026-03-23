@@ -145,6 +145,7 @@
     <Compile Include="Models\WarpLocation.cs" />
     <Compile Include="Models\UpgradeType.cs" />
     <Compile Include="Services\EmevdService.cs" />
+    <Compile Include="Services\EnemyService.cs" />
     <Compile Include="Services\EventService.cs" />
     <Compile Include="Services\EzStateService.cs" />
     <Compile Include="Services\GameTickService.cs" />
@@ -152,7 +153,6 @@
     <Compile Include="Services\MemoryService.cs" />
     <Compile Include="Services\ParamService.cs" />
     <Compile Include="Services\PlayerService.cs" />
-    <Compile Include="Services\EnemyService.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\StateService.cs" />
     <Compile Include="Services\TargetService.cs" />

@@ -11,11 +11,14 @@ namespace SilkySouls.Services;
 
 public class EmevdService(IMemoryService memoryService) : IEmevdService
 {
-    public void ExecuteEmevdCommand(EmevdCommand command)
+    public bool? ExecuteEmevdCommand(EmevdCommand command)
     {
         
         var args = CodeCaveOffsets.Base + CodeCaveOffsets.EmevdArgs;
         memoryService.WriteBytes(args, command.ParamData);
+        
+        var result = CodeCaveOffsets.Base + CodeCaveOffsets.EmevdResult;
+        memoryService.Write<byte>(result, 0xFF);
         
         var bytes = AsmLoader.GetAsmBytes(AsmScript.ExecuteEmevd);
         AsmHelper.WriteAbsoluteAddresses(bytes, [
@@ -23,7 +26,8 @@ public class EmevdService(IMemoryService memoryService) : IEmevdService
             (Functions.EmkEventInsCtor, 0x53 + 2),
             (args, 0x81 + 2),
             (EmkSystem.Base, 0x95 + 2),
-            (Functions.ExecuteEmevdCommand, 0xAC + 2)
+            (Functions.ExecuteEmevdCommand, 0xAC + 2),
+            (result, 0xD6 + 2)
         ]);
         
         AsmHelper.WriteImmediateDwords(bytes, [
@@ -33,5 +37,8 @@ public class EmevdService(IMemoryService memoryService) : IEmevdService
         memoryService.AllocateAndExecute(bytes);
         
         memoryService.WriteBytes(args, new byte[command.ParamData.Length]);
+        
+        var resultValue = memoryService.Read<byte>(result);
+        return resultValue == 0xFF ? null : resultValue == 1;
     }
 }

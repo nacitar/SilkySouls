@@ -98,6 +98,8 @@ namespace SilkySouls.memory
             public static readonly int[] PhysicsModule = [ChrCtrl, 0x28];
             public const int Angle = 0x4;
             public const int Coords = 0x10;
+            public static readonly int[] HavokCoords = [0x38, 0x80, 0x30, 0x30];
+            
 
             public enum NpcParamOffsets
             {
@@ -193,10 +195,11 @@ namespace SilkySouls.memory
         {
             public static nint Base;
 
+            public const int IsFadeActive = 0xB8;
+
             public enum MenuManData
             {
                 LevelUpMenu = 0x8C,
-                AttunementMenu = 0x94,
                 BottomlessBox = 0x98,
                 Warp = 0xC0,
                 Feed = 0x130,
@@ -205,7 +208,6 @@ namespace SilkySouls.memory
             }
         }
         
-        public static int ShowEnhancedShopArmorOffset = -0x40;
 
         public enum LockedTarget
         {
@@ -227,15 +229,7 @@ namespace SilkySouls.memory
             public const int WarpFlagBit2 = 5;
 
             public const int BonfireFlags = 0x18;
-
-            public const int QuelaagBellPtr1 = 0x40;
-            public const int QuelaagBellPtr2 = 0x690;
-            public const int QuelaagBellPtr3 = 0x18;
-            public const int QuelaagBellBit = 8;
-
-            public const int GargOffset = 0xF54;
-            public const int GargBellBit = 0x1C;
-
+            
             public enum BonfireBitFlag
             {
                 OolaSanc = 13,
@@ -316,6 +310,7 @@ namespace SilkySouls.memory
             public static nint LuaVmSwitch;
             public static nint BattleActivate;
             public static nint Emevd;
+            public static nint FourKingsGenerator;
         }
 
         public static class Patches
@@ -323,7 +318,6 @@ namespace SilkySouls.memory
             public static nint DrawEvent;
             public static nint DrawSoundView;
             public static nint InfiniteDurability;
-            public static nint FourKings;
             public static nint NoRoll;
             public static nint NoBackStep;
             public static nint Quitout;
@@ -647,6 +641,17 @@ namespace SilkySouls.memory
                 _ => 0
             };
             
+            Hooks.FourKingsGenerator = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x36A0D0,
+                Version1_0_1_1 => 0x369DD0,
+                Version1_0_1_2 => 0x36D2F0,
+                Version1_0_3_0 => 0x3737B0,
+                Version1_0_3_1 => 0x372E70,
+                _ => 0
+            };
+
+            
             Patches.DrawEvent = moduleBase + Version switch
             {
                 // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
@@ -670,16 +675,6 @@ namespace SilkySouls.memory
                 Version1_0_1_2 => 0x744400,
                 Version1_0_3_0 => 0x74BA90,
                 Version1_0_3_1 => 0x74E770,
-                _ => 0
-            };
-
-            Patches.FourKings = moduleBase + Version switch
-            {
-                Version1_0_1_0 => 0x34198E,
-                Version1_0_1_1 => 0x34168E,
-                Version1_0_1_2 => 0x344BAE,
-                Version1_0_3_0 => 0x34ADAE,
-                Version1_0_3_1 => 0x34D26E,
                 _ => 0
             };
 
@@ -881,12 +876,12 @@ namespace SilkySouls.memory
             PrintOffset("LuaVmSwitch", Hooks.LuaVmSwitch);
             PrintOffset("BattleActivate", Hooks.BattleActivate);
             PrintOffset("Emevd", Hooks.Emevd);
+            PrintOffset("FourKingsGenerator", Hooks.FourKingsGenerator);
 
             Console.WriteLine("\n--- Patches ---");
             PrintOffset("DrawEvent", Patches.DrawEvent);
             PrintOffset("DrawSoundView", Patches.DrawSoundView);
             PrintOffset("InfiniteDurability", Patches.InfiniteDurability);
-            PrintOffset("FourKings", Patches.FourKings);
             PrintOffset("NoRoll", Patches.NoRoll);
             PrintOffset("NoBackStep", Patches.NoBackStep);
             PrintOffset("Quitout", Patches.Quitout);

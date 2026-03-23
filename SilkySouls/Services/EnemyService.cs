@@ -1,55 +1,31 @@
-﻿using System;
+﻿// 
+
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.memory;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
+using static SilkySouls.memory.Offsets;
 
-namespace SilkySouls.Services
+namespace SilkySouls.Services;
+
+public class EnemyService(IMemoryService memoryService, HookManager hookManager) : IEnemyService
 {
-    public class EnemyService(IMemoryService memoryService, HookManager hookManager)
+    public void ToggleEnemiesDebugFlag(int offset, bool isEnabled) =>
+        memoryService.Write(DebugFlags.Base + offset, isEnabled);
+
+    public void DisableFourKingsGenerator(bool isEnabled)
     {
-        
-        public void ToggleAllNoDamage(int value)
+        var code = CodeCaveOffsets.Base + CodeCaveOffsets.DisableFourKingsGenerator;
+        if (isEnabled)
         {
-            var allNoDamagePtr = Offsets.DebugFlags.Base + Offsets.DebugFlags.AllNoDamage;
-            memoryService.Write(allNoDamagePtr, value);
-
-            var codeBlock = CodeCaveOffsets.Base + CodeCaveOffsets.AllNoDamage;
-            if (value == 1)
-            {
-                nint origin = Offsets.Hooks.AllNoDamage;
-
-                byte[] restoreHealthBytes = AsmLoader.GetAsmBytes(AsmScript.AllNoDamage);
-                byte[] jumpBytes = BitConverter.GetBytes(origin + 7 - (codeBlock + 26));
-                Array.Copy(jumpBytes, 0, restoreHealthBytes, 22, 4);
-                memoryService.WriteBytes(codeBlock, restoreHealthBytes);
-                hookManager.InstallHook(codeBlock, origin,
-                    new byte[] { 0xF6, 0x81, 0x54, 0x01, 0x00, 0x00, 0x28 });
-            }
-            else
-            {
-                hookManager.UninstallHook(codeBlock);
-            }
+            var bytes = AsmLoader.GetAsmBytes(AsmScript.DisableFourKingsGenerator);
+            AsmHelper.WriteRelativeOffset(bytes, code + 0x16, Hooks.FourKingsGenerator + 5, 5, 0x16 + 1);
+            memoryService.WriteBytes(code, bytes);
+            hookManager.InstallHook(code, Hooks.FourKingsGenerator, [0x48, 0x89, 0x6C, 0x24, 0x10]);
         }
-
-        public void ToggleAllNoDeath(int value)
+        else
         {
-            var allNoDeathPtr = Offsets.DebugFlags.Base + Offsets.DebugFlags.AllNoDeath;
-            memoryService.Write(allNoDeathPtr, value);
-        }
-
-        public void ToggleAi(int value)
-        {
-            var disableAiPtr = Offsets.DebugFlags.Base + Offsets.DebugFlags.DisableAi;
-            memoryService.Write(disableAiPtr, value);
-        }
-
-        public void Toggle4KingsTimer(bool is4KingsTimerStopped)
-        {
-            var patchLocation = Offsets.Patches.FourKings;
-            if (is4KingsTimerStopped) memoryService.WriteBytes(patchLocation, new byte[] {0x90, 0x90, 0x90, 0x90, 0x90});
-            else memoryService.WriteBytes(patchLocation, new byte[]{ 0xF3, 0x0F, 0x11, 0x47, 0x10 });
+            hookManager.UninstallHook(code);
         }
     }
 }

@@ -73,7 +73,11 @@ public class TargetViewModel : BaseViewModel
             else
             {
                 _gameTickService.Unsubscribe(TargetTick);
-                IsRepeatActEnabled = false;
+                if (IsCurrentTargetRepeating())
+                {
+                    _targetService.DisableRepeatAct();
+                    _currentlyRepeatingAct = "None";
+                }
                 ShowAllResistances = false;
                 IsResistancesWindowOpen = false;
                 IsFreezeHealthEnabled = false;
@@ -149,7 +153,6 @@ public class TargetViewModel : BaseViewModel
         get => _targetCurrentBleed;
         set => SetProperty(ref _targetCurrentBleed, value);
     }
-
     private int _targetMaxBleed;
 
     public int TargetMaxBleed
@@ -301,53 +304,6 @@ public class TargetViewModel : BaseViewModel
             _currentlyRepeatingAct = value;
         }
     }
-
-    private bool _isRepeatActEnabled;
-
-    public bool IsRepeatActEnabled
-    {
-        get => _isRepeatActEnabled;
-        set
-        {
-            if (!SetProperty(ref _isRepeatActEnabled, value)) return;
-            if (_isRepeatActEnabled)
-            {
-                for (int i = RepeatActOptions.Count - 1; i >= 0; i--)
-                {
-                    if (RepeatActOptions[i] != "None")
-                        RepeatActOptions.RemoveAt(i);
-                }
-
-                int[] acts = _targetService.GetActs();
-                foreach (int act in acts)
-                {
-                    string actLabel = $"Act {act}";
-                    if (!RepeatActOptions.Contains(actLabel))
-                        RepeatActOptions.Add(actLabel);
-                }
-
-                if (!IsCurrentTargetRepeating())
-                {
-                    _targetService.DisableRepeatAct();
-                    _currentlyRepeatingAct = "None";
-                }
-
-                if (!RepeatActOptions.Contains(_currentlyRepeatingAct))
-                {
-                    _currentlyRepeatingAct = "None";
-                }
-
-                SelectedRepeatActOption = _currentlyRepeatingAct;
-            }
-            else
-            {
-                if (!IsCurrentTargetRepeating()) return;
-                _targetService.DisableRepeatAct();
-                _currentlyRepeatingAct = "None";
-            }
-        }
-    }
-
     private bool _isResistancesWindowOpen;
 
     public bool IsResistancesWindowOpen
@@ -403,7 +359,6 @@ public class TargetViewModel : BaseViewModel
     private void OnNotLoaded()
     {
         IsFreezeHealthEnabled = false;
-        IsRepeatActEnabled = false;
         _targetService.DisableRepeatAct();
         _currentlyRepeatingAct = "None";
         AreOptionsEnabled = false;
@@ -457,7 +412,7 @@ public class TargetViewModel : BaseViewModel
 #endif
             
             IsDisableTargetAiEnabled = _targetService.IsAiDisabled();
-            IsRepeatActEnabled = IsCurrentTargetRepeating();
+            PopulateRepeatActOptions();
             IsFreezeHealthEnabled = _targetService.IsNoDamageEnabled();
             _currentChrIns = chrIns;
             TargetMaxPoise = _targetService.GetMaxPoise();
@@ -619,6 +574,36 @@ public class TargetViewModel : BaseViewModel
         var currentRepeatEnemyId = _targetService.GetCurrentRepeatEnemyId();
         var lockedTargetId = _targetService.GetBattleId();
         return currentRepeatEnemyId == lockedTargetId;
+    }
+    
+    private void PopulateRepeatActOptions()
+    {
+        for (int i = RepeatActOptions.Count - 1; i >= 0; i--)
+        {
+            if (RepeatActOptions[i] != "None")
+                RepeatActOptions.RemoveAt(i);
+        }
+
+        int[] acts = _targetService.GetActs();
+        foreach (int act in acts)
+        {
+            string actLabel = $"Act {act}";
+            if (!RepeatActOptions.Contains(actLabel))
+                RepeatActOptions.Add(actLabel);
+        }
+
+        if (!IsCurrentTargetRepeating())
+        {
+            _targetService.DisableRepeatAct();
+            _currentlyRepeatingAct = "None";
+        }
+
+        if (!RepeatActOptions.Contains(_currentlyRepeatingAct))
+        {
+            _currentlyRepeatingAct = "None";
+        }
+
+        SelectedRepeatActOption = _currentlyRepeatingAct;
     }
 
     #endregion

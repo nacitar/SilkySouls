@@ -61,9 +61,9 @@ namespace SilkySouls
 
             IEmevdService emevdService = new EmevdService(_memoryService);
             IEzStateService ezStateService = new EzStateService(_memoryService);
+            IEnemyService enemyService = new EnemyService(_memoryService, _hookManager);
             var eventService = new EventService(_memoryService);
             var utilityService = new UtilityService(_memoryService, _hookManager);
-            var enemyService = new EnemyService(_memoryService, _hookManager);
             IParamService paramService = new ParamService(_memoryService);
             _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
@@ -119,6 +119,8 @@ namespace SilkySouls
         private bool _loaded;
         private bool _hasAllocatedMemory;
         private bool _hasCheckedPatch;
+        private bool _hasPublishedFadedIn;
+        private bool _hasPublishedLoaded;
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -151,8 +153,14 @@ namespace SilkySouls
 
                 if (_stateService.IsLoaded())
                 {
+                    if (!_hasPublishedFadedIn && _hasPublishedLoaded && !_stateService.IsFading())
+                    {
+                        _stateService.Publish(State.FadedIn);
+                        _hasPublishedFadedIn = true;
+                    }
                     if (_loaded) return;
                     _loaded = true;
+                    _hasPublishedLoaded = true;
                     _stateService.Publish(State.Loaded);
                     TrySetGameStartPrefs();
                     _settingsViewModel.ApplyLoadedOptions();
@@ -161,6 +169,8 @@ namespace SilkySouls
                 {
                     _stateService.Publish(State.NotLoaded);
                     _loaded = false;
+                    _hasPublishedLoaded = false;
+                    _hasPublishedFadedIn = false;
                 }
             }
             else
@@ -171,6 +181,8 @@ namespace SilkySouls
                 _settingsViewModel.ResetAttached();
                 _hasAllocatedMemory = false;
                 _hasCheckedPatch = false;
+                _hasPublishedLoaded = false;
+                _hasPublishedFadedIn = false;
                 _loaded = false;
                 _itemService.Reset();
                 IsAttachedText.Text = "Not attached";

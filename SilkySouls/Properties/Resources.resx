@@ -1432,6 +1432,28 @@ b8 0a d7 a3 3c          mov    eax,0x3ca3d70a
 48 b8 00 00 00 00 00    movabs rax,0x0
 00 00 00 
 ff d0                   call   rax
+48 8d 8d 50 fe ff ff    lea    rcx,[rbp-0x1b0]
+48 8b 41 38             mov    rax,QWORD PTR [rcx+0x38]
+48 85 c0                test   rax,rax
+74 1a                   je     e2 &lt;no_condition&gt;
+48 8b 40 10             mov    rax,QWORD PTR [rax+0x10]
+48 85 c0                test   rax,rax
+74 11                   je     e2 &lt;no_condition&gt;
+8a 40 10                mov    al,BYTE PTR [rax+0x10]
+24 01                   and    al,0x1
+48 b9 00 00 00 00 00    movabs rcx,0x0
+00 00 00 
+88 01                   mov    BYTE PTR [rcx],al
+
+0000000000e2 &lt;no_condition&gt;:
+48 8d 8d 50 fe ff ff    lea    rcx,[rbp-0x1b0]
+48 c7 81 b0 00 00 00    mov    QWORD PTR [rcx+0xb0],0x0
+00 00 00 00 
+48 c7 81 b8 00 00 00    mov    QWORD PTR [rcx+0xb8],0x0
+00 00 00 00 
+31 d2                   xor    edx,edx
+48 8b 01                mov    rax,QWORD PTR [rcx]
+ff 10                   call   QWORD PTR [rax]
 48 81 c4 08 04 00 00    add    rsp,0x408
 c3                      ret</value>
   </data>
@@ -1469,5 +1491,16 @@ ff c7                   inc    edi
 e8 00 00 00 00          call   90 &lt;param_loop+0x3d&gt;
 48 81 c4 98 05 00 00    add    rsp,0x598
 c3                      ret</value>
+  </data>
+  <data name="DisableFourKingsGenerator" xml:space="preserve">
+    <value>48 89 6c 24 10          mov    QWORD PTR [rsp+0x10],rbp
+81 fa b8 75 18 00       cmp    edx,0x1875b8
+75 09                   jne    16 &lt;exit&gt;
+41 80 f8 01             cmp    r8b,0x1
+75 03                   jne    16 &lt;exit&gt;
+41 b0 00                mov    r8b,0x0
+
+000000000016 &lt;exit&gt;:
+e9 00 00 00 00          jmp    1b &lt;exit+0x5&gt;</value>
   </data>
 </root>

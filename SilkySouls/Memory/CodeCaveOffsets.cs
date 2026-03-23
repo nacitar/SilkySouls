@@ -11,8 +11,6 @@ namespace SilkySouls.Memory
             public const int LockedTarget = 0x220;
             public const int LockedTargetPtr = 0x270;
             public const int AllNoDamage = 0x300;
-            public const int SavePos1 = 0x320;
-            public const int SavePos2 = 0x330;
             
             public enum WarpCoords
             {
@@ -65,18 +63,12 @@ namespace SilkySouls.Memory
                 EnemyIdentifierCode = 0xD70,
             }
 
-            public enum EmevdCommand
-            {
-                XmmStorage = 0x1000, 
-                CommandParams = 0x1090,
-                FuncParams = 0x1098,
-                Flag = 0x10A0,
-                ParamStruct = 0x10B0,
-                Code = 0x11B0,
-            }
+            public const int DisableFourKingsGenerator = 0x1000;
+      
 
             public const int GetEventResult = 0x13B0;
 
+            public const int EmevdResult = 0x13F9;
             public const int EmevdArgs = 0x1400;
 
             public const int EzStateTalkCode = 0x1500;

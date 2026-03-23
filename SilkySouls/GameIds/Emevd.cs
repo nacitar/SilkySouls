@@ -47,5 +47,12 @@ public static class Emevd
     public static class EmevdCommands
     {
         
+        //Conditions
+        public static EmevdCommand IsPlayerStandingOnHit(int eventEntityId) => new(11, 2, (sbyte)0, eventEntityId);
+        
+        
+        //Commands
+
+        public static EmevdCommand SetGeneratorState(int generatorId, bool state) => new(2003, 3, generatorId, (byte)(state ? 1 : 0));
     }
 }

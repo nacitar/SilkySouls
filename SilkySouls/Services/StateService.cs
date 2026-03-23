@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.memory;
+using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Services;
 
@@ -12,11 +12,14 @@ public class StateService(IMemoryService memoryService) : IStateService
 
     public bool IsLoaded()
     {
-        var loadingCheckPtr = memoryService.FollowPointers(
-            memoryService.Read<nint>(Offsets.MenuMan.Base),
-            [(int)Offsets.MenuMan.MenuManData.LoadedFlag
-        ], false);
-        return memoryService.Read<int>(loadingCheckPtr) == 1;
+        var worldChrMan = memoryService.Read<nint>(WorldChrMan.Base);
+        return memoryService.Read<nint>(worldChrMan + WorldChrMan.PlayerIns) != 0;
+    }
+
+    public bool IsFading()
+    {
+        var menuMan = memoryService.Read<nint>(MenuMan.Base);
+        return memoryService.Read<int>(menuMan + MenuMan.IsFadeActive) == 1;
     }
 
     public void Publish(State eventType)

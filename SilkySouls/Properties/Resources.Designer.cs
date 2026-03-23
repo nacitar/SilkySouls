@@ -195,6 +195,23 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 48 89 6c 24 10          mov    QWORD PTR [rsp+0x10],rbp
+        ///81 fa b8 75 18 00       cmp    edx,0x1875b8
+        ///75 09                   jne    16 &lt;exit&gt;
+        ///41 80 f8 01             cmp    r8b,0x1
+        ///75 03                   jne    16 &lt;exit&gt;
+        ///41 b0 00                mov    r8b,0x0
+        ///
+        ///000000000016 &lt;exit&gt;:
+        ///e9 00 00 00 00          jmp    1b &lt;exit+0x5&gt;.
+        /// </summary>
+        internal static string DisableFourKingsGenerator {
+            get {
+                return ResourceManager.GetString("DisableFourKingsGenerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 48 b8 00 00 00 00 00    movabs rax,0x0
         ///00 00 00
         ///8b 58 08                mov    ebx,DWORD PTR [rax+0x8]

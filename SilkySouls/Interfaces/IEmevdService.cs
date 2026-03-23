@@ -6,5 +6,5 @@ namespace SilkySouls.Interfaces;
 
 public interface IEmevdService
 {
-    void ExecuteEmevdCommand(EmevdCommand command);
+    bool? ExecuteEmevdCommand(EmevdCommand command);
 }

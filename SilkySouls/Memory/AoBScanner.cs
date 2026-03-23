@@ -83,8 +83,6 @@ namespace SilkySouls.Memory
                 addr => Hooks.Emevd = addr, saved);
 
 // Patches
-            TryPatternWithFallback("FourKingsPatch", Patterns.FourKingsPatch,
-                addr => Patches.FourKings = addr, saved);
             TryPatternWithFallback("NoRollPatch", Patterns.NoRollPatch, addr => Patches.NoRoll = addr,
                 saved);
             TryPatternWithFallback("InfiniteDurabilityPatch", Patterns.InfiniteDurabilityPatch,
