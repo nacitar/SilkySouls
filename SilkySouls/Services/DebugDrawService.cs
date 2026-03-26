@@ -36,10 +36,10 @@ public class DebugDrawService : IDebugDrawService
             (code + 0x4D, Functions.FinalizeEntry, 5, 0x4D + 1),
             (code + 0x5D, Functions.SetTag, 5, 0x5D + 1),
             (code + 0x7D, Functions.FinalizeEntry, 5, 0x7D + 1),
-            (code + 0x8A, Hooks.Draw + 7, 5, 0x8A + 1),
+            (code + 0x8A, Hooks.Draw + 8, 5, 0x8A + 1),
         ]);
 
-        _memoryService.Write(code, AsmScript.EnableDraw);
+        _memoryService.WriteBytes(code, bytes);
         _hookManager.InstallHook(code, Hooks.Draw, [0x44, 0x8B, 0xC6, 0xBA, 0x16, 0x00, 0x00, 0x00]);
         _isCtorHookInstalled = true;
 

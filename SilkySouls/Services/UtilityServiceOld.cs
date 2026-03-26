@@ -11,8 +11,6 @@ namespace SilkySouls.Services
     {
 
         
-        
-
         public void ToggleFilter(bool value)
         {
             if (value)

@@ -23,10 +23,7 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
         var rightTriggerCode = CodeCaveOffsets.Base + CodeCaveOffsets.TriggerR2;
         var leftTriggerCode = CodeCaveOffsets.Base + CodeCaveOffsets.TriggerL2;
         var updateCoordsCode = CodeCaveOffsets.Base + CodeCaveOffsets.UpdateCoords;
-
-        var playerIns =
-            memoryService.Read<nint>(memoryService.Read<nint>(WorldChrMan.Base) + WorldChrMan.PlayerIns);
-
+        
         if (isEnabled)
         {
             WriteInAirTimer(inAirTimerCode);
@@ -40,8 +37,6 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
             hookManager.InstallHook(rightTriggerCode, Hooks.ControllerR2, [0x0F, 0xB6, 0x44, 0x24, 0x27]);
             hookManager.InstallHook(leftTriggerCode, Hooks.ControllerL2, [0x0F, 0xB6, 0x44, 0x24, 0x26]);
             hookManager.InstallHook(updateCoordsCode, Hooks.UpdateCoords, [0x0F, 0x14, 0xDA, 0x0F, 0x29, 0x5B, 0x10]);
-
-            // memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, true);
         }
         else
         {
@@ -50,8 +45,6 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
             hookManager.UninstallHook(rightTriggerCode);
             hookManager.UninstallHook(leftTriggerCode);
             hookManager.UninstallHook(updateCoordsCode);
-
-            // memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, false);
         }
     }
 
@@ -139,8 +132,7 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
     }
 
     public void ToggleDeathCamera(bool isEnabled) =>
-        memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
-            isEnabled ? (byte)1 : (byte)0);
+        memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam, isEnabled);
 
     public bool HasTemporalAntiAliasing()
     {
