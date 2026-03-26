@@ -462,17 +462,17 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 50                      push   rax
-        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+        ///   Looks up a localized string similar to 0f 14 da                unpcklps xmm3,xmm2
+        ///50                      push   rax
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # b &lt;_main+0xb&gt;
         ///48 85 c0                test   rax,rax
-        ///0f 84 a7 01 00 00       je     1b8 &lt;exit&gt;
+        ///0f 84 87 01 00 00       je     19b &lt;exit&gt;
         ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
         ///48 85 c0                test   rax,rax
-        ///0f 84 9a 01 00 00       je     1b8 &lt;exit&gt;
+        ///0f 84 7a 01 00 00       je     19b &lt;exit&gt;
         ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
         ///48 85 c0                test   rax,rax
-        ///0f 84 8d 01 00 00       je     1b8 &lt;exit&gt;
-        ///48 8b 40 28             mov    rax [rest of string was truncated]&quot;;.
+        ///0f 84 6d 01 00 00       je     19 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NoClip_UpdateCoords {
             get {

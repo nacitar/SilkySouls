@@ -605,11 +605,11 @@ namespace SilkySouls.memory
 
             Hooks.UpdateCoords = moduleBase + Version switch
             {
-                Version1_0_1_0 => 0x9B7313,
-                Version1_0_1_1 => 0x9B7193,
-                Version1_0_1_2 => 0x9BCDB3,
-                Version1_0_3_0 => 0x9C2923,
-                Version1_0_3_1 => 0x9C7243,
+                Version1_0_1_0 => 0x2B22E6,
+                Version1_0_1_1 => 0x2B1FE6,
+                Version1_0_1_2 => 0x2B5436,
+                Version1_0_3_0 => 0x2B9A76,
+                Version1_0_3_1 => 0x2BB576,
                 _ => 0
             };
 

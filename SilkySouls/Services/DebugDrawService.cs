@@ -26,18 +26,6 @@ public class DebugDrawService : IDebugDrawService
 
     private void EnsureDebugDrawEnabled()
     {
-        //TODO   MessageBox.Show(
-        // "DRAW INFORMATION\n\n" +
-        //     "Enable Draw Instructions:\n" +
-        //     "• You must exit to the main menu before you can view hitboxes, draw events, and other visual elements.\n\n" +
-        //     "Known Display Issues:\n" +
-        //     "• Temporal Anti-Aliasing (default setting) will prevent hitboxes from displaying properly.\n" +
-        //     "• Solution: Select any other anti-aliasing option in quality settings to fix the display.",
-        // "Info",
-        // MessageBoxButton.OK,
-        // MessageBoxImage.Information
-        //     );
-        
         if (_isCtorHookInstalled) return;
 
         var code = CodeCaveOffsets.Base + CodeCaveOffsets.EnableDraw;
@@ -89,12 +77,12 @@ public class DebugDrawService : IDebugDrawService
         _hookManager.InstallHook(code, Hooks.HgDrawCommandExecutor, [0x31, 0xF6, 0x45, 0x31, 0xED]);
 
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        // timer.Tick += (_, _) =>
-        // {
-        //     _hookManager.UninstallHook(code);
-        //     timer.Stop();
-        // };
-        // timer.Start();
+        timer.Tick += (_, _) =>
+        {
+            _hookManager.UninstallHook(code);
+            timer.Stop();
+        };
+        timer.Start();
     }
 
     public void ToggleDrawHitbox(bool isEnabled)

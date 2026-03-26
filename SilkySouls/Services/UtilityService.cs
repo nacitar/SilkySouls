@@ -39,9 +39,9 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
             hookManager.InstallHook(kbCode, Hooks.Keyboard, [0xC6, 0x43, 0xF0, 0x01, 0xC6, 0x00, 0x01]);
             hookManager.InstallHook(rightTriggerCode, Hooks.ControllerR2, [0x0F, 0xB6, 0x44, 0x24, 0x27]);
             hookManager.InstallHook(leftTriggerCode, Hooks.ControllerL2, [0x0F, 0xB6, 0x44, 0x24, 0x26]);
-            hookManager.InstallHook(updateCoordsCode, Hooks.UpdateCoords, [0x0F, 0x29, 0x81, 0x20, 0x01, 0x00, 0x00]);
+            hookManager.InstallHook(updateCoordsCode, Hooks.UpdateCoords, [0x0F, 0x14, 0xDA, 0x0F, 0x29, 0x5B, 0x10]);
 
-            memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, true);
+            // memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, true);
         }
         else
         {
@@ -51,7 +51,7 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
             hookManager.UninstallHook(leftTriggerCode);
             hookManager.UninstallHook(updateCoordsCode);
 
-            memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, false);
+            // memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, false);
         }
     }
 
@@ -123,17 +123,17 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
         var speedScale = CodeCaveOffsets.Base + CodeCaveOffsets.SpeedScale;
 
         AsmHelper.WriteRelativeOffsets(codeBytes, [
-            (code + 0x1, WorldChrMan.Base, 7, 0x1 + 3),
-            (code + 0x96, PadMan.Base, 7, 0x96 + 3),
-            (code + 0xA1, DbgMapWalkPadVtable, 7, 0xA1 + 3),
-            (code + 0xC0, Functions.GetYMovement, 5, 0xC0 + 1),
-            (code + 0xCF, Functions.GetXMovement, 5, 0xCF + 1),
-            (code + 0x103, FieldArea.Base, 7, 0x103 + 3),
-            (code + 0x116, Functions.MatrixVectorProduct, 5, 0x116 + 1),
-            (code + 0x152, speedScale, 9, 0x152 + 5),
-            (code + 0x168, zDirection, 6, 0x168 + 2),
-            (code + 0x192, zDirection, 7, 0x192 + 2),
-            (code + 0x1C0, Hooks.UpdateCoords + 7, 5, 0x1C0 + 1)
+            (code + 0x4, WorldChrMan.Base, 7, 0x4 + 3),
+            (code + 0x79, PadMan.Base, 7, 0x79 + 3),
+            (code + 0x84, DbgMapWalkPadVtable, 7, 0x84 + 3),
+            (code + 0xA3, Functions.GetYMovement, 5, 0xA3 + 1),
+            (code + 0xB2, Functions.GetXMovement, 5, 0xB2 + 1),
+            (code + 0xE6, FieldArea.Base, 7, 0xE6 + 3),
+            (code + 0xF9, Functions.MatrixVectorProduct, 5, 0xF9 + 1),
+            (code + 0x135, speedScale, 9, 0x135 + 5),
+            (code + 0x14B, zDirection, 6, 0x14B + 2),
+            (code + 0x175, zDirection, 7, 0x175 + 2),
+            (code + 0x1A0, Hooks.UpdateCoords + 7, 5, 0x1A0 + 1)
         ]);
         memoryService.WriteBytes(code, codeBytes);
     }
