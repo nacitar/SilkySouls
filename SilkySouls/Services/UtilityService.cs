@@ -15,12 +15,7 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
     public void ShowMenu(int offset, int val) =>
         memoryService.Write(memoryService.Read<nint>(MenuMan.Base) + offset, val);
 
-    public void ToggleDebugDraw(bool isEnabled)
-    {
-        throw new System.NotImplementedException();
-    }
     
-
     public void ToggleNoClip(bool isEnabled)
     {
         var inAirTimerCode = CodeCaveOffsets.Base + CodeCaveOffsets.InAirTimer;
@@ -146,4 +141,11 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
     public void ToggleDeathCamera(bool isEnabled) =>
         memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
             isEnabled ? (byte)1 : (byte)0);
+
+    public bool HasTemporalAntiAliasing()
+    {
+        var pcOptionData =
+            memoryService.Read<nint>(memoryService.Read<nint>(GameDataMan.Base) + (int)GameDataMan.GameDataOffsets.PcOptionData);
+        return memoryService.Read<int>(pcOptionData + (int)GameDataMan.PcOptionData.AntiAliasingMode) == 3;
+    }
 }

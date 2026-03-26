@@ -29,7 +29,7 @@ namespace SilkySouls.ViewModels
         public const int EstusParamRowIdx = 32;
         public const int LordVesselIconId = 2085;
         public const int IconIdOffset = 0x2C;
-        
+
         private const float DefaultNoclipSpeedScale = 1f;
 
         public UtilityViewModel(UtilityServiceOld utilityServiceOld, IUtilityService utilityService,
@@ -90,7 +90,7 @@ namespace SilkySouls.ViewModels
             get => _areAttachedOptionsEnabled;
             set => SetProperty(ref _areAttachedOptionsEnabled, value);
         }
-        
+
         private bool _isHitboxEnabled;
 
         public bool IsHitboxEnabled
@@ -99,6 +99,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isHitboxEnabled, value)) return;
+                DoTemporalAliasingCheck();
                 _debugDrawService.ToggleDrawHitbox(_isHitboxEnabled);
             }
         }
@@ -138,7 +139,7 @@ namespace SilkySouls.ViewModels
                 if (_isNoClipEnabled)
                 {
                     _utilityService.WriteNoClipSpeed(NoClipSpeedScale);
-                    
+
                     _wasNoDeathEnabled = _playerViewModel.IsNoDeathEnabled;
                     _wasNoDmgEnabled = _playerViewModel.IsNoDamageEnabled;
                     _playerViewModel.IsNoDeathEnabled = true;
@@ -153,6 +154,7 @@ namespace SilkySouls.ViewModels
                     _playerViewModel.IsSilentEnabled = false;
                     _playerViewModel.IsInvisibleEnabled = false;
                 }
+
                 _utilityService.ToggleNoClip(_isNoClipEnabled);
             }
         }
@@ -199,7 +201,7 @@ namespace SilkySouls.ViewModels
                 }
             }
         }
-        
+
         private float _noClipSpeedScale = DefaultNoclipSpeedScale;
 
         public float NoClipSpeedScale
@@ -291,6 +293,17 @@ namespace SilkySouls.ViewModels
             }
 
             AreOptionsEnabled = true;
+        }
+
+        private void DoTemporalAliasingCheck()
+        {
+            if (_utilityService.HasTemporalAntiAliasing())
+            {
+                MsgBox.Show(
+                    "Temporal Anti-Aliasing (default setting) will prevent hitboxes from displaying properly.\n" +
+                    "Go to PC Settings --> Quality --> Anti-Aliasing and set it to anything else to properly view them",
+                    "Temporal Anti-Aliasing");
+            }
         }
 
         #endregion

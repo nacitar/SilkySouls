@@ -8,5 +8,6 @@ public interface IUtilityService
     void ToggleNoClip(bool isEnabled);
     void WriteNoClipSpeed(float speedScale);
     void ToggleDeathCamera(bool isEnabled);
-    
+
+    bool HasTemporalAntiAliasing();
 }

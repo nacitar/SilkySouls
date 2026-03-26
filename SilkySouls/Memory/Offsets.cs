@@ -137,6 +137,7 @@ namespace SilkySouls.memory
             public enum GameDataOffsets
             {
                 PlayerGameData = 0x10,
+                PcOptionData = 0x68,
                 Ng = 0x78,
                 InGameTime = 0xA4,
             }
@@ -157,6 +158,11 @@ namespace SilkySouls.memory
                 TotalSouls = 0x98,
                 EquipMagicData = 0x418,
                 EquipGameData = 0x430,
+            }
+
+            public enum PcOptionData
+            {
+                AntiAliasingMode = 0xF0,
             }
         }
 
@@ -698,8 +704,8 @@ namespace SilkySouls.memory
             Patches.DrawSoundView = moduleBase + Version switch
             {
                 // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
-                Version1_0_3_0 => 0x622286,
-                Version1_0_3_1 => 0x624b86,
+                Version1_0_3_0 => 0x622289,
+                Version1_0_3_1 => 0x624b89,
                 _ => 0
             };
             
