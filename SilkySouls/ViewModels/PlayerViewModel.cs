@@ -302,6 +302,14 @@ namespace SilkySouls.ViewModels
                 }
             }
         }
+        
+        private bool _isHotEnabled;
+
+        public bool IsHotEnabled
+        {
+            get => _isHotEnabled;
+            set => SetProperty(ref _isHotEnabled, value);
+        }
 
         private bool _isAutoSetNewGameSixEnabled;
 
@@ -527,6 +535,8 @@ namespace SilkySouls.ViewModels
         private void PlayerTick()
         {
             if (_pauseUpdates) return;
+            
+            if (IsHotEnabled) TryApplyHot();
 
             CurrentHp = _playerService.GetHp();
             CurrentMaxHp = _playerService.GetMaxHp();
@@ -544,6 +554,16 @@ namespace SilkySouls.ViewModels
                 LoadStats();
             }
         }
+        private void TryApplyHot()
+        {
+            int currentHp = _playerService.GetHp();
+            int maxHp = _playerService.GetMaxHp();
+
+            if (currentHp >= maxHp) return;
+            int hpToSet = Math.Min(currentHp + (int)(maxHp * 0.033), maxHp);
+            _playerService.SetHp(hpToSet);
+        }
+        
 
         private void LoadStats()
         {

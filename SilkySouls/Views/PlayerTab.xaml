@@ -184,6 +184,9 @@
                     <CheckBox Content="Infinite Poise" 
                               IsChecked="{Binding IsInfinitePoiseEnabled}"
                               Margin="0,2"/>
+                    <CheckBox Content="Hp Regen" 
+                              IsChecked="{Binding IsHotEnabled}"
+                              Margin="0,2"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">

@@ -50,8 +50,6 @@
                             <CheckBox Content="All No Death"
                                       IsChecked="{Binding IsAllNoDeathEnabled}"
                                       Margin="0,2" />
-                            
-                            <Button Content="Test" Command="{Binding TestCommand}"></Button>
                         </UniformGrid>
                     </StackPanel>
                 </Border>
