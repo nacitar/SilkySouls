@@ -278,7 +278,7 @@ namespace SilkySouls.memory
             public static nint Base;
             public const int ParamResCap = 0x570;
             public const int ItemLot = 0x38;
-            public const int BkhDropRateBase = 0x32C30;
+            public const int BkhItemLotEntry = 0x32C30;
 
             public enum BkhDropRateSlots
             {

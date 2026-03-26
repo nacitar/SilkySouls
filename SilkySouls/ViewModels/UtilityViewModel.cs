@@ -3,7 +3,6 @@ using System.Windows.Input;
 using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
-using SilkySouls.Services;
 using SilkySouls.Utilities;
 using static SilkySouls.GameIds.EzState;
 using static SilkySouls.memory.Offsets;
@@ -16,8 +15,7 @@ namespace SilkySouls.ViewModels
         private bool _wasNoDmgEnabled;
 
         private bool _areAttachedOptionsRestored;
-
-        private readonly UtilityServiceOld _utilityServiceOld;
+        
         private readonly IUtilityService _utilityService;
         private readonly PlayerViewModel _playerViewModel;
         private readonly IParamService _paramService;
@@ -32,12 +30,11 @@ namespace SilkySouls.ViewModels
 
         private const float DefaultNoclipSpeedScale = 1f;
 
-        public UtilityViewModel(UtilityServiceOld utilityServiceOld, IUtilityService utilityService,
+        public UtilityViewModel(IUtilityService utilityService,
             HotkeyManager hotkeyManager,
             PlayerViewModel playerViewModel, IParamService paramService, IStateService stateService,
             IEzStateService ezStateService, IDebugDrawService debugDrawService)
         {
-            _utilityServiceOld = utilityServiceOld;
             _utilityService = utilityService;
             _playerViewModel = playerViewModel;
             _paramService = paramService;
@@ -82,15 +79,7 @@ namespace SilkySouls.ViewModels
             get => _areOptionsEnabled;
             set => SetProperty(ref _areOptionsEnabled, value);
         }
-
-        private bool _areAttachedOptionsEnabled;
-
-        public bool AreAttachedOptionsEnabled
-        {
-            get => _areAttachedOptionsEnabled;
-            set => SetProperty(ref _areAttachedOptionsEnabled, value);
-        }
-
+        
         private bool _isHitboxEnabled;
 
         public bool IsHitboxEnabled
@@ -144,15 +133,11 @@ namespace SilkySouls.ViewModels
                     _wasNoDmgEnabled = _playerViewModel.IsNoDamageEnabled;
                     _playerViewModel.IsNoDeathEnabled = true;
                     _playerViewModel.IsNoDamageEnabled = true;
-                    _playerViewModel.IsSilentEnabled = true;
-                    _playerViewModel.IsInvisibleEnabled = true;
                 }
                 else
                 {
                     _playerViewModel.IsNoDeathEnabled = _wasNoDeathEnabled;
                     _playerViewModel.IsNoDamageEnabled = _wasNoDmgEnabled;
-                    _playerViewModel.IsSilentEnabled = false;
-                    _playerViewModel.IsInvisibleEnabled = false;
                 }
 
                 _utilityService.ToggleNoClip(_isNoClipEnabled);
@@ -179,7 +164,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isFilterRemoveEnabled, value)) return;
-                _utilityServiceOld.ToggleFilter(_isFilterRemoveEnabled);
+                _utilityService.ToggleFilter(_isFilterRemoveEnabled);
             }
         }
 
@@ -196,7 +181,7 @@ namespace SilkySouls.ViewModels
                     {
                         var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
                         _paramService.WriteInt32(estusRow, IconIdOffset, LordVesselIconId);
-                        _utilityServiceOld.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
+                        _utilityService.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
                     }
                 }
             }
@@ -274,12 +259,12 @@ namespace SilkySouls.ViewModels
             if (IsDrawEventEnabled)
                 _debugDrawService.ToggleDrawEvents(true);
             if (IsFilterRemoveEnabled)
-                _utilityServiceOld.ToggleFilter(IsFilterRemoveEnabled);
+                _utilityService.ToggleFilter(IsFilterRemoveEnabled);
             if (IsDeathCamEnabled)
                 _utilityService.ToggleDeathCamera(IsDeathCamEnabled);
             if (IsGuaranteedBkhEnabled)
             {
-                _utilityServiceOld.SetGuaranteedBkhDrop(true);
+                _utilityService.SetGuaranteedBkhDrop(true);
                 _ = Task.Run(() =>
                 {
                     Task.Delay(500).Wait();
@@ -289,7 +274,7 @@ namespace SilkySouls.ViewModels
             }
             else
             {
-                _utilityServiceOld.SetGuaranteedBkhDrop(false);
+                _utilityService.SetGuaranteedBkhDrop(false);
             }
 
             AreOptionsEnabled = true;

@@ -161,7 +161,6 @@
     <Compile Include="Services\TargetService.cs" />
     <Compile Include="Services\TravelService.cs" />
     <Compile Include="Services\UtilityService.cs" />
-    <Compile Include="Services\UtilityServiceOld.cs" />
     <Compile Include="Utilities\AsmLoader.cs" />
     <Compile Include="Utilities\HotkeyManager.cs" />
     <Compile Include="Utilities\DataLoader.cs" />

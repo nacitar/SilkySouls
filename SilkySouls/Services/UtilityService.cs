@@ -1,5 +1,6 @@
 ﻿// 
 
+using System;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
@@ -139,5 +140,62 @@ public class UtilityService(IMemoryService memoryService, HookManager hookManage
         var pcOptionData =
             memoryService.Read<nint>(memoryService.Read<nint>(GameDataMan.Base) + (int)GameDataMan.GameDataOffsets.PcOptionData);
         return memoryService.Read<int>(pcOptionData + (int)GameDataMan.PcOptionData.AntiAliasingMode) == 3;
+    }
+
+    public void SetGuaranteedBkhDrop(bool isEnabled)
+    {
+        var bkhPtr = memoryService.FollowPointers(memoryService.Read<nint>(SoloParamMan.Base), new[]
+        {
+            SoloParamMan.ParamResCap,
+            SoloParamMan.ItemLot,
+            SoloParamMan.BkhItemLotEntry
+        }, false);
+
+        if (isEnabled)
+        {
+            memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Nothing, (byte)0);
+            memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bkh, (byte)0x64);
+            memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bks, (byte)0);
+        }
+        else
+        {
+            memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Nothing, (byte)0x4B);
+            memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bkh, (byte)0x14);
+            memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bks, (byte)0x5);
+        }
+    }
+
+    public void ToggleFilter(bool isEnabled)
+    {
+        if (isEnabled)
+        {
+            var filterPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
+                { FieldArea.RenderPtr, FieldArea.FilterRemoval }, false);
+            memoryService.Write(filterPtr, (byte)1);
+            var brightnessPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
+                { FieldArea.RenderPtr, FieldArea.Brightness }, false);
+            var bytes = new byte[12];
+            var floatBytes = BitConverter.GetBytes(5.0f);
+            Buffer.BlockCopy(floatBytes, 0, bytes, 0, 4);
+            Buffer.BlockCopy(floatBytes, 0, bytes, 4, 4);
+            Buffer.BlockCopy(floatBytes, 0, bytes, 8, 4);
+
+            memoryService.WriteBytes(brightnessPtr, bytes);
+        }
+        else
+        {
+            var filterPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
+                { FieldArea.RenderPtr, FieldArea.FilterRemoval }, false);
+            memoryService.Write(filterPtr, (byte)0);
+            var brightnessPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
+                { FieldArea.RenderPtr, FieldArea.Brightness }, false);
+            var bytes = new byte[12];
+            var floatBytes = BitConverter.GetBytes(1.0f);
+            Buffer.BlockCopy(floatBytes, 0, bytes, 0, 4);
+            Buffer.BlockCopy(floatBytes, 0, bytes, 4, 4);
+            Buffer.BlockCopy(floatBytes, 0, bytes, 8, 4);
+
+            memoryService.WriteBytes(brightnessPtr, bytes);
+        }
     }
 }

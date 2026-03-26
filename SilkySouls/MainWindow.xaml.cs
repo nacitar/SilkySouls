@@ -65,7 +65,6 @@ namespace SilkySouls
             IEventService eventService = new EventService(_memoryService, playerService, emevdService);
             IUtilityService utilityService = new UtilityService(_memoryService, _hookManager);
             IDebugDrawService debugDrawService = new DebugDrawService(_memoryService, _hookManager, _stateService);
-            var utilityServiceOld = new UtilityServiceOld(_memoryService, _hookManager);
             IParamService paramService = new ParamService(_memoryService);
             _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
@@ -74,7 +73,7 @@ namespace SilkySouls
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel =
                 new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
-            _utilityViewModel = new UtilityViewModel(utilityServiceOld, utilityService, hotkeyManager, _playerViewModel, paramService,
+            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService,
                 _stateService, ezStateService, debugDrawService);
             var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
             var eventViewModel = new EventViewModel(eventService,  _stateService);
