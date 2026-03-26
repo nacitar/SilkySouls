@@ -2,7 +2,8 @@
 
 namespace SilkySouls.Interfaces;
 
-public class ISettingsService
+public interface ISettingsService
 {
-    
+    void Quitout();
+    void ToggleFastQuitout(int value);
 }

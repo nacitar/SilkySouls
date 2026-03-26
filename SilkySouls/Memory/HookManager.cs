@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 
 namespace SilkySouls.Memory
 {
-    public class HookManager(IMemoryService memoryService)
+    public class HookManager
     {
         private readonly Dictionary<nint, HookData> _hookRegistry = new();
+        private readonly IMemoryService _memoryService;
+
+        public HookManager(IMemoryService memoryService, IStateService stateService)
+        {
+            _memoryService = memoryService;
+            stateService.Subscribe(State.Detached, ClearHooks);
+        }
 
         private class HookData
         {
@@ -19,7 +27,7 @@ namespace SilkySouls.Memory
         public nint InstallHook(nint codeLoc, nint origin, byte[] originalBytes)
         {
             byte[] hookBytes = GetHookBytes(originalBytes.Length, codeLoc, origin);
-            memoryService.WriteBytes(origin, hookBytes);
+            _memoryService.WriteBytes(origin, hookBytes);
             _hookRegistry[codeLoc] = new HookData
             {
                 CaveAddr = codeLoc,
@@ -50,14 +58,11 @@ namespace SilkySouls.Memory
         {
             if (!_hookRegistry.TryGetValue(key, out HookData hookToUninstall)) return;
 
-            memoryService.WriteBytes(hookToUninstall.OriginAddr, hookToUninstall.OriginalBytes);
+            _memoryService.WriteBytes(hookToUninstall.OriginAddr, hookToUninstall.OriginalBytes);
             _hookRegistry.Remove(key);
         }
 
-        public void ClearHooks()
-        {
-            _hookRegistry.Clear();
-        }
+        private void ClearHooks() => _hookRegistry.Clear();
 
         public void UninstallAllHooks()
         {

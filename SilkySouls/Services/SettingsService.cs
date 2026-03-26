@@ -4,7 +4,7 @@ using SilkySouls.Memory;
 
 namespace SilkySouls.Services
 {
-    public class SettingsService(IMemoryService memoryService)
+    public class SettingsService(IMemoryService memoryService) : ISettingsService
     {
         public void Quitout()
         {

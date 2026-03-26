@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using H.Hooks;
 using SilkySouls.Enums;
-using SilkySouls.Services;
+using SilkySouls.Interfaces;
 using SilkySouls.Utilities;
 
 namespace SilkySouls.ViewModels
@@ -12,7 +12,7 @@ namespace SilkySouls.ViewModels
     public class SettingsViewModel : BaseViewModel
     {
         private readonly HotkeyManager _hotkeyManager;
-        private readonly SettingsService _settingsService;
+        private readonly ISettingsService _settingsService;
         private readonly Dictionary<string, HotkeyBindingViewModel> _hotkeyLookup;
 
         private string _currentSettingHotkeyId;
@@ -22,10 +22,13 @@ namespace SilkySouls.ViewModels
 
         public Dictionary<string, List<HotkeyBindingViewModel>> Hotkeys { get; }
 
-        public SettingsViewModel(SettingsService settingsService, HotkeyManager hotkeyManager)
+        public SettingsViewModel(ISettingsService settingsService, HotkeyManager hotkeyManager,
+            IStateService stateService)
         {
             _settingsService = settingsService;
             _hotkeyManager = hotkeyManager;
+            
+            stateService.Subscribe(State.Loaded, OnLoaded);
 
             Hotkeys = new Dictionary<string, List<HotkeyBindingViewModel>>
             {
@@ -181,12 +184,7 @@ namespace SilkySouls.ViewModels
             StopSettingHotkey();
         }
 
-        public void ApplyLoadedOptions()
-        {
-            _isLoaded = true;
-            if (IsFastQuitoutEnabled) _settingsService.ToggleFastQuitout(1);
-        }
-
+        
         public void ApplyStartUpOptions()
         {
             _isEnableHotkeysEnabled = SettingsManager.Default.EnableHotkeys;
@@ -197,12 +195,7 @@ namespace SilkySouls.ViewModels
             OnPropertyChanged(nameof(IsFastQuitoutEnabled));
             IsAlwaysOnTopEnabled = SettingsManager.Default.AlwaysOnTop;
         }
-
-        public void ResetAttached()
-        {
-            _isLoaded = false;
-        }
-
+        
         #endregion
 
         #region Private Methods
@@ -210,6 +203,11 @@ namespace SilkySouls.ViewModels
         private void RegisterHotkeys()
         {
             _hotkeyManager.RegisterAction(HotkeyActions.Quitout, () => _settingsService.Quitout());
+        }
+        
+        private void OnLoaded()
+        {
+            if (IsFastQuitoutEnabled) _settingsService.ToggleFastQuitout(1);
         }
 
         private void LoadHotkeyDisplays()

@@ -16,7 +16,7 @@ namespace SilkySouls.ViewModels
 {
     public class ItemViewModel : BaseViewModel
     {
-        private readonly ItemService _itemService;
+        private readonly IItemService _itemService;
 
         private readonly Dictionary<string, ObservableCollection<Item>> _itemsByCategory;
         private readonly Dictionary<string, InfusionType> _infusionTypes = new();
@@ -25,12 +25,13 @@ namespace SilkySouls.ViewModels
         private string _preSearchCategory;
         private bool _isSearchActive;
 
-        public ItemViewModel(ItemService itemService, IStateService stateService)
+        public ItemViewModel(IItemService itemService, IStateService stateService)
         {
             _itemService = itemService;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
+            stateService.Subscribe(State.OnNewGameStart, OnNewGame);
 
             _categories = new ObservableCollection<ItemCategory>();
             _items = new ObservableCollection<Item>();
@@ -345,23 +346,7 @@ namespace SilkySouls.ViewModels
         }
 
         #endregion
-
-        #region Public Methods
-
-        public void TrySpawnWeaponPref()
-        {
-            if (AutoSpawnEnabled && SelectedAutoSpawnWeapon != null)
-            {
-                int itemId = SelectedAutoSpawnWeapon.Id;
-
-                _itemService.ItemSpawn(
-                    itemId,
-                    0x00000000,
-                    1);
-            }
-        }
-
-        #endregion
+        
 
         #region Private Methods
 
@@ -502,6 +487,17 @@ namespace SilkySouls.ViewModels
         private void OnLoaded()
         {
             AreOptionsEnabled = true;
+        }
+        
+        private void OnNewGame()
+        {
+            if (!AutoSpawnEnabled || SelectedAutoSpawnWeapon == null) return;
+            int itemId = SelectedAutoSpawnWeapon.Id;
+
+            _itemService.ItemSpawn(
+                itemId,
+                0x00000000,
+                1);
         }
 
         #endregion

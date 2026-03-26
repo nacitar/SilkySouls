@@ -24,13 +24,7 @@ namespace SilkySouls
         private readonly IMemoryService _memoryService;
         private readonly DispatcherTimer _gameLoadedTimer;
 
-        private readonly PlayerViewModel _playerViewModel;
-        private readonly UtilityViewModel _utilityViewModel;
-        private readonly ItemViewModel _itemViewModel;
-        private readonly SettingsViewModel _settingsViewModel;
-        private readonly HookManager _hookManager;
         private readonly AoBScanner _aobScanner;
-        private readonly ItemService _itemService;
         private readonly IStateService _stateService;
 
         public MainWindow()
@@ -48,47 +42,47 @@ namespace SilkySouls
             else WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             var hotkeyManager = new HotkeyManager(_memoryService);
-            _hookManager = new HookManager(_memoryService);
+            var hookManager = new HookManager(_memoryService, _stateService);
 
             IGameTickService gameTickService = new GameTickService(_stateService);
 
-            ITravelService travelService = new TravelService(_memoryService, _hookManager);
+            ITravelService travelService = new TravelService(_memoryService, hookManager);
             IPlayerService playerService = new PlayerService(_memoryService, travelService);
 
-            ITargetService targetService = new TargetService(_memoryService, _hookManager);
+            ITargetService targetService = new TargetService(_memoryService, hookManager);
 
             _aobScanner = new AoBScanner(_memoryService);
 
             IEmevdService emevdService = new EmevdService(_memoryService);
             IEzStateService ezStateService = new EzStateService(_memoryService);
-            IEnemyService enemyService = new EnemyService(_memoryService, _hookManager);
+            IEnemyService enemyService = new EnemyService(_memoryService, hookManager);
             IEventService eventService = new EventService(_memoryService, playerService, emevdService);
-            IUtilityService utilityService = new UtilityService(_memoryService, _hookManager);
-            IDebugDrawService debugDrawService = new DebugDrawService(_memoryService, _hookManager, _stateService);
+            IUtilityService utilityService = new UtilityService(_memoryService, hookManager);
+            IDebugDrawService debugDrawService = new DebugDrawService(_memoryService, hookManager, _stateService);
             IParamService paramService = new ParamService(_memoryService);
-            _itemService = new ItemService(_memoryService);
-            var settingsService = new SettingsService(_memoryService);
+            IItemService itemService = new ItemService(_memoryService, _stateService);
+            ISettingsService settingsService = new SettingsService(_memoryService);
 
 
-            _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService, gameTickService);
+            var playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel =
                 new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
-            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService,
+            var utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, playerViewModel, paramService,
                 _stateService, ezStateService, debugDrawService);
-            var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
+            var travelViewModel = new TravelViewModel(travelService, hotkeyManager, utilityViewModel, _stateService);
             var eventViewModel = new EventViewModel(eventService,  _stateService);
             var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService, emevdService);
-            _itemViewModel = new ItemViewModel(_itemService, _stateService);
-            _settingsViewModel = new SettingsViewModel(settingsService, hotkeyManager);
+            var itemViewModel = new ItemViewModel(itemService, _stateService);
+            var settingsViewModel = new SettingsViewModel(settingsService, hotkeyManager, _stateService);
 
-            var playerTab = new PlayerTab(_playerViewModel);
+            var playerTab = new PlayerTab(playerViewModel);
             var travelTab = new TravelTab(travelViewModel);
             var eventTab = new EventTab(eventViewModel);
-            var utilityTab = new UtilityTab(_utilityViewModel);
+            var utilityTab = new UtilityTab(utilityViewModel);
             var enemyTab = new EnemyTab(enemyViewModel);
             var targetTab = new TargetTab(targetViewModel);
-            var itemTab = new ItemTab(_itemViewModel);
-            var settingsTab = new SettingsTab(_settingsViewModel);
+            var itemTab = new ItemTab(itemViewModel);
+            var settingsTab = new SettingsTab(settingsViewModel);
 
             MainTabControl.Items.Add(new TabItem { Header = "Player", Content = playerTab });
             MainTabControl.Items.Add(new TabItem { Header = "Travel", Content = travelTab });
@@ -99,7 +93,7 @@ namespace SilkySouls
             MainTabControl.Items.Add(new TabItem { Header = "Items", Content = itemTab });
             MainTabControl.Items.Add(new TabItem { Header = "Settings", Content = settingsTab });
 
-            _settingsViewModel.ApplyStartUpOptions();
+            settingsViewModel.ApplyStartUpOptions();
             Closing += MainWindow_Closing;
 
             _gameLoadedTimer = new DispatcherTimer
@@ -149,8 +143,7 @@ namespace SilkySouls
 #endif
                     _hasAllocatedMemory = true;
                 }
-
-                _utilityViewModel.TryRestoreAttachedFeatures();
+                
 
                 if (_stateService.IsLoaded())
                 {
@@ -163,8 +156,7 @@ namespace SilkySouls
                     _loaded = true;
                     _hasPublishedLoaded = true;
                     _stateService.Publish(State.Loaded);
-                    TrySetGameStartPrefs();
-                    _settingsViewModel.ApplyLoadedOptions();
+                    TryPublishNewGameStart();
                 }
                 else if (_loaded)
                 {
@@ -176,40 +168,29 @@ namespace SilkySouls
             }
             else
             {
-                _hookManager.ClearHooks();
                 _stateService.Publish(State.Detached);
                 _stateService.Publish(State.NotLoaded);
-                _utilityViewModel.ResetAttached();
-                _settingsViewModel.ResetAttached();
                 _hasAllocatedMemory = false;
                 _hasCheckedPatch = false;
                 _hasPublishedLoaded = false;
                 _hasPublishedFadedIn = false;
                 _loaded = false;
-                _itemService.Reset();
                 IsAttachedText.Text = "Not attached";
                 IsAttachedText.Foreground = (SolidColorBrush)Application.Current.Resources["NotAttachedBrush"];
             }
         }
 
-        private void TrySetGameStartPrefs()
+        private void TryPublishNewGameStart()
         {
             var gameDataPtr = _memoryService.Read<nint>(Offsets.GameDataMan.Base);
             IntPtr inGameTimePtr = gameDataPtr + (int)Offsets.GameDataMan.GameDataOffsets.InGameTime;
             long gameTimeMs = _memoryService.Read<long>(inGameTimePtr);
             if (gameTimeMs < 5000)
             {
-                _playerViewModel.TrySetNgPref();
-                _itemViewModel.TrySpawnWeaponPref();
+                _stateService.Publish(State.OnNewGameStart);
             }
         }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-            _hookManager?.UninstallAllHooks();
-        }
-
+        
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
@@ -230,8 +211,6 @@ namespace SilkySouls
             SettingsManager.Default.WindowLeft = Left;
             SettingsManager.Default.WindowTop = Top;
             SettingsManager.Default.Save();
-            _itemService.SignalClose();
-            _hookManager.UninstallAllHooks();
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)

@@ -38,6 +38,7 @@ namespace SilkySouls.ViewModels
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.NotLoaded, OnNotLoaded);
+            stateService.Subscribe(State.OnNewGameStart, OnNewGame);
 
             SetRtsrCommand = new DelegateCommand(SetRtsr);
             SetMaxHpCommand = new DelegateCommand(SetMaxHp);
@@ -469,13 +470,6 @@ namespace SilkySouls.ViewModels
             _playerService.SetPlayerStat(stat, val);
         }
 
-        public void TrySetNgPref()
-        {
-            if (IsAutoSetNewGameSixEnabled)
-                _playerService.SetNewGame(7);
-            NewGame = _playerService.GetNewGame();
-        }
-
         #endregion
 
         #region Private Methods
@@ -503,6 +497,13 @@ namespace SilkySouls.ViewModels
             AreOptionsEnabled = true;
             LoadStats();
             _gameTickService.Subscribe(PlayerTick);
+        }
+
+        private void OnNewGame()
+        {
+            if (!IsAutoSetNewGameSixEnabled) return;
+            _playerService.SetNewGame(7);
+            NewGame = _playerService.GetNewGame();
         }
 
         private void RegisterHotkeys()

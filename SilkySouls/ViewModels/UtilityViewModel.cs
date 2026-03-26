@@ -206,18 +206,7 @@ namespace SilkySouls.ViewModels
 
         #region Public Methods
 
-        public void ResetAttached()
-        {
-            IsNoClipEnabled = false;
-            _areAttachedOptionsRestored = false;
-        }
-
-        public void TryRestoreAttachedFeatures()
-        {
-            if (_areAttachedOptionsRestored) return;
-            _areAttachedOptionsRestored = true;
-        }
-
+        
         public void DisableNoClip()
         {
             _utilityService.ToggleNoClip(false);
