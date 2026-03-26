@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using SilkySouls.Interfaces;
-using SilkySouls.memory;
 using static SilkySouls.memory.Offsets;
 
 namespace SilkySouls.Memory

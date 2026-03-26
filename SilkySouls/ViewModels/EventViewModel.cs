@@ -2,17 +2,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using SilkySouls.Core;
 using SilkySouls.Enums;
+using SilkySouls.GameIds;
 using SilkySouls.Interfaces;
-using SilkySouls.Memory;
 using SilkySouls.Services;
 
 namespace SilkySouls.ViewModels
 {
     public class EventViewModel : BaseViewModel
     {
-        private readonly EventService _eventService;
+        private readonly IEventService _eventService;
 
-        public EventViewModel(EventService eventService, IStateService stateService)
+        public EventViewModel(IEventService eventService, IStateService stateService)
         {
             _eventService = eventService;
 
@@ -21,15 +21,15 @@ namespace SilkySouls.ViewModels
 
             SetFlagCommand = new DelegateCommand(SetFlag);
             GetEventCommand = new DelegateCommand(GetEvent);
-            UnlockKalameetCommand = new DelegateCommand(() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.UnlockKalameet));
-            RingGargBellCommand = new DelegateCommand(() => _eventService.RingGargBell());
-            RingQuelaggBellCommand = new DelegateCommand(() => _eventService.RingQuelaagBell());
-            OpenSensCommand = new DelegateCommand(() => _eventService.OpenSensGate(GameIdsOld.EventFlags.Sens));
-            PlaceLordVesselCommand = new DelegateCommand(() => _eventService.PlaceLordVessel());
-            NewLondoNoWaterCommand = new DelegateCommand(() => _eventService.SetEvent(GameIdsOld.EventFlags.NewLondoWater, true));
-            LaurentiusToFirelinkCommand = new DelegateCommand(() => _eventService.SetEvent(GameIdsOld.EventFlags.LaurentiusToFirelink, true));
-            LoganToFirelinkCommand = new DelegateCommand(() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.LoganToFirelink));
-            GriggsToFirelinkCommand = new DelegateCommand(() => _eventService.SetMultipleEventsOn(GameIdsOld.EventFlags.GriggsToFirelink));
+            UnlockKalameetCommand = new DelegateCommand(UnlockKalameet);
+            RingGargBellCommand = new DelegateCommand(RingGargBell);
+            RingQuelaggBellCommand = new DelegateCommand(RingQuelaagBell);
+            OpenSensCommand = new DelegateCommand(OpenSens);
+            PlaceLordVesselCommand = new DelegateCommand(PlaceLordVessel);
+            NewLondoNoWaterCommand = new DelegateCommand(NewLondoNoWater);
+            LaurentiusToFirelinkCommand = new DelegateCommand(LaurentiusToFirelink);
+            LoganToFirelinkCommand = new DelegateCommand(LoganToFirelink);
+            GriggsToFirelinkCommand = new DelegateCommand(GriggsToFirelink);
         }
 
         #region Commands
@@ -157,6 +157,57 @@ namespace SilkySouls.ViewModels
         {
             AreOptionsEnabled = false;
             IsDisableEventsEnabled = false;
+        }
+
+        private void UnlockKalameet()
+        {
+            foreach (var eventId in EventFlags.UnlockKalameet)
+            {
+                _eventService.SetEvent(eventId, true);
+            }
+        }
+
+        private void RingGargBell()
+        {
+            _eventService.SetEvent(EventFlags.GargBell, true);
+
+            if (_eventService.GetEvent(EventFlags.QuelaagBell))
+            {
+                _eventService.SetEvent(EventFlags.Sens, true);
+            }
+        }
+
+        private void RingQuelaagBell()
+        {
+            _eventService.SetEvent(EventFlags.QuelaagBell, true);
+
+            if (_eventService.GetEvent(EventFlags.GargBell))
+            {
+                _eventService.SetEvent(EventFlags.Sens, true);
+            }
+        }
+
+        private void OpenSens() => _eventService.OpenSensGate();
+        private void PlaceLordVessel() => _eventService.PlaceLordVessel();
+
+        private void NewLondoNoWater() => _eventService.SetEvent(EventFlags.NewLondoWater, true);
+
+        private void LaurentiusToFirelink() => _eventService.SetEvent(EventFlags.LaurentiusToFirelink, true);
+
+        private void LoganToFirelink()
+        {
+            foreach (var eventId in EventFlags.LoganToFirelink)
+            {
+                _eventService.SetEvent(eventId, true);
+            }
+        }
+
+        private void GriggsToFirelink()
+        {
+            foreach (var eventId in EventFlags.GriggsToFirelink)
+            {
+                _eventService.SetEvent(eventId, true);
+            }
         }
 
         #endregion

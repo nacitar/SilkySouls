@@ -110,8 +110,11 @@
     <Compile Include="Enums\HotkeyActions.cs" />
     <Compile Include="Enums\State.cs" />
     <Compile Include="GameIds\Emevd.cs" />
+    <Compile Include="GameIds\EntityId.cs" />
+    <Compile Include="GameIds\EventFlags.cs" />
     <Compile Include="GameIds\EzState.cs" />
     <Compile Include="GameIds\ShopParams.cs" />
+    <Compile Include="Interfaces\IDebugDrawService.cs" />
     <Compile Include="Interfaces\IEmevdService.cs" />
     <Compile Include="Interfaces\IEnemyService.cs" />
     <Compile Include="Interfaces\IEventLogReader.cs" />
@@ -132,7 +135,6 @@
     <Compile Include="Memory\AsmHelper.cs" />
     <Compile Include="Memory\BitFlag.cs" />
     <Compile Include="Memory\CodeCaveOffsets.cs" />
-    <Compile Include="Memory\GameIdsOld.cs" />
     <Compile Include="Memory\HookManager.cs" />
     <Compile Include="Memory\MemoryBlock.cs" />
     <Compile Include="Memory\Pattern.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="Models\Position.cs" />
     <Compile Include="Models\WarpLocation.cs" />
     <Compile Include="Models\UpgradeType.cs" />
+    <Compile Include="Services\DebugDrawService.cs" />
     <Compile Include="Services\EmevdService.cs" />
     <Compile Include="Services\EnemyService.cs" />
     <Compile Include="Services\EventService.cs" />
@@ -158,6 +161,7 @@
     <Compile Include="Services\TargetService.cs" />
     <Compile Include="Services\TravelService.cs" />
     <Compile Include="Services\UtilityService.cs" />
+    <Compile Include="Services\UtilityServiceOld.cs" />
     <Compile Include="Utilities\AsmLoader.cs" />
     <Compile Include="Utilities\HotkeyManager.cs" />
     <Compile Include="Utilities\DataLoader.cs" />

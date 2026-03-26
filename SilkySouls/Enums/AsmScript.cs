@@ -23,6 +23,7 @@ public enum AsmScript
     
     
     EnableDraw,
+    LoadedEnableDraw,
     NoClip_InAirTimer,
     NoClip_ZDirection_R2,
     NoClip_ZDirection_L2,

@@ -62,8 +62,10 @@ namespace SilkySouls
             IEmevdService emevdService = new EmevdService(_memoryService);
             IEzStateService ezStateService = new EzStateService(_memoryService);
             IEnemyService enemyService = new EnemyService(_memoryService, _hookManager);
-            var eventService = new EventService(_memoryService);
-            var utilityService = new UtilityService(_memoryService, _hookManager);
+            IEventService eventService = new EventService(_memoryService, playerService, emevdService);
+            IUtilityService utilityService = new UtilityService(_memoryService, _hookManager);
+            IDebugDrawService debugDrawService = new DebugDrawService(_memoryService, _hookManager, _stateService);
+            var utilityServiceOld = new UtilityServiceOld(_memoryService, _hookManager);
             IParamService paramService = new ParamService(_memoryService);
             _itemService = new ItemService(_memoryService);
             var settingsService = new SettingsService(_memoryService);
@@ -72,10 +74,10 @@ namespace SilkySouls
             _playerViewModel = new PlayerViewModel(playerService, hotkeyManager, _stateService, gameTickService);
             TargetViewModel targetViewModel =
                 new TargetViewModel(targetService, hotkeyManager, gameTickService, _stateService);
-            _utilityViewModel = new UtilityViewModel(utilityService, hotkeyManager, _playerViewModel, paramService,
-                _stateService, ezStateService);
+            _utilityViewModel = new UtilityViewModel(utilityServiceOld, utilityService, hotkeyManager, _playerViewModel, paramService,
+                _stateService, ezStateService, debugDrawService);
             var travelViewModel = new TravelViewModel(travelService, hotkeyManager, _utilityViewModel, _stateService);
-            var eventViewModel = new EventViewModel(eventService, _stateService);
+            var eventViewModel = new EventViewModel(eventService,  _stateService);
             var enemyViewModel = new EnemyViewModel(enemyService, hotkeyManager, _stateService, emevdService);
             _itemViewModel = new ItemViewModel(_itemService, _stateService);
             _settingsViewModel = new SettingsViewModel(settingsService, hotkeyManager);
@@ -176,6 +178,7 @@ namespace SilkySouls
             else
             {
                 _hookManager.ClearHooks();
+                _stateService.Publish(State.Detached);
                 _stateService.Publish(State.NotLoaded);
                 _utilityViewModel.ResetAttached();
                 _settingsViewModel.ResetAttached();

@@ -6,7 +6,6 @@ using SilkySouls.Core;
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Models;
-using SilkySouls.Services;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
 
@@ -515,7 +514,8 @@ namespace SilkySouls.ViewModels
             _hotkeyManager.RegisterAction(HotkeyActions.RTSR, SetRtsr);
             _hotkeyManager.RegisterAction(HotkeyActions.NoDeath, () => { IsNoDeathEnabled = !IsNoDeathEnabled; });
             _hotkeyManager.RegisterAction(HotkeyActions.OneShot, () => { IsOneShotEnabled = !IsOneShotEnabled; });
-            _hotkeyManager.RegisterAction(HotkeyActions.RestoreSpellCasts, () => SafeExecute(() => _playerService.RestoreSpellCasts()));
+            _hotkeyManager.RegisterAction(HotkeyActions.RestoreSpellCasts,
+                () => SafeExecute(() => _playerService.RestoreSpellCasts()));
             _hotkeyManager.RegisterAction(HotkeyActions.ToggleSpeed, ToggleSpeed);
             _hotkeyManager.RegisterAction(HotkeyActions.IncreaseSpeed,
                 () => SetSpeed(Math.Min(10, PlayerSpeed + 0.25f)));

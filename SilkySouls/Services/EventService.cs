@@ -1,89 +1,85 @@
-﻿using SilkySouls.Enums;
+﻿// 
+
+using SilkySouls.Enums;
+using SilkySouls.GameIds;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
+using static SilkySouls.GameIds.Emevd;
 using static SilkySouls.memory.Offsets;
 
-namespace SilkySouls.Services
+namespace SilkySouls.Services;
+
+public class EventService(IMemoryService memoryService, IPlayerService playerService, IEmevdService emevdService)
+    : IEventService
 {
-    public class EventService(IMemoryService memoryService)
+    public const int AnorLondoBlockId = 0xF010000;
+    public const int TotgBlockId = 0xD010000;
+    public const int DemonRuinsBlockId = 0xE010000;
+
+    public void SetEvent(int eventId, bool setVal)
     {
-        
-        public void ToggleDisableEvents(bool isDisableEventsEnabled)
-        {
-            memoryService.Write(memoryService.Read<nint>(DebugEventMan.Base) + DebugEventMan.DisableEvents,
-                isDisableEventsEnabled ? (byte)1 : (byte)0);
-        }
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.SetEvent);
+        AsmHelper.WriteAbsoluteAddresses(bytes, [
+            (memoryService.Read<nint>(EventFlagMan.Base), 2),
+            (eventId, 0xA + 2),
+            (setVal ? 1 : 0, 0x14 + 2),
+            (Functions.SetEvent, 0x28 + 2)
+        ]);
+        memoryService.AllocateAndExecute(bytes);
+    }
 
-        public void SetEvent(int eventId, bool setVal)
-        {
-            var bytes = AsmLoader.GetAsmBytes(AsmScript.SetEvent);
-            AsmHelper.WriteAbsoluteAddresses(bytes, [
-                (memoryService.Read<nint>(EventFlagMan.Base), 2 ),
-                (eventId, 0xA + 2),
-                (setVal ? 1 : 0, 0x14 + 2),
-                (Functions.SetEvent, 0x28 + 2)
-            ]);
-            memoryService.AllocateAndExecute(bytes);
-        }
+    public bool GetEvent(int eventId)
+    {
+        var getEventBytes = AsmLoader.GetAsmBytes(AsmScript.GetEvent);
+        AsmHelper.WriteAbsoluteAddresses(getEventBytes, [
+            (memoryService.Read<nint>(EventFlagMan.Base), 0x0 + 2),
+            (eventId, 0xA + 2),
+            (Functions.GetEvent, 0x14 + 2),
+            (CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult, 0x28 + 2)
+        ]);
 
-        public void SetMultipleEventsOn(params int[] flagIds)
-        {
-            foreach (var flagId in flagIds)
-            {
-                SetEvent(flagId, true);
-            }
-        }
+        memoryService.AllocateAndExecute(getEventBytes);
+        return memoryService.Read<byte>(CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult) == 1;
+    }
 
-        public bool GetEvent(int eventId)
-        {
-            var getEventBytes = AsmLoader.GetAsmBytes(AsmScript.GetEvent);
-            AsmHelper.WriteAbsoluteAddresses(getEventBytes, [
-                (memoryService.Read<nint>(EventFlagMan.Base), 0x0 + 2),
-                (eventId, 0xA + 2),
-                (Functions.GetEvent, 0x14 + 2),
-                (CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult, 0x28 + 2)
-            ]);
-            
-            memoryService.AllocateAndExecute(getEventBytes);
-            return memoryService.Read<byte>(CodeCaveOffsets.Base + CodeCaveOffsets.GetEventResult) == 1;
-        }
-        
-        public void RingGargBell()
-        {
-            SetEvent(GameIdsOld.EventFlags.GargBell, true);
-            if (GetEvent(GameIdsOld.EventFlags.QuelaagBell))SetEvent(GameIdsOld.EventFlags.Sens, true);
-        }
-        public void RingQuelaagBell()
-        {
-            SetEvent(GameIdsOld.EventFlags.QuelaagBell, true);
-            if (GetEvent(GameIdsOld.EventFlags.GargBell))SetEvent(GameIdsOld.EventFlags.Sens, true);
-        }
-        
-        public void OpenSensGate(int sens)
-        {
-            SetEvent(sens, true);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.ReproduceObjectAnimation,
-            //     GameIdsOld.EmevdCommandParams.SensDoor);
-        }
+    public void ToggleDisableEvents(bool isEnabled) =>
+        memoryService.Write(memoryService.Read<nint>(DebugEventMan.Base) + DebugEventMan.DisableEvents, isEnabled);
 
-        
-        public void PlaceLordVessel()
+    public void OpenSensGate()
+    {
+        SetEvent(EventFlags.Sens, true);
+        emevdService.ExecuteEmevdCommand(
+            EmevdCommands.ReproduceObjectAnimation(EntityId.SensDoor, 0));
+    }
+
+    public void PlaceLordVessel()
+    {
+        SetEvent(EventFlags.PlaceLordVessel, true);
+        var currentBlockId =
+            memoryService.FollowPointers(playerService.GetPlayerIns(), WorldChrMan.CurrentBlockId, false);
+
+        switch (currentBlockId)
         {
-            SetEvent(GameIdsOld.EventFlags.PlaceLordVessel, true);
-            SetEvent(GameIdsOld.EventFlags.DukesAfterLordVessel, true);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeactiveObject, GameIdsOld.EmevdCommandParams.DukesFogDeactiveObject);
-            // await Task.Delay(5);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeleteMapSfx, GameIdsOld.EmevdCommandParams.DukesFogDeleteMapSfx);
-            // await Task.Delay(5);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeactiveObject, GameIdsOld.EmevdCommandParams.DemonRuinsFogDeactiveObject);
-            // await Task.Delay(5);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeleteMapSfx, GameIdsOld.EmevdCommandParams.DemonRuinsFogDeleteMapSfx);
-            // await Task.Delay(5);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeactiveObject, GameIdsOld.EmevdCommandParams.NitoFogDeactiveObject);
-            // await Task.Delay(5);
-            // ExecuteEmevdCommand(GameIdsOld.EmevdCommands.DeleteMapSfx, GameIdsOld.EmevdCommandParams.NitoFogDeleteMapSfx);
-            // await Task.Delay(500);
+            case AnorLondoBlockId:
+                SetEvent(EventFlags.DukesAfterLordVessel, true);
+                emevdService.ExecuteEmevdCommand(
+                    EmevdCommands.SetObjectIsEnabled(EntityId.AnorLondoFogGateObject, false));
+                emevdService.ExecuteEmevdCommand(
+                    EmevdCommands.DeleteMapSfx(EntityId.AnorLondoFogGateSfx, false));
+                return;
+            case TotgBlockId:
+                emevdService.ExecuteEmevdCommand(
+                    EmevdCommands.SetObjectIsEnabled(EntityId.TotgFogGateObject, false));
+                emevdService.ExecuteEmevdCommand(
+                    EmevdCommands.DeleteMapSfx(EntityId.TotgFogGateSfx, false));
+                return;
+            case DemonRuinsBlockId:
+                emevdService.ExecuteEmevdCommand(
+                    EmevdCommands.SetObjectIsEnabled(EntityId.DemonRuinsFogGateObject, false));
+                emevdService.ExecuteEmevdCommand(
+                    EmevdCommands.DeleteMapSfx(EntityId.DemonRuinsFogGateSfx, false));
+                return;
         }
     }
 }

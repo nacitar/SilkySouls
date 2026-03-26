@@ -7,6 +7,7 @@ namespace SilkySouls.Interfaces;
 
 public interface IPlayerService
 {
+    nint GetPlayerIns();
     int GetHp();
     int GetMaxHp();
     void SetHp(int hp);

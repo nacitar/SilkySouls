@@ -1,6 +1,5 @@
 ﻿// 
 
-using System;
 using System.IO;
 using SilkySouls.Interfaces;
 using SilkySouls.memory;

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Numerics;
 using SilkySouls.Models;
+using SilkySouls.Properties;
 
 namespace SilkySouls.Utilities
 {
@@ -14,7 +14,7 @@ namespace SilkySouls.Utilities
         {
             List<Item> items = new List<Item>();
 
-            string csvData = Properties.Resources.ResourceManager.GetString(listName);
+            string csvData = Resources.ResourceManager.GetString(listName);
             
             if (string.IsNullOrEmpty(csvData))
             {
@@ -48,7 +48,7 @@ namespace SilkySouls.Utilities
         {
             Dictionary<string, List<WarpLocation>> warpDict = new Dictionary<string, List<WarpLocation>>();
 
-            string csvData = Properties.Resources.WarpLocations;
+            string csvData = Resources.WarpLocations;
     
             if (string.IsNullOrWhiteSpace(csvData))
                 return warpDict;
@@ -106,7 +106,7 @@ namespace SilkySouls.Utilities
         {
             var dict = new Dictionary<TKey, TValue>();
 
-            string data = Properties.Resources.ResourceManager.GetString(resourceName);
+            string data = Resources.ResourceManager.GetString(resourceName);
             if (string.IsNullOrWhiteSpace(data)) return dict;
 
             var keyConverter = TypeDescriptor.GetConverter(typeof(TKey));

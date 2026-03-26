@@ -1,318 +1,149 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// 
+
 using SilkySouls.Enums;
 using SilkySouls.Interfaces;
 using SilkySouls.Memory;
 using SilkySouls.Utilities;
 using static SilkySouls.memory.Offsets;
 
-namespace SilkySouls.Services
+namespace SilkySouls.Services;
+
+public class UtilityService(IMemoryService memoryService, HookManager hookManager) : IUtilityService
 {
-    public class UtilityService(IMemoryService memoryService, HookManager hookManager)
+    public const float DefaultNoClipSpeedScale = 0.2f;
+
+    public void ShowMenu(int offset, int val) =>
+        memoryService.Write(memoryService.Read<nint>(MenuMan.Base) + offset, val);
+
+    public void ToggleDebugDraw(bool isEnabled)
     {
-        private IntPtr _draw;
-        private nint _drawOrigin;
+        throw new System.NotImplementedException();
+    }
+    
 
-        private readonly byte[] _drawOriginBytes = { 0x44, 0x8B, 0xC6, 0xBA, 0x16, 0x00, 0x00, 0x00 };
+    public void ToggleNoClip(bool isEnabled)
+    {
+        var inAirTimerCode = CodeCaveOffsets.Base + CodeCaveOffsets.InAirTimer;
+        var kbCode = CodeCaveOffsets.Base + CodeCaveOffsets.Kb;
+        var rightTriggerCode = CodeCaveOffsets.Base + CodeCaveOffsets.TriggerR2;
+        var leftTriggerCode = CodeCaveOffsets.Base + CodeCaveOffsets.TriggerL2;
+        var updateCoordsCode = CodeCaveOffsets.Base + CodeCaveOffsets.UpdateCoords;
 
-        private List<nint> _noClipHooks;
+        var playerIns =
+            memoryService.Read<nint>(memoryService.Read<nint>(WorldChrMan.Base) + WorldChrMan.PlayerIns);
 
-        internal bool EnableDraw()
+        if (isEnabled)
         {
-            if (!IsDrawOriginInitialized()) return false;
-            _draw = CodeCaveOffsets.Base + CodeCaveOffsets.EnableDraw;
+            WriteInAirTimer(inAirTimerCode);
+            WriteKeyboardHook(kbCode);
+            WriteRightTriggerCode(rightTriggerCode);
+            WriteLeftTriggerCode(leftTriggerCode);
+            WriteUpdateCoordsCode(updateCoordsCode);
 
-            var ezDraw = memoryService.FollowPointers(memoryService.Read<nint>(HgDraw.Base), new[] { HgDraw.EzDraw }, true);
-            long drawFunc1 = _drawOrigin + 11 + 5 + memoryService.Read<int>((IntPtr)(_drawOrigin + 11) + 1);
-            long drawFunc2 = _drawOrigin + 43 + 5 + memoryService.Read<int>((IntPtr)(_drawOrigin + 43) + 1);
+            hookManager.InstallHook(inAirTimerCode, Hooks.InAirTimer, [0xF3, 0x0F, 0x58, 0x9B, 0xB0, 0x01, 0x00, 0x00]);
+            hookManager.InstallHook(kbCode, Hooks.Keyboard, [0xC6, 0x43, 0xF0, 0x01, 0xC6, 0x00, 0x01]);
+            hookManager.InstallHook(rightTriggerCode, Hooks.ControllerR2, [0x0F, 0xB6, 0x44, 0x24, 0x27]);
+            hookManager.InstallHook(leftTriggerCode, Hooks.ControllerL2, [0x0F, 0xB6, 0x44, 0x24, 0x26]);
+            hookManager.InstallHook(updateCoordsCode, Hooks.UpdateCoords, [0x0F, 0x29, 0x81, 0x20, 0x01, 0x00, 0x00]);
 
-            byte[] drawBytes = AsmLoader.GetAsmBytes(AsmScript.EnableDraw);
-            byte[] bytes = BitConverter.GetBytes(ezDraw);
-            Array.Copy(bytes, 0, drawBytes, 2, 8);
-            bytes = BitConverter.GetBytes(drawFunc1);
-            Array.Copy(bytes, 0, drawBytes, 26, 8);
-            bytes = BitConverter.GetBytes(drawFunc2);
-            Array.Copy(bytes, 0, drawBytes, 85, 8);
-            bytes = BitConverter.GetBytes(drawFunc1);
-            Array.Copy(bytes, 0, drawBytes, 108, 8);
-            bytes = BitConverter.GetBytes(drawFunc2);
-            Array.Copy(bytes, 0, drawBytes, 147, 8);
-            byte[] jumpBytes = BitConverter.GetBytes((int)(_drawOrigin + 8 - (_draw.ToInt64() + 170)));
-            Array.Copy(jumpBytes, 0, drawBytes, 166, 4);
-            memoryService.WriteBytes(_draw, drawBytes);
-
-            hookManager.InstallHook(_draw, _drawOrigin, _drawOriginBytes);
-            return true;
+            memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, true);
         }
-
-        private bool IsDrawOriginInitialized()
+        else
         {
-            _drawOrigin = Hooks.Draw;
-            var originBytes = memoryService.ReadBytes((IntPtr)_drawOrigin, 8);
-            return originBytes.SequenceEqual(_drawOriginBytes);
-        }
+            hookManager.UninstallHook(inAirTimerCode);
+            hookManager.UninstallHook(kbCode);
+            hookManager.UninstallHook(rightTriggerCode);
+            hookManager.UninstallHook(leftTriggerCode);
+            hookManager.UninstallHook(updateCoordsCode);
 
-        internal void DisableDraw()
-        {
-            hookManager.UninstallHook(_draw);
-        }
-
-        internal void EnableHitboxView()
-        {
-            var hitboxAddr =
-                memoryService.FollowPointers(memoryService.Read<nint>(DamageManager.Base), new[] { DamageManager.HitboxFlag }, false);
-            memoryService.Write(hitboxAddr, 1);
-        }
-
-        internal void DisableHitboxView()
-        {
-            var hitboxAddr =
-                memoryService.FollowPointers(memoryService.Read<nint>(DamageManager.Base), new[] { DamageManager.HitboxFlag }, false);
-            memoryService.Write(hitboxAddr, 0);
-        }
-
-        internal void EnableSoundView()
-        {
-            memoryService.Write(Patches.DrawSoundView, (byte)1);
-        }
-
-        internal void DisableSoundView()
-        {
-            memoryService.Write(Patches.DrawSoundView, (byte)0);
-        }
-
-        public void EnableDrawEvent()
-        {
-            memoryService.Write(Patches.DrawEvent, (byte)1);
-        }
-
-        public void DisableDrawEvent()
-        {
-            memoryService.Write(Patches.DrawEvent, (byte)0);
-        }
-        
-        public void EnableNoClip()
-        {
-            var zDirectionAddr = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionVariable;
-
-            var playerCoordsBase = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
-                new[]
-                {
-                    (int)WorldChrMan.BaseOffsets.UpdateCoordsBasePtr, WorldChrMan.UpdateCoords
-                },
-                true);
-
-            var inAirTimerOrigin = Hooks.InAirTimer;
-            IntPtr inAirTimerBlock = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.InAirTimer;
-            byte[] inAirTimerCodeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_InAirTimer);
-
-            byte[] bytes = BitConverter.GetBytes(playerCoordsBase);
-            Array.Copy(bytes, 0, inAirTimerCodeBytes, 11, 8);
-            bytes = BitConverter.GetBytes(3);
-            Array.Copy(bytes, 0, inAirTimerCodeBytes, 24, 4);
-            bytes = BitConverter.GetBytes(inAirTimerOrigin + 5 - (inAirTimerBlock.ToInt64() + 37));
-            Array.Copy(bytes, 0, inAirTimerCodeBytes, 33, 4);
-
-            memoryService.WriteBytes(inAirTimerBlock, inAirTimerCodeBytes);
-
-            IntPtr zDirectionKbCheck = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionKbCheck;
-            var keyOrigin = Hooks.Keyboard;
-
-            byte[] zDirectKbBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_KB);
-            bytes = BitConverter.GetBytes(25);
-            Array.Copy(bytes, 0, zDirectKbBytes, 6, 4);
-            bytes = BitConverter.GetBytes(39);
-            Array.Copy(bytes, 0, zDirectKbBytes, 19, 4);
-            int originOffset = (int)(keyOrigin + 7 - (zDirectionKbCheck.ToInt64() + 35));
-            bytes = BitConverter.GetBytes(originOffset);
-            Array.Copy(bytes, 0, zDirectKbBytes, 31, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr);
-            Array.Copy(bytes, 0, zDirectKbBytes, 38, 8);
-            originOffset = (int)(keyOrigin + 7 - (zDirectionKbCheck.ToInt64() + 62));
-            bytes = BitConverter.GetBytes(originOffset);
-            Array.Copy(bytes, 0, zDirectKbBytes, 58, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr);
-            Array.Copy(bytes, 0, zDirectKbBytes, 65, 8);
-            originOffset = (int)(keyOrigin + 7 - (zDirectionKbCheck.ToInt64() + 89));
-            bytes = BitConverter.GetBytes(originOffset);
-            Array.Copy(bytes, 0, zDirectKbBytes, 85, 4);
-
-            memoryService.WriteBytes(zDirectionKbCheck, zDirectKbBytes);
-
-            IntPtr zDirectionR2Check = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionR2Check;
-            var r2Origin = Hooks.ControllerR2;
-
-            byte[] r2Bytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_R2);
-
-            bytes = BitConverter.GetBytes(17);
-            Array.Copy(bytes, 0, r2Bytes, 9, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr);
-            Array.Copy(bytes, 0, r2Bytes, 16, 8);
-            originOffset = (int)(r2Origin + 5 - (zDirectionR2Check.ToInt64() + 35));
-            bytes = BitConverter.GetBytes(originOffset);
-            Array.Copy(bytes, 0, r2Bytes, 31, 4);
-
-            memoryService.WriteBytes(zDirectionR2Check, r2Bytes);
-
-            IntPtr zDirectionL2Check = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionL2Check;
-            var l2Origin = Hooks.ControllerL2;
-
-            byte[] l2Bytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_L2);
-
-            bytes = BitConverter.GetBytes(17);
-            Array.Copy(bytes, 0, l2Bytes, 9, 4);
-            bytes = BitConverter.GetBytes(zDirectionAddr);
-            Array.Copy(bytes, 0, l2Bytes, 16, 8);
-            originOffset = (int)(l2Origin + 5 - (zDirectionL2Check.ToInt64() + 35));
-            bytes = BitConverter.GetBytes(originOffset);
-            Array.Copy(bytes, 0, l2Bytes, 31, 4);
-
-            memoryService.WriteBytes(zDirectionL2Check, l2Bytes);
-
-            IntPtr updateCoordsBlock = CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.UpdateCoords;
-
-            var coordsPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base), new[]
-            {
-                (int)WorldChrMan.PlayerIns,
-                (int)WorldChrMan.PlayerInsOffsets.CoordsPtr1,
-                WorldChrMan.CoordsPtr2,
-                WorldChrMan.CoordsPtr3,
-                WorldChrMan.CoordsPtr4,
-            }, true);
-
-            var updateCoordsOrigin = Hooks.UpdateCoords;
-            var padManPtr = memoryService.FollowPointers(memoryService.Read<nint>(WorldChrMan.Base),
-                new[]
-                {
-                    (int)WorldChrMan.PlayerIns,
-                    (int)WorldChrMan.PlayerInsOffsets.PadMan
-                }, true);
-
-            var camPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[] { FieldArea.ChrCam, FieldArea.ChrExFollowCam }, true);
-
-            byte[] updateCoordsCodeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_UpdateCoords);
-
-            bytes = BitConverter.GetBytes(coordsPtr);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 3, 8);
-            bytes = BitConverter.GetBytes(247);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 16, 4);
-            bytes = BitConverter.GetBytes(padManPtr);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 31, 8);
-            bytes = BitConverter.GetBytes(camPtr);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 84, 8);
-            bytes = BitConverter.GetBytes(padManPtr);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 106, 8);
-            bytes = BitConverter.GetBytes(camPtr);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 159, 8);
-            bytes = BitConverter.GetBytes(zDirectionAddr);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 181, 8);
-            bytes = BitConverter.GetBytes(10);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 196, 4);
-            bytes = BitConverter.GetBytes(14);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 206, 4);
-            bytes = BitConverter.GetBytes(5);
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 215, 4);
-            bytes = BitConverter.GetBytes(updateCoordsOrigin + 7 - (updateCoordsBlock.ToInt64() + 267));
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 263, 4);
-            bytes = BitConverter.GetBytes(updateCoordsOrigin + 7 - (updateCoordsBlock.ToInt64() + 273));
-            Array.Copy(bytes, 0, updateCoordsCodeBytes, 269, 4);
-
-            memoryService.WriteBytes(updateCoordsBlock, updateCoordsCodeBytes);
-
-            _noClipHooks = new List<nint>
-            {
-                hookManager.InstallHook(inAirTimerBlock, inAirTimerOrigin,
-                    new byte[] { 0xF3, 0x0F, 0x58, 0x9B, 0xB0, 0x01, 0x00, 0x00 }),
-                hookManager.InstallHook(zDirectionKbCheck, keyOrigin,
-                    new byte[] { 0xC6, 0x43, 0xF0, 0x01, 0xC6, 0x00, 0x01 }),
-                hookManager.InstallHook(zDirectionR2Check, r2Origin,
-                    new byte[] { 0x0F, 0xB6, 0x44, 0x24, 0x27 }),
-                hookManager.InstallHook(zDirectionL2Check, l2Origin,
-                    new byte[] { 0x0F, 0xB6, 0x44, 0x24, 0x26 }),
-                hookManager.InstallHook(updateCoordsBlock, updateCoordsOrigin,
-                    new byte[] { 0x0F, 0x29, 0x81, 0x20, 0x01, 0x00, 0x00 })
-            };
-        }
-
-        public void DisableNoClip()
-        {
-            for (int i = _noClipHooks.Count - 1; i >= 0; i--)
-            {
-                hookManager.UninstallHook(_noClipHooks[i]);
-            }
-
-            _noClipHooks.Clear();
-            memoryService.WriteBytes(CodeCaveOffsets.Base + (int)CodeCaveOffsets.NoClip.ZDirectionVariable, new byte[641]);
-        }
-
-        public void ToggleFilter(bool value)
-        {
-            if (value)
-            {
-                var filterPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
-                    { FieldArea.RenderPtr, FieldArea.FilterRemoval }, false);
-                memoryService.Write(filterPtr, (byte)1);
-                var brightnessPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
-                    { FieldArea.RenderPtr, FieldArea.Brightness }, false);
-                var bytes = new byte[12];
-                var floatBytes = BitConverter.GetBytes(5.0f);
-                Buffer.BlockCopy(floatBytes, 0, bytes, 0, 4);
-                Buffer.BlockCopy(floatBytes, 0, bytes, 4, 4);
-                Buffer.BlockCopy(floatBytes, 0, bytes, 8, 4);
-
-                memoryService.WriteBytes(brightnessPtr, bytes);
-            }
-            else
-            {
-                var filterPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
-                    { FieldArea.RenderPtr, FieldArea.FilterRemoval }, false);
-                memoryService.Write(filterPtr, (byte)0);
-                var brightnessPtr = memoryService.FollowPointers(memoryService.Read<nint>(FieldArea.Base), new[]
-                    { FieldArea.RenderPtr, FieldArea.Brightness }, false);
-                var bytes = new byte[12];
-                var floatBytes = BitConverter.GetBytes(1.0f);
-                Buffer.BlockCopy(floatBytes, 0, bytes, 0, 4);
-                Buffer.BlockCopy(floatBytes, 0, bytes, 4, 4);
-                Buffer.BlockCopy(floatBytes, 0, bytes, 8, 4);
-
-                memoryService.WriteBytes(brightnessPtr, bytes);
-            }
-        }
-
-        public void ShowMenu(MenuMan.MenuManData menuType)
-        {
-            var menuPtr = memoryService.FollowPointers(memoryService.Read<nint>(MenuMan.Base), new[] { (int)menuType }, false);
-            memoryService.Write(menuPtr, menuType == MenuMan.MenuManData.Warp ? (byte)2 : (byte)1);
-        }
-
-        
-        public void ToggleDeathCam(bool isDeathCamEnabled) =>
-            memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
-                isDeathCamEnabled ? (byte)1 : (byte)0);
-
-        
-        public void SetGuaranteedBkhDrop(bool setValue)
-        {
-            var bkhPtr = memoryService.FollowPointers(memoryService.Read<nint>(SoloParamMan.Base), new[]
-            {
-                SoloParamMan.ParamResCap,
-                SoloParamMan.ItemLot,
-                SoloParamMan.BkhDropRateBase
-            }, false);
-
-            if (setValue)
-            {
-                memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Nothing, (byte)0);
-                memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bkh, (byte)0x64);
-                memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bks, (byte)0);
-            }
-            else
-            {
-                memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Nothing, (byte)0x4B);
-                memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bkh, (byte)0x14);
-                memoryService.Write(bkhPtr + (int)SoloParamMan.BkhDropRateSlots.Bks, (byte)0x5);
-            }
+            memoryService.SetBitValue(playerIns + ChrIns.NoGravity.Offset, ChrIns.NoGravity.Bit, false);
         }
     }
+
+    public void WriteNoClipSpeed(float speedScale)
+    {
+        var ptr = CodeCaveOffsets.Base + CodeCaveOffsets.SpeedScale;
+        memoryService.Write(ptr, DefaultNoClipSpeedScale * speedScale);
+    }
+
+    private void WriteInAirTimer(nint code)
+    {
+        var codeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_InAirTimer);
+        AsmHelper.WriteRelativeOffsets(codeBytes, [
+            (code + 0x9, WorldChrMan.Base, 7, 0x9 + 3),
+            (code + 0x31, Hooks.InAirTimer + 8, 5, 0x31 + 1)
+        ]);
+
+        memoryService.WriteBytes(code, codeBytes);
+    }
+
+    private void WriteKeyboardHook(nint code)
+    {
+        var codeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_KB);
+        var zDirection = CodeCaveOffsets.Base + CodeCaveOffsets.ZDirection;
+
+        AsmHelper.WriteRelativeOffsets(codeBytes, [
+            (code + 0x16, Hooks.Keyboard + 7, 5, 0x16 + 1),
+            (code + 0x1b, zDirection, 7, 0x1B + 2),
+            (code + 0x29, Hooks.Keyboard + 7, 5, 0x29 + 1),
+            (code + 0x2E, zDirection, 7, 0x2E + 2),
+            (code + 0x3C, Hooks.Keyboard + 7, 5, 0x3C + 1),
+        ]);
+
+        memoryService.WriteBytes(code, codeBytes);
+    }
+
+    private void WriteRightTriggerCode(nint code)
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_R2);
+        var zDirection = CodeCaveOffsets.Base + CodeCaveOffsets.ZDirection;
+
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x7, Hooks.ControllerR2 + 5, 6, 0x7 + 2),
+            (code + 0xD, zDirection, 7, 0xD + 2),
+            (code + 0x16, Hooks.ControllerR2 + 5, 5, 0x16 + 1),
+        ]);
+
+        memoryService.WriteBytes(code, bytes);
+    }
+
+    private void WriteLeftTriggerCode(nint code)
+    {
+        var bytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_ZDirection_L2);
+        var zDirection = CodeCaveOffsets.Base + CodeCaveOffsets.ZDirection;
+
+        AsmHelper.WriteRelativeOffsets(bytes, [
+            (code + 0x7, Hooks.ControllerL2 + 5, 6, 0x7 + 2),
+            (code + 0xD, zDirection, 7, 0xD + 2),
+            (code + 0x16, Hooks.ControllerL2 + 5, 5, 0x16 + 1),
+        ]);
+
+        memoryService.WriteBytes(code, bytes);
+    }
+
+    private void WriteUpdateCoordsCode(nint code)
+    {
+        var codeBytes = AsmLoader.GetAsmBytes(AsmScript.NoClip_UpdateCoords);
+        var zDirection = CodeCaveOffsets.Base + CodeCaveOffsets.ZDirection;
+        var speedScale = CodeCaveOffsets.Base + CodeCaveOffsets.SpeedScale;
+
+        AsmHelper.WriteRelativeOffsets(codeBytes, [
+            (code + 0x1, WorldChrMan.Base, 7, 0x1 + 3),
+            (code + 0x96, PadMan.Base, 7, 0x96 + 3),
+            (code + 0xA1, DbgMapWalkPadVtable, 7, 0xA1 + 3),
+            (code + 0xC0, Functions.GetYMovement, 5, 0xC0 + 1),
+            (code + 0xCF, Functions.GetXMovement, 5, 0xCF + 1),
+            (code + 0x103, FieldArea.Base, 7, 0x103 + 3),
+            (code + 0x116, Functions.MatrixVectorProduct, 5, 0x116 + 1),
+            (code + 0x152, speedScale, 9, 0x152 + 5),
+            (code + 0x168, zDirection, 6, 0x168 + 2),
+            (code + 0x192, zDirection, 7, 0x192 + 2),
+            (code + 0x1C0, Hooks.UpdateCoords + 7, 5, 0x1C0 + 1)
+        ]);
+        memoryService.WriteBytes(code, codeBytes);
+    }
+
+    public void ToggleDeathCamera(bool isEnabled) =>
+        memoryService.Write(memoryService.Read<nint>(WorldChrMan.Base) + (int)WorldChrMan.BaseOffsets.DeathCam,
+            isEnabled ? (byte)1 : (byte)0);
 }

@@ -20,49 +20,16 @@
                 CornerRadius="3"
                 Margin="0,0,0,10">
             <StackPanel Margin="10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <CheckBox Content="Enable Draw"
-                              IsChecked="{Binding IsDrawEnabled}"
-                              Grid.Column="0" />
-
-                    <Border
-                        Background="#3498db"
-                        CornerRadius="10"
-                        Width="12"
-                        Height="12"
-                        Margin="10,0,0,0"
-                        Cursor="Hand"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Grid.Column="1"
-                        MouseLeftButtonDown="DrawInfoBorder_MouseLeftButtonDown">
-                        <TextBlock Text="i"
-                                   Foreground="White"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   FontWeight="Bold"
-                                   FontSize="10" />
-                    </Border>
-                </Grid>
-
-                <UniformGrid Columns="2" Margin="20,5,0,0">
+                <UniformGrid Columns="2" Margin="0,0,0,0">
                     <CheckBox Content="Hitbox View"
-                              IsEnabled="{Binding IsDrawEnabled}"
                               IsChecked="{Binding IsHitboxEnabled}"
                               Margin="0,2" />
 
                     <CheckBox Content="Player Sound View"
-                              IsEnabled="{Binding IsDrawEnabled}"
                               IsChecked="{Binding IsSoundViewEnabled}"
                               Margin="0,2" />
 
                     <CheckBox Content="Draw Events"
-                              IsEnabled="{Binding IsDrawEnabled}"
                               IsChecked="{Binding IsDrawEventEnabled}"
                               Margin="0,2" />
 

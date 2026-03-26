@@ -212,20 +212,17 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
+        ///   Looks up a localized string similar to 48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 7 &lt;_main+0x7&gt;
+        ///48 8b 40 58             mov    rax,QWORD PTR [rax+0x58]
         ///8b 58 08                mov    ebx,DWORD PTR [rax+0x8]
         ///41 89 f0                mov    r8d,esi
         ///ba 16 00 00 00          mov    edx,0x16
         ///48 89 f9                mov    rcx,rdi
-        ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
-        ///ff d0                   call   rax
+        ///e8 00 00 00 00          call   1e &lt;_main+0x1e&gt;
         ///48 8b 0f                mov    rcx,QWORD PTR [rdi]
         ///48 83 c1 03             add    rcx,0x3
         ///48 83 e1 fc             and    rcx,0xfffffffffffffffc
-        ///48 8d 41 04             lea    rax,[rcx+0x4]
-        ///48 89  [rest of string was truncated]&quot;;.
+        ///48 8 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EnableDraw {
             get {
@@ -390,6 +387,26 @@ namespace SilkySouls.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 80 3d 00 00 00 00 01    cmp    BYTE PTR [rip+0x0],0x1        # 7 &lt;_main+0x7&gt;
+        ///0f 85 11 02 00 00       jne    21e &lt;early_exit&gt;
+        ///c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 14 &lt;_main+0x14&gt;
+        ///50                      push   rax
+        ///51                      push   rcx
+        ///52                      push   rdx
+        ///41 50                   push   r8
+        ///41 51                   push   r9
+        ///41 52                   push   r10
+        ///41 53                   push   r11
+        ///53                      push   rbx
+        ///56                  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string LoadedEnableDraw {
+            get {
+                return ResourceManager.GetString("LoadedEnableDraw", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 48 89 fa                mov    rdx,rdi
         ///50                      push   rax
         ///51                      push   rcx
@@ -426,15 +443,17 @@ namespace SilkySouls.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to f3 0f 58 9b b0 01 00    addss  xmm3,DWORD PTR [rbx+0x1b0]
-        ///00
+        ///00 
         ///50                      push   rax
-        ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
-        ///48 39 d8                cmp    rax,rbx
-        ///0f 85 00 00 00 00       jne    1c &lt;_main+0x1c&gt;
-        ///0f 57 db                xorps  xmm3,xmm3
-        ///58                      pop    rax
-        ///e9 00 00 00 00          jmp    25 &lt;_main+0x25&gt;.
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 10 &lt;_main+0x10&gt;
+        ///48 85 c0                test   rax,rax
+        ///74 1b                   je     30 &lt;exit&gt;
+        ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+        ///48 85 c0                test   rax,rax
+        ///74 12                   je     30 &lt;exit&gt;
+        ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+        ///48 85 c0                test   rax,rax
+        ///74 09         [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NoClip_InAirTimer {
             get {
@@ -444,20 +463,16 @@ namespace SilkySouls.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to 50                      push   rax
-        ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
-        ///48 39 c8                cmp    rax,rcx
-        ///0f 85 00 00 00 00       jne    0x14 
-        ///52                      push   rdx
-        ///66 0f 6f b1 20 01 00    movdqa xmm6,XMMWORD PTR [rcx+0x120]
-        ///00
-        ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
-        ///8b 90 04 03 00 00       mov    edx,DWORD PTR [rax+0x304]
-        ///c1 e2 02                shl    edx,0x2
-        ///f3 44 0f 10 bc 10 64    movss  xmm15,DWORD PTR [rax+rdx*1+0x264]
-        ///02 00 00
-        ///45 0f c6 ff 00          [rest of string was truncated]&quot;;.
+        ///48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 8 &lt;_main+0x8&gt;
+        ///48 85 c0                test   rax,rax
+        ///0f 84 a7 01 00 00       je     1b8 &lt;exit&gt;
+        ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+        ///48 85 c0                test   rax,rax
+        ///0f 84 9a 01 00 00       je     1b8 &lt;exit&gt;
+        ///48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+        ///48 85 c0                test   rax,rax
+        ///0f 84 8d 01 00 00       je     1b8 &lt;exit&gt;
+        ///48 8b 40 28             mov    rax [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NoClip_UpdateCoords {
             get {
@@ -467,17 +482,17 @@ namespace SilkySouls.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to 48 83 ff 20             cmp    rdi,0x20
-        ///0f 84 00 00 00 00       je     a &lt;_main+0xa&gt;
+        ///74 15                   je     1b &lt;set_up&gt;
         ///48 81 ff a2 00 00 00    cmp    rdi,0xa2
-        ///0f 84 00 00 00 00       je     17 &lt;_main+0x17&gt;
+        ///74 1f                   je     2e &lt;set_down&gt;
         ///c6 43 f0 01             mov    BYTE PTR [rbx-0x10],0x1
         ///c6 00 01                mov    BYTE PTR [rax],0x1
-        ///e9 00 00 00 00          jmp    23 &lt;_main+0x23&gt;
-        ///50                      push   rax
-        ///48 b8 00 00 00 00 00    movabs rax,0x0
-        ///00 00 00
-        ///c6 00 01                mov    BYTE PTR [rax],0x1
-        ///c6 43 f0 00             mov    BYTE PTR [rbx [rest of string was truncated]&quot;;.
+        ///e9 00 00 00 00          jmp    1b &lt;set_up&gt;
+        ///
+        ///00000000001b &lt;set_up&gt;:
+        ///c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 22 &lt;set_up+0x7&gt;
+        ///c6 43 f0 00             mov    BYTE PTR [rbx-0x10],0x0
+        ///c6 00 00                mov [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NoClip_ZDirection_KB {
             get {
@@ -488,14 +503,10 @@ namespace SilkySouls.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 0f b6 44 24 26          movzx  eax,BYTE PTR [rsp+0x26]
         ///3c 1e                   cmp    al,0x1e
-        ///0f 86 00 00 00 00       jbe     d &lt;_main+0xd&gt;
-        ///51                      push   rcx
-        ///48 b9 00 00 00 00 00    movabs rcx,0x0
-        ///00 00 00
-        ///c6 01 02                mov    BYTE PTR [rcx],0x2
+        ///0f 86 00 00 00 00       jbe    d &lt;_main+0xd&gt;
+        ///c6 05 00 00 00 00 02    mov    BYTE PTR [rip+0x0],0x2        # 14 &lt;_main+0x14&gt;
         ///30 c0                   xor    al,al
-        ///59                      pop    rcx
-        ///e9 00 00 00 00          jmp    23 &lt;_main+0x23&gt;.
+        ///e9 00 00 00 00          jmp    1b &lt;_main+0x1b&gt;.
         /// </summary>
         internal static string NoClip_ZDirection_L2 {
             get {
@@ -506,14 +517,10 @@ namespace SilkySouls.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 0f b6 44 24 27          movzx  eax,BYTE PTR [rsp+0x27]
         ///3c 1e                   cmp    al,0x1e
-        ///0f 86 00 00 00 00       jbe     d &lt;_main+0xd&gt;
-        ///51                      push   rcx
-        ///48 b9 00 00 00 00 00    movabs rcx,0x0
-        ///00 00 00
-        ///c6 01 01                mov    BYTE PTR [rcx],0x1
+        ///0f 86 00 00 00 00       jbe    d &lt;_main+0xd&gt;
+        ///c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 14 &lt;_main+0x14&gt;
         ///30 c0                   xor    al,al
-        ///59                      pop    rcx
-        ///e9 00 00 00 00          jmp    23 &lt;_main+0x23&gt;.
+        ///e9 00 00 00 00          jmp    1b &lt;_main+0x1b&gt;.
         /// </summary>
         internal static string NoClip_ZDirection_R2 {
             get {

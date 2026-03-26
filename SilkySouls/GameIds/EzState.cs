@@ -17,6 +17,7 @@ public static class EzState
         public static readonly TalkCommand OpenEnhanceWeapon = new(24, [0]);
         public static readonly TalkCommand OpenEnhanceArmor = new(24, [10]);
         public static readonly TalkCommand OpenAttunement = new(28, [10000, 10099]);
+        public static readonly TalkCommand OpenSell = new(46, [-1, -1]);
         
     }
 }

@@ -63,7 +63,7 @@ public class TravelService(IMemoryService memoryService, HookManager hookManager
 
         IntPtr loadingFlagAddr =
             memoryService.FollowPointers(memoryService.Read<nint>(MenuMan.Base),
-                new[] { (int)MenuMan.MenuManData.LoadedFlag }, false);
+                new[] { MenuMan.LoadedFlag }, false);
 
         if (!WaitForLoadingFlag(loadingFlagAddr, 0))
         {

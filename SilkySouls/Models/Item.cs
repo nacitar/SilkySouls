@@ -1,20 +1,11 @@
 ﻿namespace SilkySouls.Models
 {
-    public class Item
+    public class Item(int id, int stackSize, UpgradeType upgradeType, string name)
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public UpgradeType UpgradeType { get; set; }
-        public int StackSize { get; set; }
+        public int Id { get; set; } = id;
+        public string Name { get; set; } = name;
+        public UpgradeType UpgradeType { get; set; } = upgradeType;
+        public int StackSize { get; set; } = stackSize;
         public string CategoryName { get; set; }
-        
-        public Item(int id, int stackSize, UpgradeType upgradeType, string name)
-        {
-            Id = id;
-            Name = name;
-            StackSize = stackSize;
-            UpgradeType = upgradeType;
-        }
-
     }
 }

@@ -19,8 +19,8 @@ namespace SilkySouls.ViewModels
         private readonly ItemService _itemService;
 
         private readonly Dictionary<string, ObservableCollection<Item>> _itemsByCategory;
-        private readonly Dictionary<string, InfusionType> _infusionTypes = new Dictionary<string, InfusionType>();
-        private readonly ObservableCollection<Item> _searchResultsCollection = new ObservableCollection<Item>();
+        private readonly Dictionary<string, InfusionType> _infusionTypes = new();
+        private readonly ObservableCollection<Item> _searchResultsCollection = new();
 
         private string _preSearchCategory;
         private bool _isSearchActive;

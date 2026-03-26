@@ -19,17 +19,8 @@ namespace SilkySouls.Memory
                 CoordCode = 0x3A0,
                 AngleCode = 0x3D0
             }
-            
-            public enum NoClip
-            {
-                ZDirectionVariable = 0x400,
-                InAirTimer = 0x420,
-                ZDirectionKbCheck = 0x460,
-                ZDirectionL2Check = 0x4C0,
-                ZDirectionR2Check = 0x4F0,
-                UpdateCoords = 0x570,
-            }
 
+        
             public enum ItemSpawn
             {
                 ShouldExitFlag = 0x6A0,
@@ -73,6 +64,17 @@ namespace SilkySouls.Memory
 
             public const int EzStateTalkCode = 0x1500;
             public const int EzStateTalkParams = 0x1600;
+
+            public const int ZDirection = 0x1A00;
+            public const int SpeedScale = 0x1A04;
+            public const int InAirTimer = 0x1A20;
+            public const int Kb = 0x1A60;
+            public const int TriggerL2 = 0x1AC0;
+            public const int TriggerR2 = 0x1BC0;
+            public const int UpdateCoords = 0x1C70;
+
+            public const int EnableFlag = 0x2400;
+            public const int LoadedEnableDraw = 0x2410;
 
     }
 }

@@ -15,6 +15,7 @@ public class EzStateService(IMemoryService memoryService) : IEzStateService
     public void ExecuteTalkCommand(EzState.TalkCommand command)
     {
         if (command == null) return;
+
         var code = CodeCaveOffsets.Base + CodeCaveOffsets.EzStateTalkCode;
         var paramsLoc = CodeCaveOffsets.Base + CodeCaveOffsets.EzStateTalkParams;
 
@@ -35,7 +36,7 @@ public class EzStateService(IMemoryService memoryService) : IEzStateService
             (command.CommandId, 0x11 + 1),
             (command.Params.Length, 0x3F + 1)
         ]);
-        
+
         memoryService.WriteBytes(code, bytes);
         memoryService.RunThread(code);
     }

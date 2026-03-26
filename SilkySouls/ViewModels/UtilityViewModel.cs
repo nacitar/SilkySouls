@@ -17,25 +17,32 @@ namespace SilkySouls.ViewModels
 
         private bool _areAttachedOptionsRestored;
 
-        private readonly UtilityService _utilityService;
+        private readonly UtilityServiceOld _utilityServiceOld;
+        private readonly IUtilityService _utilityService;
         private readonly PlayerViewModel _playerViewModel;
         private readonly IParamService _paramService;
         private readonly IEzStateService _ezStateService;
+        private readonly IDebugDrawService _debugDrawService;
         private readonly HotkeyManager _hotkeyManager;
 
         public const int EquipParamGoodsTableIdx = 3;
         public const int EstusParamRowIdx = 32;
         public const int LordVesselIconId = 2085;
         public const int IconIdOffset = 0x2C;
+        
+        private const float DefaultNoclipSpeedScale = 1f;
 
-        public UtilityViewModel(UtilityService utilityService, HotkeyManager hotkeyManager,
+        public UtilityViewModel(UtilityServiceOld utilityServiceOld, IUtilityService utilityService,
+            HotkeyManager hotkeyManager,
             PlayerViewModel playerViewModel, IParamService paramService, IStateService stateService,
-            IEzStateService ezStateService)
+            IEzStateService ezStateService, IDebugDrawService debugDrawService)
         {
+            _utilityServiceOld = utilityServiceOld;
             _utilityService = utilityService;
             _playerViewModel = playerViewModel;
             _paramService = paramService;
             _ezStateService = ezStateService;
+            _debugDrawService = debugDrawService;
             _hotkeyManager = hotkeyManager;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
@@ -83,29 +90,7 @@ namespace SilkySouls.ViewModels
             get => _areAttachedOptionsEnabled;
             set => SetProperty(ref _areAttachedOptionsEnabled, value);
         }
-
-        private bool _isDrawEnabled;
-
-        public bool IsDrawEnabled
-        {
-            get => _isDrawEnabled;
-            set
-            {
-                if (!SetProperty(ref _isDrawEnabled, value)) return;
-                if (value)
-                {
-                    _utilityService.EnableDraw();
-                }
-                else
-                {
-                    _utilityService.DisableDraw();
-                    IsHitboxEnabled = false;
-                    IsDrawEventEnabled = false;
-                    IsSoundViewEnabled = false;
-                }
-            }
-        }
-
+        
         private bool _isHitboxEnabled;
 
         public bool IsHitboxEnabled
@@ -114,14 +99,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isHitboxEnabled, value)) return;
-                if (_isHitboxEnabled)
-                {
-                    _utilityService.EnableHitboxView();
-                }
-                else
-                {
-                    _utilityService.DisableHitboxView();
-                }
+                _debugDrawService.ToggleDrawHitbox(_isHitboxEnabled);
             }
         }
 
@@ -133,14 +111,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isSoundViewEnabled, value)) return;
-                if (_isSoundViewEnabled)
-                {
-                    _utilityService.EnableSoundView();
-                }
-                else
-                {
-                    _utilityService.DisableSoundView();
-                }
+                _debugDrawService.ToggleDrawSoundView(_isSoundViewEnabled);
             }
         }
 
@@ -152,14 +123,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isDrawEventEnabled, value)) return;
-                if (_isDrawEventEnabled)
-                {
-                    _utilityService.EnableDrawEvent();
-                }
-                else
-                {
-                    _utilityService.DisableDrawEvent();
-                }
+                _debugDrawService.ToggleDrawEvents(_isDrawEventEnabled);
             }
         }
 
@@ -173,7 +137,8 @@ namespace SilkySouls.ViewModels
                 if (!SetProperty(ref _isNoClipEnabled, value)) return;
                 if (_isNoClipEnabled)
                 {
-                    _utilityService.EnableNoClip();
+                    _utilityService.WriteNoClipSpeed(NoClipSpeedScale);
+                    
                     _wasNoDeathEnabled = _playerViewModel.IsNoDeathEnabled;
                     _wasNoDmgEnabled = _playerViewModel.IsNoDamageEnabled;
                     _playerViewModel.IsNoDeathEnabled = true;
@@ -183,12 +148,12 @@ namespace SilkySouls.ViewModels
                 }
                 else
                 {
-                    _utilityService.DisableNoClip();
                     _playerViewModel.IsNoDeathEnabled = _wasNoDeathEnabled;
                     _playerViewModel.IsNoDamageEnabled = _wasNoDmgEnabled;
                     _playerViewModel.IsSilentEnabled = false;
                     _playerViewModel.IsInvisibleEnabled = false;
                 }
+                _utilityService.ToggleNoClip(_isNoClipEnabled);
             }
         }
 
@@ -200,7 +165,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isDeathCamEnabled, value)) return;
-                _utilityService.ToggleDeathCam(_isDeathCamEnabled);
+                _utilityService.ToggleDeathCamera(_isDeathCamEnabled);
             }
         }
 
@@ -212,7 +177,7 @@ namespace SilkySouls.ViewModels
             set
             {
                 if (!SetProperty(ref _isFilterRemoveEnabled, value)) return;
-                _utilityService.ToggleFilter(_isFilterRemoveEnabled);
+                _utilityServiceOld.ToggleFilter(_isFilterRemoveEnabled);
             }
         }
 
@@ -229,8 +194,23 @@ namespace SilkySouls.ViewModels
                     {
                         var estusRow = _paramService.GetParamRow(EquipParamGoodsTableIdx, 0, EstusParamRowIdx);
                         _paramService.WriteInt32(estusRow, IconIdOffset, LordVesselIconId);
-                        _utilityService.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
+                        _utilityServiceOld.SetGuaranteedBkhDrop(_isGuaranteedBkhEnabled);
                     }
+                }
+            }
+        }
+        
+        private float _noClipSpeedScale = DefaultNoclipSpeedScale;
+
+        public float NoClipSpeedScale
+        {
+            get => _noClipSpeedScale;
+            set
+            {
+                if (SetProperty(ref _noClipSpeedScale, value))
+                {
+                    if (!IsNoClipEnabled) return;
+                    _utilityService.WriteNoClipSpeed(_noClipSpeedScale);
                 }
             }
         }
@@ -248,17 +228,12 @@ namespace SilkySouls.ViewModels
         public void TryRestoreAttachedFeatures()
         {
             if (_areAttachedOptionsRestored) return;
-            if (IsDrawEnabled)
-            {
-                if (!_utilityService.EnableDraw()) return;
-            }
-
             _areAttachedOptionsRestored = true;
         }
 
         public void DisableNoClip()
         {
-            _utilityService.DisableNoClip();
+            _utilityService.ToggleNoClip(false);
             IsNoClipEnabled = false;
         }
 
@@ -266,13 +241,13 @@ namespace SilkySouls.ViewModels
 
         #region Private Methods
 
-        private void ShowLevelUpMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.LevelUpMenu);
+        private void ShowLevelUpMenu() => _utilityService.ShowMenu(MenuMan.IsLevelUpMenuOpen, 1);
         private void ShowAttunementMenu() => _ezStateService.ExecuteTalkCommand(TalkCommands.OpenAttunement);
         private void UpgradeWeapon() => _ezStateService.ExecuteTalkCommand(TalkCommands.OpenEnhanceWeapon);
         private void UpgradeArmor() => _ezStateService.ExecuteTalkCommand(TalkCommands.OpenEnhanceArmor);
-        private void OpenFeedMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.Feed);
-        private void OpenWarpMenu() => _utilityService.ShowMenu(MenuMan.MenuManData.Warp);
-        private void OpenBottomlessBox() => _utilityService.ShowMenu(MenuMan.MenuManData.BottomlessBox);
+        private void OpenFeedMenu() => _utilityService.ShowMenu(MenuMan.Feed, 1);
+        private void OpenWarpMenu() => _utilityService.ShowMenu(MenuMan.Warp, 2);
+        private void OpenBottomlessBox() => _utilityService.ShowMenu(MenuMan.BottomlessBox, 1);
 
         private void OpenShop(int[] shopParams) =>
             _ezStateService.ExecuteTalkCommand(TalkCommands.OpenRegularShop(shopParams[0], shopParams[1]));
@@ -291,18 +266,18 @@ namespace SilkySouls.ViewModels
         private void OnLoaded()
         {
             if (IsHitboxEnabled)
-                _utilityService.EnableHitboxView();
+                _debugDrawService.ToggleDrawHitbox(true);
             if (IsSoundViewEnabled)
-                _utilityService.EnableSoundView();
+                _debugDrawService.ToggleDrawSoundView(true);
             if (IsDrawEventEnabled)
-                _utilityService.EnableDrawEvent();
+                _debugDrawService.ToggleDrawEvents(true);
             if (IsFilterRemoveEnabled)
-                _utilityService.ToggleFilter(IsFilterRemoveEnabled);
+                _utilityServiceOld.ToggleFilter(IsFilterRemoveEnabled);
             if (IsDeathCamEnabled)
-                _utilityService.ToggleDeathCam(IsDeathCamEnabled);
+                _utilityService.ToggleDeathCamera(IsDeathCamEnabled);
             if (IsGuaranteedBkhEnabled)
             {
-                _utilityService.SetGuaranteedBkhDrop(true);
+                _utilityServiceOld.SetGuaranteedBkhDrop(true);
                 _ = Task.Run(() =>
                 {
                     Task.Delay(500).Wait();
@@ -312,7 +287,7 @@ namespace SilkySouls.ViewModels
             }
             else
             {
-                _utilityService.SetGuaranteedBkhDrop(false);
+                _utilityServiceOld.SetGuaranteedBkhDrop(false);
             }
 
             AreOptionsEnabled = true;

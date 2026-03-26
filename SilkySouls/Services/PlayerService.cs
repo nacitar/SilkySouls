@@ -29,6 +29,9 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
         new(0, Vector3.Zero, 0f)
     ];
 
+    public nint GetPlayerIns() =>
+        memoryService.Read<nint>(memoryService.Read<nint>(WorldChrMan.Base) + WorldChrMan.PlayerIns);
+
     public int GetHp() => memoryService.Read<int>(GetPlayerIns() + ChrIns.Health);
 
     public int GetMaxHp() => memoryService.Read<int>(GetPlayerIns() + ChrIns.MaxHealth);
@@ -44,7 +47,7 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
     public void SetSp(int sp) => memoryService.Write(GetPlayerIns() + ChrIns.Stamina, sp);
 
     public Vector3 GetPosition() => memoryService.Read<Vector3>(GetPlayerIns() + ChrIns.ReadOnlyCoords);
-    
+
     public void SavePosition(int index)
     {
         var posToSave = _positions[index];
@@ -52,7 +55,7 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
         var blockIdPtr = memoryService.FollowPointers(playerIns, WorldChrMan.CurrentBlockId, false);
         var physicsModule = memoryService.FollowPointers(playerIns, ChrIns.PhysicsModule, true);
         var havokCoords = memoryService.FollowPointers(physicsModule, ChrIns.HavokCoords, false);
-        
+
         posToSave.BlockId = memoryService.Read<uint>(blockIdPtr);
         posToSave.Coords = memoryService.Read<Vector3>(havokCoords);
         posToSave.Coords = memoryService.Read<Vector3>(physicsModule + ChrIns.Coords);
@@ -227,9 +230,6 @@ public class PlayerService(IMemoryService memoryService, ITravelService travelSe
 
         memoryService.AllocateAndExecute(bytes);
     }
-    
-    private nint GetPlayerIns() =>
-        memoryService.Read<nint>(memoryService.Read<nint>(WorldChrMan.Base) + WorldChrMan.PlayerIns);
 
     private void UpdatePlayerStats(int difference)
     {

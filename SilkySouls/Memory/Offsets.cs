@@ -86,6 +86,8 @@ namespace SilkySouls.memory
             public const int ToxicMax = 0x42C;
             public const int BleedMax = 0x430;
 
+            
+            public static readonly BitFlag NoGravity = new(0x2A5, 1 << 5);
             public static readonly BitFlag InfinitePoise = new(0x2A6, 1 << 0);
             public static readonly BitFlag NoDamage = new(0x524, 1 << 6);
             public static readonly BitFlag InfiniteStam = new(0x525, 1 << 2);
@@ -180,6 +182,11 @@ namespace SilkySouls.memory
             public const int LastBonfire = 0xB34;
         }
 
+        public static class PadMan
+        {
+            public static nint Base;
+        }
+
         public static class EventMan
         {
             public static nint Base;
@@ -195,17 +202,15 @@ namespace SilkySouls.memory
         {
             public static nint Base;
 
+            public const int IsLevelUpMenuOpen = 0x8C;
             public const int IsFadeActive = 0xB8;
+            public const int Warp = 0xC0;
+            public const int BottomlessBox = 0x98;
+            public const int Feed = 0x130;
+            public const int Quitout = 0x24C;
+            public const int LoadedFlag = 0x258;
 
-            public enum MenuManData
-            {
-                LevelUpMenu = 0x8C,
-                BottomlessBox = 0x98,
-                Warp = 0xC0,
-                Feed = 0x130,
-                Quitout = 0x24C,
-                LoadedFlag = 0x258
-            }
+
         }
         
 
@@ -294,6 +299,11 @@ namespace SilkySouls.memory
             public static nint Base;
         }
 
+        public static nint DbgMapWalkPadVtable;
+        public static nint BeginTargetSceneVtable;
+        public static nint EndTargetSceneVtable;
+        public static nint HGDrawPlanEntityVtable;
+        
         public static class Hooks
         {
             public static nint LastLockedTarget;
@@ -311,6 +321,7 @@ namespace SilkySouls.memory
             public static nint BattleActivate;
             public static nint Emevd;
             public static nint FourKingsGenerator;
+            public static nint HgDrawCommandExecutor;
         }
 
         public static class Patches
@@ -338,8 +349,14 @@ namespace SilkySouls.memory
             public static nint SetExternalEventTempParam;
             public static nint ExternalEventTempCtor;
             public static nint ExecuteTalkEvent;
+            public static nint GetYMovement;
+            public static nint GetXMovement;
+            public static nint MatrixVectorProduct;
+            public static nint AllocateMemory;
+            public static nint SetTag;
+            public static nint FinalizeEntry;
         }
-
+        
         private static void InitializeBaseAddresses(nint moduleBase)
         {
             WorldChrMan.Base = moduleBase + Version switch
@@ -501,9 +518,17 @@ namespace SilkySouls.memory
                 Version1_0_3_1 => 0x1C8ADC0,
                 _ => 0
             };
-
-
-
+            
+            PadMan.Base = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1CE0570,
+                Version1_0_1_1 => 0x1C70550,
+                Version1_0_1_2 => 0x1CF3CD0,
+                Version1_0_3_0 => 0x1D06EB0,
+                Version1_0_3_1 => 0x1C6AEA0,
+                _ => 0
+            };
+            
             Hooks.LastLockedTarget = moduleBase + Version switch
             {
                 Version1_0_1_0 => 0x316EB5,
@@ -648,6 +673,16 @@ namespace SilkySouls.memory
                 Version1_0_1_2 => 0x36D2F0,
                 Version1_0_3_0 => 0x3737B0,
                 Version1_0_3_1 => 0x372E70,
+                _ => 0
+            };
+            
+            Hooks.HgDrawCommandExecutor = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x11AF785,
+                Version1_0_1_1 => 0x11AF745,
+                Version1_0_1_2 => 0x11B3F45,
+                Version1_0_3_0 => 0x11BB2F5,
+                Version1_0_3_1 => 0x11BE7B5,
                 _ => 0
             };
 
@@ -839,6 +874,112 @@ namespace SilkySouls.memory
                 Version1_0_3_1 => 0x4DB340,
                 _ => 0
             };
+            
+            Functions.GetYMovement = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x19A6A0,
+                Version1_0_1_1 => 0x19A3A0,
+                Version1_0_1_2 => 0x19D740,
+                Version1_0_3_0 => 0x1A1E10,
+                Version1_0_3_1 => 0x1A3700,
+                _ => 0
+            };
+
+
+            
+            Functions.GetXMovement = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x19A6F0,
+                Version1_0_1_1 => 0x19A3F0,
+                Version1_0_1_2 => 0x19D790,
+                Version1_0_3_0 => 0x1A1E60,
+                Version1_0_3_1 => 0x1A3750,
+                _ => 0
+            };
+            
+            Functions.MatrixVectorProduct = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x93CA0,
+                Version1_0_1_1 => 0x93990,
+                Version1_0_1_2 => 0x93E80,
+                Version1_0_3_0 => 0x93E50,
+                Version1_0_3_1 => 0x93A30,
+                _ => 0
+            };
+            
+            
+            Functions.AllocateMemory = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xF89B60,
+                Version1_0_1_1 => 0xF899E0,
+                Version1_0_1_2 => 0xCB8BF0,
+                Version1_0_3_0 => 0xCC0230,
+                Version1_0_3_1 => 0xCC3E10,
+                _ => 0
+            };
+            
+            Functions.SetTag = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x11A4820,
+                Version1_0_1_1 => 0x11A46A0,
+                Version1_0_1_2 => 0x11A8FE0,
+                Version1_0_3_0 => 0x11B0240,
+                Version1_0_3_1 => 0x11B3710,
+                _ => 0
+            };
+
+            Functions.FinalizeEntry = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x11A47C0,
+                Version1_0_1_1 => 0x11A4640,
+                Version1_0_1_2 => 0x11A8F80,
+                Version1_0_3_0 => 0x11B01E0,
+                Version1_0_3_1 => 0x11B36B0,
+                _ => 0
+            };
+
+
+            BeginTargetSceneVtable = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x16878A8,
+                Version1_0_1_1 => 0x1617C60,
+                Version1_0_1_2 => 0x1699A08,
+                Version1_0_3_0 => 0x16AADB8,
+                Version1_0_3_1 => 0x160E5F0,
+                _ => 0
+            };
+
+            EndTargetSceneVtable = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1687820,
+                Version1_0_1_1 => 0x1617098,
+                Version1_0_1_2 => 0x1699930,
+                Version1_0_3_0 => 0x16AAC80,
+                Version1_0_3_1 => 0x160DA40,
+                _ => 0
+            };
+
+
+            DbgMapWalkPadVtable = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x12CDF58,
+                Version1_0_1_1 => 0x12CDE80,
+                Version1_0_1_2 => 0x12D3118,
+                Version1_0_3_0 => 0x12DA5B8,
+                Version1_0_3_1 => 0x12DE530,
+                _ => 0
+            };
+
+            HGDrawPlanEntityVtable = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x168A558,
+                Version1_0_1_1 => 0x16180F0,
+                Version1_0_1_2 => 0x169C098,
+                Version1_0_3_0 => 0x16AA6F0,
+                Version1_0_3_1 => 0x160EA80,
+                _ => 0
+            };
+
 
 
 #if DEBUG
@@ -860,6 +1001,11 @@ namespace SilkySouls.memory
             PrintOffset("WorldAiMan", WorldAiMan.Base);
             PrintOffset("EmkEventIns", EmkEventIns.Base);
             PrintOffset("EmkSystem", EmkSystem.Base);
+            PrintOffset("PadMan", PadMan.Base);
+            PrintOffset("DbgMapWalkPadVtable", DbgMapWalkPadVtable);
+            PrintOffset("BeginTargetSceneVtable", BeginTargetSceneVtable);
+            PrintOffset("EndTargetSceneVtable", EndTargetSceneVtable);
+            PrintOffset("HGDrawPlanEntityVtable", HGDrawPlanEntityVtable);
 
             Console.WriteLine("\n--- Hooks ---");
             PrintOffset("LastLockedTarget", Hooks.LastLockedTarget);
@@ -877,6 +1023,7 @@ namespace SilkySouls.memory
             PrintOffset("BattleActivate", Hooks.BattleActivate);
             PrintOffset("Emevd", Hooks.Emevd);
             PrintOffset("FourKingsGenerator", Hooks.FourKingsGenerator);
+            PrintOffset("HgDrawCommandExecutor", Hooks.HgDrawCommandExecutor);
 
             Console.WriteLine("\n--- Patches ---");
             PrintOffset("DrawEvent", Patches.DrawEvent);
@@ -900,6 +1047,12 @@ namespace SilkySouls.memory
             PrintOffset("SetExternalEventTempParam", Functions.SetExternalEventTempParam);
             PrintOffset("ExternalEventTempCtor", Functions.ExternalEventTempCtor);
             PrintOffset("ExecuteTalkEvent", Functions.ExecuteTalkEvent);
+            PrintOffset("GetYMovement", Functions.GetYMovement);
+            PrintOffset("GetXMovement", Functions.GetXMovement);
+            PrintOffset("MatrixVectorProduct", Functions.MatrixVectorProduct);
+            PrintOffset("AllocateMemory", Functions.AllocateMemory);
+            PrintOffset("SetTag", Functions.SetTag);
+            PrintOffset("FinalizeEntry", Functions.FinalizeEntry);
             
             Console.WriteLine("\n====================================\n");
 #endif

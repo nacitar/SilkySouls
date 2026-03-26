@@ -46,13 +46,21 @@ public static class Emevd
 
     public static class EmevdCommands
     {
-        
         //Conditions
         public static EmevdCommand IsPlayerStandingOnHit(int eventEntityId) => new(11, 2, (sbyte)0, eventEntityId);
-        
-        
+
         //Commands
 
-        public static EmevdCommand SetGeneratorState(int generatorId, bool state) => new(2003, 3, generatorId, (byte)(state ? 1 : 0));
+        public static EmevdCommand SetGeneratorState(int generatorId, bool state) =>
+            new(2003, 3, generatorId, (byte)(state ? 1 : 0));
+
+        public static EmevdCommand SetObjectIsEnabled(int objectId, bool state) =>
+            new(2005, 3, objectId, (byte)(state ? 1 : 0));
+
+        public static EmevdCommand DeleteMapSfx(int entityId, bool state) =>
+            new(2006, 1, entityId, (byte)(state ? 1 : 0));
+
+        public static EmevdCommand ReproduceObjectAnimation(
+            int objectId, int animationId) => new(2005, 7, objectId, animationId);
     }
 }
