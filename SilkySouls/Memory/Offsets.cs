@@ -314,6 +314,13 @@ namespace SilkySouls.memory
         {
             public static nint LastLockedTarget;
             public static nint AllNoDamage;
+            public static nint Hit;
+            public static nint ApplyHealthDelta;
+            public static nint KillChr;
+            public static nint CheckAuxAttacker;
+            public static nint CheckAuxProc;
+            public static nint SetThrowState;
+            public static nint ClearThrowState;
             public static nint Draw;
             public static nint InAirTimer;
             public static nint Keyboard;
@@ -362,6 +369,10 @@ namespace SilkySouls.memory
             public static nint SetTag;
             public static nint FinalizeEntry;
         }
+
+        public static nint FallDmgRetAddr;
+        public static nint AuxDeathRetAddr;
+        public static nint EnvDeathRetAddr;
         
         private static void InitializeBaseAddresses(nint moduleBase)
         {
@@ -550,6 +561,94 @@ namespace SilkySouls.memory
                 // WARNING: No match found for: Version1_0_1_0, Version1_0_1_1, Version1_0_1_2
                 Version1_0_3_0 => 0x3206C9,
                 Version1_0_3_1 => 0x322919,
+                _ => 0
+            };
+
+            Hooks.Hit = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x28065C5,
+                Version1_0_1_1 => 0x210131E,
+                Version1_0_1_2 => 0x2B90267,
+                Version1_0_3_0 => 0x2305994,
+                Version1_0_3_1 => 0x395221,
+                _ => 0
+            };
+
+            Hooks.ApplyHealthDelta = moduleBase + Version switch
+            {
+                Version1_0_3_0 => 0x32071C,
+                Version1_0_3_1 => 0x32296C,
+                _ => 0
+            };
+
+            Hooks.KillChr = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xF2E482,
+                Version1_0_1_1 => 0x3080D02,
+                Version1_0_1_2 => 0x3565DD4,
+                Version1_0_3_0 => 0x298DA68,
+                Version1_0_3_1 => 0x2653E32,
+                _ => 0
+            };
+
+            Hooks.CheckAuxAttacker = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x2A70883,
+                Version1_0_1_1 => 0x34C5E2E,
+                Version1_0_1_2 => 0xF60E84,
+                Version1_0_3_0 => 0xF87274,
+                Version1_0_3_1 => 0x48E8B4,
+                _ => 0
+            };
+
+            Hooks.CheckAuxProc = moduleBase + Version switch
+            {
+                Version1_0_3_0 => 0x90D184,
+                Version1_0_3_1 => 0x11B08D4,
+                _ => 0
+            };
+
+            Hooks.SetThrowState = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0xDE2A81,
+                Version1_0_1_1 => 0xCD88A1,
+                Version1_0_1_2 => 0x2D830E0,
+                Version1_0_3_0 => 0x69B491,
+                Version1_0_3_1 => 0x6FFB31,
+                _ => 0
+            };
+
+            Hooks.ClearThrowState = moduleBase + Version switch
+            {
+                Version1_0_3_0 => 0x275BE3E,
+                Version1_0_3_1 => 0x46A3AB,
+                _ => 0
+            };
+
+            FallDmgRetAddr = moduleBase + Version switch
+            {
+                Version1_0_3_0 => 0x32610E,
+                Version1_0_3_1 => 0x3282BE,
+                _ => 0
+            };
+
+            AuxDeathRetAddr = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x31CF9E,
+                Version1_0_1_1 => 0x31CC9E,
+                Version1_0_1_2 => 0x3201BE,
+                Version1_0_3_0 => 0x32D384,
+                Version1_0_3_1 => 0x32F594,
+                _ => 0
+            };
+
+            EnvDeathRetAddr = moduleBase + Version switch
+            {
+                Version1_0_1_0 => 0x1151975,
+                Version1_0_1_1 => 0x11517F5,
+                Version1_0_1_2 => 0x31A89D,
+                Version1_0_3_0 => 0x32084D,
+                Version1_0_3_1 => 0x1144085,
                 _ => 0
             };
 

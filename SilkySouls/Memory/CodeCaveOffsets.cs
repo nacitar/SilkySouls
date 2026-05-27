@@ -76,5 +76,21 @@ namespace SilkySouls.Memory
             public const int EnableFlag = 0x2400;
             public const int LoadedEnableDraw = 0x2410;
 
+            public enum HitlessPractice
+            {
+                CheckEnvDeathFlag = 0x2500,
+                CheckAuxProcFlag = 0x2501,
+                InThrowFlag = 0x2502,
+                HitCounter = 0x2510,
+                LastAttackerPtr = 0x2520,
+                HitCode = 0x2600,
+                ApplyHealthDeltaCode = 0x2900,
+                KillChrCode = 0x2B00,
+                CheckAuxAttackerCode = 0x2C00,
+                CheckAuxProcCode = 0x2D00,
+                ClearThrowStateCode = 0x2F00,
+                SetThrowStateCode = 0x3000,
+            }
+
     }
 }

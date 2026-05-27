@@ -4,6 +4,14 @@ namespace SilkySouls.Enums;
 
 public enum AsmScript
 {
+    DSRHit,
+    DSRApplyHealthDelta,
+    DSRKillChr,
+    DSRCheckAuxAttacker,
+    DSRAuxProc,
+    DSRClearThrowState,
+    DSRSetThrowState,
+
     LevelUp,
     RestoreSpellCasts,
     BreakRightHandWep,

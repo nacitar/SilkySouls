@@ -13,17 +13,20 @@ namespace SilkySouls.ViewModels
         private readonly IEnemyService _enemyService;
         private readonly HotkeyManager _hotkeyManager;
         private readonly IEmevdService _emevdService;
+        private readonly IPlayerHitBehaviorService _playerHitBehaviorService;
 
         public const int FourKingsHitEventEntityId = 1603300;
         public const int FourKingsGeneratorId = 1603000;
 
         public EnemyViewModel(IEnemyService enemyService, HotkeyManager hotkeyManager,
             IStateService stateService,
-            IEmevdService emevdService)
+            IEmevdService emevdService,
+            IPlayerHitBehaviorService playerHitBehaviorService)
         {
             _enemyService = enemyService;
             _hotkeyManager = hotkeyManager;
             _emevdService = emevdService;
+            _playerHitBehaviorService = playerHitBehaviorService;
 
             stateService.Subscribe(State.Loaded, OnLoaded);
             stateService.Subscribe(State.FadedIn, OnFadedIn);
@@ -111,6 +114,30 @@ namespace SilkySouls.ViewModels
                 SetGeneratorStateIfInArena(_is4KingsTimerStopped);
             }
         }
+
+        private bool _isNegateNonFatalHitDamageEnabled;
+
+        public bool IsNegateNonFatalHitDamageEnabled
+        {
+            get => _isNegateNonFatalHitDamageEnabled;
+            set
+            {
+                if (!SetProperty(ref _isNegateNonFatalHitDamageEnabled, value)) return;
+                _playerHitBehaviorService.SetNegateNonFatalHitDamageEnabled(_isNegateNonFatalHitDamageEnabled);
+            }
+        }
+
+        private bool _isHealEnemiesOnPlayerHitEnabled;
+
+        public bool IsHealEnemiesOnPlayerHitEnabled
+        {
+            get => _isHealEnemiesOnPlayerHitEnabled;
+            set
+            {
+                if (!SetProperty(ref _isHealEnemiesOnPlayerHitEnabled, value)) return;
+                _playerHitBehaviorService.SetHealEnemiesOnPlayerHitEnabled(_isHealEnemiesOnPlayerHitEnabled);
+            }
+        }
         
         #endregion
 
@@ -138,6 +165,8 @@ namespace SilkySouls.ViewModels
         private void OnLoaded()
         {
             AreOptionsEnabled = true;
+            IsNegateNonFatalHitDamageEnabled = _playerHitBehaviorService.IsNegateNonFatalHitDamageEnabled;
+            IsHealEnemiesOnPlayerHitEnabled = _playerHitBehaviorService.IsHealEnemiesOnPlayerHitEnabled;
             if (IsDisableAiEnabled) _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.DisableAi, true);
             if (IsAllNoDeathEnabled) _enemyService.ToggleEnemiesDebugFlag(Offsets.DebugFlags.AllNoDeath, true);
             if (Is4KingsTimerStopped) _enemyService.DisableFourKingsGenerator(true);

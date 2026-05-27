@@ -1707,4 +1707,215 @@ c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 203 &lt;exit&gt;
 45 31 ed                xor    r13d,r13d
 e9 00 00 00 00          jmp    228 &lt;early_exit+0xa&gt;</value>
   </data>
+  <data name="DSRHit" xml:space="preserve">
+    <value>c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
+80 3d 00 00 00 00 01    cmp    BYTE PTR [rip+0x0],0x1        # e &lt;_main+0xe&gt;
+0f 84 97 00 00 00       je     ab &lt;skip_all&gt;
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1c &lt;_main+0x1c&gt;
+48 85 c0                test   rax,rax
+0f 84 85 00 00 00       je     aa &lt;exit&gt;
+48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+48 85 c0                test   rax,rax
+74 7c                   je     aa &lt;exit&gt;
+83 b8 e8 03 00 00 00    cmp    DWORD PTR [rax+0x3e8],0x0
+74 73                   je     aa &lt;exit&gt;
+48 39 c1                cmp    rcx,rax
+75 6e                   jne    aa &lt;exit&gt;
+48 39 c2                cmp    rdx,rax
+74 69                   je     aa &lt;exit&gt;
+48 85 d2                test   rdx,rdx
+74 0c                   je     52 &lt;null_attacker&gt;
+48 89 15 00 00 00 00    mov    QWORD PTR [rip+0x0],rdx        # 4d &lt;_main+0x4d&gt;
+90                      nop
+90                      nop
+90                      nop
+90                      nop
+90                      nop
+
+000000000052 &lt;null_attacker&gt;:
+41 81 78 3c 88 13 00    cmp    DWORD PTR [r8+0x3c],0x1388
+00 
+74 47                   je     a3 &lt;set_env_flag&gt;
+41 81 78 3c e2 13 00    cmp    DWORD PTR [r8+0x3c],0x13e2
+00 
+74 3d                   je     a3 &lt;set_env_flag&gt;
+41 81 78 3c e3 13 00    cmp    DWORD PTR [r8+0x3c],0x13e3
+00 
+74 33                   je     a3 &lt;set_env_flag&gt;
+45 0f 57 ff             xorps  xmm15,xmm15
+45 0f 2f 38             comiss xmm15,DWORD PTR [r8]
+72 21                   jb     9b &lt;hit&gt;
+45 0f 2f 78 04          comiss xmm15,DWORD PTR [r8+0x4]
+72 1a                   jb     9b &lt;hit&gt;
+45 0f 2f 78 08          comiss xmm15,DWORD PTR [r8+0x8]
+72 13                   jb     9b &lt;hit&gt;
+45 0f 2f 78 0c          comiss xmm15,DWORD PTR [r8+0xc]
+72 0c                   jb     9b &lt;hit&gt;
+41 0f b6 40 1c          movzx  eax,BYTE PTR [r8+0x1c]
+ff c8                   dec    eax
+83 f8 0a                cmp    eax,0xa
+77 0f                   ja     aa &lt;exit&gt;
+
+00000000009b &lt;hit&gt;:
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # a1 &lt;hit+0x6&gt;
+eb 07                   jmp    aa &lt;exit&gt;
+
+0000000000a3 &lt;set_env_flag&gt;:
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # aa &lt;exit&gt;
+
+0000000000aa &lt;exit&gt;:
+58                      pop    rax
+
+0000000000ab &lt;skip_all&gt;:
+48 89 6c 24 10          mov    QWORD PTR [rsp+0x10],rbp
+e9 00 00 00 00          jmp    b5 &lt;skip_all+0xa&gt;</value>
+  </data>
+  <data name="DSRApplyHealthDelta" xml:space="preserve">
+    <value>48 89 7c 24 40          mov    QWORD PTR [rsp+0x40],rdi
+50                      push   rax
+48 b8 00 00 00 00 00    movabs rax,0x0
+00 00 00 
+48 39 44 24 30          cmp    QWORD PTR [rsp+0x30],rax
+74 2b                   je     42 &lt;process&gt;
+80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # 1e &lt;_main+0x1e&gt;
+74 11                   je     31 &lt;next&gt;
+48 b8 00 00 00 00 00    movabs rax,0x0
+00 00 00 
+48 39 44 24 30          cmp    QWORD PTR [rsp+0x30],rax
+74 11                   je     42 &lt;process&gt;
+
+000000000031 &lt;next&gt;:
+48 b8 00 00 00 00 00    movabs rax,0x0
+00 00 00 
+48 39 44 24 30          cmp    QWORD PTR [rsp+0x30],rax
+75 18                   jne    5a &lt;exit&gt;
+
+000000000042 &lt;process&gt;:
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 49 &lt;process+0x7&gt;
+48 85 c0                test   rax,rax
+74 0c                   je     5a &lt;exit&gt;
+48 3b 58 68             cmp    rbx,QWORD PTR [rax+0x68]
+75 06                   jne    5a &lt;exit&gt;
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 5a &lt;exit&gt;
+
+00000000005a &lt;exit&gt;:
+58                      pop    rax
+e9 00 00 00 00          jmp    60 &lt;exit+0x6&gt;</value>
+  </data>
+  <data name="DSRKillChr" xml:space="preserve">
+    <value>48 8d 64 24 f8          lea    rsp,[rsp-0x8]
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # d &lt;_main+0xd&gt;
+48 85 c0                test   rax,rax
+74 0c                   je     1e &lt;exit&gt;
+48 3b 48 68             cmp    rcx,QWORD PTR [rax+0x68]
+75 06                   jne    1e &lt;exit&gt;
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 1e &lt;exit&gt;
+
+00000000001e &lt;exit&gt;:
+58                      pop    rax
+e9 00 00 00 00          jmp    24 &lt;exit+0x6&gt;</value>
+  </data>
+  <data name="DSRCheckAuxAttacker" xml:space="preserve">
+    <value>c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 7 &lt;_main+0x7&gt;
+0f b6 80 56 01 00 00    movzx  eax,BYTE PTR [rax+0x156]
+48 83 7c 24 10 00       cmp    QWORD PTR [rsp+0x10],0x0
+74 3d                   je     53 &lt;early_exit&gt;
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 1e &lt;_main+0x1e&gt;
+48 85 c0                test   rax,rax
+74 2f                   je     52 &lt;exit&gt;
+48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+48 85 c0                test   rax,rax
+74 26                   je     52 &lt;exit&gt;
+48 3b 44 24 10          cmp    rax,QWORD PTR [rsp+0x10]
+75 1f                   jne    52 &lt;exit&gt;
+48 3b 44 24 18          cmp    rax,QWORD PTR [rsp+0x18]
+74 18                   je     52 &lt;exit&gt;
+48 8b 44 24 18          mov    rax,QWORD PTR [rsp+0x18]
+81 b8 c8 00 00 00 69    cmp    DWORD PTR [rax+0xc8],0x81269
+12 08 00 
+74 07                   je     52 &lt;exit&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 52 &lt;exit&gt;
+
+000000000052 &lt;exit&gt;:
+58                      pop    rax
+
+000000000053 &lt;early_exit&gt;:
+e9 00 00 00 00          jmp    58 &lt;early_exit+0x5&gt;</value>
+  </data>
+  <data name="DSRAuxProc" xml:space="preserve">
+    <value>44 8b 83 34 04 00 00    mov    r8d,DWORD PTR [rbx+0x434]
+80 3d 00 00 00 00 00    cmp    BYTE PTR [rip+0x0],0x0        # e &lt;_main+0xe&gt;
+74 2b                   je     3b &lt;early_exit&gt;
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 18 &lt;_main+0x18&gt;
+48 85 c0                test   rax,rax
+74 1d                   je     3a &lt;exit&gt;
+48 8b 40 68             mov    rax,QWORD PTR [rax+0x68]
+48 85 c0                test   rax,rax
+74 14                   je     3a &lt;exit&gt;
+48 39 d8                cmp    rax,rbx
+75 0f                   jne    3a &lt;exit&gt;
+f6 80 48 09 00 00 0f    test   BYTE PTR [rax+0x948],0xf
+74 06                   je     3a &lt;exit&gt;
+ff 05 00 00 00 00       inc    DWORD PTR [rip+0x0]        # 3a &lt;exit&gt;
+
+00000000003a &lt;exit&gt;:
+58                      pop    rax
+
+00000000003b &lt;early_exit&gt;:
+e9 00 00 00 00          jmp    40 &lt;early_exit+0x5&gt;</value>
+  </data>
+  <data name="DSRClearThrowState" xml:space="preserve">
+    <value>48 8b 8b 48 04 00 00    mov    rcx,QWORD PTR [rbx+0x448]
+48 85 c9                test   rcx,rcx
+74 21                   je     2d &lt;exit&gt;
+50                      push   rax
+48 8b 05 00 00 00 00    mov    rax,QWORD PTR [rip+0x0]        # 14 &lt;_main+0x14&gt;
+48 85 c0                test   rax,rax
+74 13                   je     2c &lt;pop_exit&gt;
+48 3b 58 68             cmp    rbx,QWORD PTR [rax+0x68]
+75 0d                   jne    2c &lt;pop_exit&gt;
+80 79 20 06             cmp    BYTE PTR [rcx+0x20],0x6
+74 07                   je     2c &lt;pop_exit&gt;
+c6 05 00 00 00 00 00    mov    BYTE PTR [rip+0x0],0x0        # 2c &lt;pop_exit&gt;
+
+00000000002c &lt;pop_exit&gt;:
+58                      pop    rax
+
+00000000002d &lt;exit&gt;:
+e9 00 00 00 00          jmp    32 &lt;exit+0x5&gt;</value>
+  </data>
+  <data name="DSRSetThrowState" xml:space="preserve">
+    <value>81 8b dc 01 00 00 00    or     DWORD PTR [rbx+0x1dc],0x200000
+00 20 00 
+50                      push   rax
+51                      push   rcx
+48 8b 43 10             mov    rax,QWORD PTR [rbx+0x10]
+48 85 c0                test   rax,rax
+74 39                   je     4e &lt;exit&gt;
+48 8b 40 10             mov    rax,QWORD PTR [rax+0x10]
+48 85 c0                test   rax,rax
+74 30                   je     4e &lt;exit&gt;
+48 8b 80 48 04 00 00    mov    rax,QWORD PTR [rax+0x448]
+48 85 c0                test   rax,rax
+74 24                   je     4e &lt;exit&gt;
+8b 40 24                mov    eax,DWORD PTR [rax+0x24]
+48 8b 0d 00 00 00 00    mov    rcx,QWORD PTR [rip+0x0]        # 34 &lt;_main+0x34&gt;
+48 85 c9                test   rcx,rcx
+74 15                   je     4e &lt;exit&gt;
+48 8b 49 68             mov    rcx,QWORD PTR [rcx+0x68]
+48 85 c9                test   rcx,rcx
+74 0c                   je     4e &lt;exit&gt;
+3b 41 08                cmp    eax,DWORD PTR [rcx+0x8]
+75 07                   jne    4e &lt;exit&gt;
+c6 05 00 00 00 00 01    mov    BYTE PTR [rip+0x0],0x1        # 4e &lt;exit&gt;
+
+00000000004e &lt;exit&gt;:
+59                      pop    rcx
+58                      pop    rax
+e9 00 00 00 00          jmp    55 &lt;exit+0x7&gt;</value>
+  </data>
 </root>

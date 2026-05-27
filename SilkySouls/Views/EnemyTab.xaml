@@ -68,6 +68,19 @@
                             <CheckBox Content="Stop 4 kings spawn timer"
                                       IsChecked="{Binding Is4KingsTimerStopped}"
                                       Margin="0,2" />
+
+                            <TextBlock Text="Hitless Practice"
+                                       FontWeight="Bold"
+                                       Margin="0,8,0,4" />
+
+                            <CheckBox Content="On non-fatal player hit: no player damage"
+                                      ToolTip="When the player is hit but would survive, negate that damage to the player."
+                                      IsChecked="{Binding IsNegateNonFatalHitDamageEnabled}"
+                                      Margin="0,2" />
+
+                            <CheckBox Content="Heal enemies when player hit"
+                                      IsChecked="{Binding IsHealEnemiesOnPlayerHitEnabled}"
+                                      Margin="0,2" />
                         </UniformGrid>
                     </StackPanel>
                 </Border>
